@@ -1,0 +1,19 @@
+[
+    {
+        "name": "sqlDataRequest",
+        "requiredServices": [
+            "dynamos-query",
+            "dynamos-algorithm"
+        ],
+        "optionalServices": {
+            "dynamos-anonymize": "anonymize",
+            "dynamos-graph": "graph",
+            "dynamos-aggregate": "aggregate"
+        }
+    },
+    {
+        "name": "genericRequest",
+        "requiredServices": [],
+        "optionalServices": {}
+    }
+]
