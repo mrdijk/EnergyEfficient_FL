@@ -1,5 +1,8 @@
 # Getting Started with DYNAMOS
 ## Preparation (installing prerequisites)
+### Install Go
+Follow this guide: https://go.dev/dl/. Select the correct OS, for Windows you should download the .msi (Microsoft Installer) file .
+
 ### Installing and running Kubernetes
 1. Make sure Docker is installed: https://docs.docker.com/desktop/ 
 
@@ -141,5 +144,34 @@ Set-ExecutionPolicy RemoteSigned
 # 5. Close VSC / 6. Open VSC how you normally do and rerun the script
 ```
 
-
 ## Building DYNAMOS components
+Run these commands individually:
+```sh
+cd go
+make agent
+
+# 'make all' will build everything
+# 'make proto' will just generate the gRPC files
+
+# Re-deploy by uninstalling agent
+helm uninstall agent
+helm upgrade -i -f "$agentsValues" agents $agentsPath
+
+# Or just restart the pod:
+kubectl rollout restart deployment agent -n agent
+```
+
+## Accessing Kubernetes Dashboard
+Run these commands individually:
+```sh
+# Add kubernetes-dashboard repository
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+
+# Deploy a Helm Release named "kubernetes-dashboard" using the kubernetes-dashboard chart
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+
+# Enable access to the Kubernetes dashboard
+kubectl proxy
+# Will be available at: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+```
+# TODO: dashboard not yet working. TODO: go to WSL and open in remote window and then use terminal from there. (change everything to Linux (download can be windows???)).
