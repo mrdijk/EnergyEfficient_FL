@@ -65,6 +65,11 @@ kubectl exec -n monitoring $GF_POD -- mkdir -p /tmp/dashboards
 # Copy the kepler_dashboard.json file to the specified location in the Grafana pod
 # Make sure you are in the correct directory (where kepler_dashboard.json is loacted, e.g. cd .\energy-efficiency\)
 kubectl cp kepler_dashboard.json monitoring/$($GF_POD):/tmp/dashboards/kepler_dashboard.json
+
+# Then add the dashboard to the Grafana instance: 
+# 1. go to http://localhost:3000/
+# 2. Navigate to Dashboards > New > Import
+# 3. Import the kepler_dashboard.json file
 ```
 
 It may take a while before Kepler is running, in the first attempt it took 7 minutes:
