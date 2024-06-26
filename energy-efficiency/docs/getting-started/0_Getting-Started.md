@@ -19,6 +19,14 @@ $<variableName>
 # After completing getting started steps
 These tutorials can be used after the getting started steps have been followed.
 
+# You can access the minikube VM using SSH:
+```sh
+# Make sure minikube is running (minikube start). In this project we use Docker for the containers/VMs
+
+# Open the SSH in minikube to access the minikube VM
+minikube ssh
+```
+
 ## Accessing Prometheus web UI
 ```sh
 kubectl port-forward deploy/prometheus-server 9090:9090

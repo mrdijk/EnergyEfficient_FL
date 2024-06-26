@@ -44,7 +44,7 @@ docker run --rm rabbitmq:3-management rabbitmqctl hash_password $pw
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 # Install in monitoring namespace
-helm upgrade -i -f "$corePath/prometheus-values.yaml" prometheus prometheus-community/prometheus
+helm upgrade -i -f "$corePath/prometheus-values.yaml" monitoring prometheus-community/prometheus
 
 # Install Nginx
 helm install -f "$corePath\ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress -n ingress --version 0.18.0
