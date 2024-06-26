@@ -6,7 +6,7 @@
     "users": [
         {
             "name": "normal_user",
-            "password_hash": "%PASSWORD%",
+            "password_hash": "WJAYafpt+iI6EsexRS71Fxlta/OUgkhWM0ErG02bu7UfnNn7",
             "hashing_algorithm": "rabbit_password_hashing_sha256",
             "tags": [],
             "limits": {}
