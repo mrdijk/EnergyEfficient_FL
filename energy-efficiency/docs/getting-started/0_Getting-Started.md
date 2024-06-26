@@ -9,19 +9,31 @@ $<variableName>
 ## Table of Contents
 - [Prerequisites](./1_Prerequisites.md)
 - [Preparing Kubernetes Cluster](./2_PreparingKubernetesCluster.md)
-- [Preparing RabbitMQ](./3_PreparingRabbitMQ.md.md)
+- [Preparing RabbitMQ](./3_PreparingRabbitMQ.md)
 - [Deploying Other Components](./4_DeployingOtherComponents.md)
 - [Building DYNAMOS Components](./5_BuildingDYNAMOSComponents.md)
 
+# TODO: stranded at final step: cd go/make agent (the part of making the services)
+
+
+# After completing getting started steps
+These tutorials can be used after the getting started steps have been followed.
+
+## Accessing Prometheus web UI
+```sh
+kubectl port-forward deploy/prometheus-server 9090:9090
+```
+After running this command you can access it via:
+http://localhost:9090/
 
 ## Accessing Kubernetes Dashboard
-Run these commands individually:
 Local environment (this is the one currently used):
 ```sh
 minikube dashboard
 ```
+It may take a while for it to start up (it will automatically open a webbrowser tab for you).
 
-Production environment:
+Production environment. Run these commands individually::
 ```sh
 # Add kubernetes-dashboard repository
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
@@ -33,4 +45,3 @@ helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dash
 kubectl proxy
 # Will be available at: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 ```
-# TODO: stranded at final step: cd go/make agent (the part of making the services)
