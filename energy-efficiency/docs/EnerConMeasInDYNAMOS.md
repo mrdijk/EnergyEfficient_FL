@@ -15,6 +15,10 @@ Therefore, it is unfortunately not possible to use Scaphandre in the current set
 ## Configure minikube to use cgroup2 driver
 See this guide for detailed instructions: https://kubernetes.io/docs/concepts/architecture/cgroups/
 The cgroup v2 version is required for metrics to not end up with zeros for Kepler.
+
+1. Delete the old minikube cluster (minikube delete).
+
+2. 
 ```sh
 # Run minikube with:
 TODO
