@@ -13,5 +13,7 @@ minikube start
 Possibly also restarting other things, such as forwarding Grafana.
 
 # Grafana (or other forwarded port taking too long)
+```sh
 E0626 17:29:45.184192   11096 portforward.go:351] error creating error stream for port 3000 -> 3000: Timeout occurred
+```
 This is an example of the error that can occur when the loading takes too long

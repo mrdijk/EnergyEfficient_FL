@@ -1,9 +1,8 @@
 # Getting Started with DYNAMOS
 
-It is recommended for the energy efficiency project to use the VSC powershell for these commands! You can print variables in powershell by running this command:
+It is recommended to use WSL (Linux OS). Install WSL and open the terminal, for example in VSC, by running:
 ```sh
-$<variableName>
-# e.g. $corePath
+wsl
 ```
 
 ## Table of Contents
@@ -41,7 +40,7 @@ minikube dashboard
 ```
 It may take a while for it to start up (it will automatically open a webbrowser tab for you).
 
-Production environment. Run these commands individually::
+Production environments. Run these commands individually::
 ```sh
 # Add kubernetes-dashboard repository
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/

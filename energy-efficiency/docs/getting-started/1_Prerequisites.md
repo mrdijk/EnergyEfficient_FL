@@ -9,12 +9,11 @@ wsl
 
 2. Execute these commands individually:
 ```sh
-# Update the url (e.g. wget https://dl.google.com/go/go1.22.4.linux-amd64.tar.gz)
+# Install Go
+# e.g. wget https://dl.google.com/go/go1.22.4.linux-amd64.tar.gz
 wget https://dl.google.com/go/<version>.linux-amd64.tar.gz
-
 # e.g. sudo tar -xvf go1.22.4.linux-amd64.tar.gz
 sudo tar -xvf <version>.linux-amd64.tar.gz
-
 sudo mv go /usr/local
 
 # Open .bashrc file
@@ -32,6 +31,8 @@ exit
 wsl
 # Check go version to verify installation
 go version
+
+# Then you can remove the downloaded tar file from step 1 if you want, this is not required anymore after unpacking it.
 ```
 
 ## Installing and running Kubernetes
