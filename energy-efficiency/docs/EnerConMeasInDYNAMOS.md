@@ -21,7 +21,7 @@ The cgroup v2 version is required for metrics to not end up with zeros for Keple
 2. 
 ```sh
 # Run minikube with:
-TODO
+minikube start --extra-config=kubelet.cgroup-driver=systemd
 ```
 
 ## Installing Kepler in Kubernetes (minikube used in this example)
