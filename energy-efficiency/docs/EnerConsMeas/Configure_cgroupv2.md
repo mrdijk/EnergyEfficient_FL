@@ -33,7 +33,7 @@ stat -fc %T /sys/fs/cgroup/
 ```
 it should output: cgroup2fs
 
-Then restart Docker Engine (restart Docker Engine) and run (add sudo before the command if it says permission denied):
+Then restart Docker Engine (restart Docker Engine) and run (if it says permission denied, see the .md guide for DockerDesktopWSL. Here it explains how you can configure the user from wsl in the docker group):
 ```sh
 docker info | grep -i cgroup
 ```

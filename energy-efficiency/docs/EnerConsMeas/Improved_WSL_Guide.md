@@ -38,5 +38,14 @@ sudo apt update && sudo apt upgrade
 ```
 It is recommended to run this command once in a while to update all packages.
 
+## Exit and restart wsl
+```sh
+# Exit wsl session (from inside wsl session in VSC powershell for example)
+exit
+
+# Restart wsl
+wsl --shutdown
+```
+
 ## Copy and paste in WSL (Linux environment)
 In these environments, you cannot copy and paste with ctrl+c/ctrl+v. You need to do this manually with the right mouse click and then select copy/paste. In most terminals pasting can be done using right mouse click. However, you can copy it from your windows environment, it is only in the WSL environment where you cannot do this, such as when running WSL in the terminal, so most of the times you can use ctrl+c to copy.
