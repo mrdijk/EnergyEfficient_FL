@@ -13,9 +13,9 @@ $(targets):
 	cp -r $(datasets) ./$@
 
 	(trap 'rm -f ./$@/Dockerfile; rm -rf ./$@/grpc_lib; rm -rf ./$@/datasets;' EXIT;  \
-	docker build --build-arg NAME='$@' -t jorrit05/dynamos-$@:$(branch_name) -t jorrit05/dynamos-$@:latest ./$@/ )
-	docker push jorrit05/dynamos-$@:$(branch_name)
-	docker push jorrit05/dynamos-$@:latest
+	docker build --build-arg NAME='$@' -t poetoec/dynamos-$@:$(branch_name) -t poetoec/dynamos-$@:latest ./$@/ )
+	docker push poetoec/dynamos-$@:$(branch_name)
+	docker push poetoec/dynamos-$@:latest
 
 
 all: all $(targets) $(proto)

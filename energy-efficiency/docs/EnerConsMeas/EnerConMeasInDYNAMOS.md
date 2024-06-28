@@ -114,8 +114,6 @@ kubectl cp kepler_dashboard.json monitoring/$($GF_POD):/tmp/dashboards/kepler_da
 
 <!-- ## Installing scaphandre in Kubernetes cluster
 ```sh
-# Create a new folder/project and open it in VSC.
-
 # Clone the git repository in the new project
 git clone https://github.com/hubblo-org/scaphandre
 
@@ -127,11 +125,23 @@ helm install scaphandre helm/scaphandre --namespace monitoring
 # Or: move the scaphandre folder into the charts folder and then run
 helm install scaphandre --namespace monitoring
 
+# Install Prometheus
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add kube-state-metrics https://kubernetes.github.io/kube-state-metrics
+helm repo update
+helm install prometheus prometheus-community/prometheus --set alertmanager.persistentVolume.enabled=false --set server.persistentVolume.enabled=false
+
+# Access prometheus
+kubectl port-forward deploy/prometheus-server 9090:9090
+
+# Remove cloned scaphandre afterwards to save space (not needed anymore)
+rm -rf ./scaphandre
+
 # Verify installation
 helm list
-``` 
+```  -->
 
-TODO: prometheus-values.yaml file needs to be configured to add scaphandre?
+<!-- TODO: prometheus-values.yaml file needs to be configured to add scaphandre?
 C:\Users\cpoet\IdeaProjects\EnergyEfficiency_DYNAMOS\charts\core\prometheus-values.yaml
 Add this?
 ```yaml
@@ -146,5 +156,4 @@ Add this?
     - source_labels: [__meta_kubernetes_service_label_app]
       action: keep
       regex: scaphandre
-```
--->
+``` -->

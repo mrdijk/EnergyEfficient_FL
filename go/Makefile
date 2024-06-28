@@ -15,9 +15,9 @@ $(targets): prepare
 	cp Dockerfile go.mod go.sum ./cmd/$@
 	cp -r pkg ./cmd/$@
 	(trap 'rm -f ./cmd/$@/Dockerfile; rm -f ./cmd/$@/go.*; rm -rf ./cmd/$@/pkg' EXIT; \
-	docker build --build-arg NAME='$@' -t jorrit05/dynamos-$@:$(branch_name) -t jorrit05/dynamos-$@:latest ./cmd/$@/)
-	docker push jorrit05/dynamos-$@:$(branch_name)
-	docker push jorrit05/dynamos-$@:latest
+	docker build --build-arg NAME='$@' -t poetoec/dynamos-$@:$(branch_name) -t poetoec/dynamos-$@:latest ./cmd/$@/)
+	docker push poetoec/dynamos-$@:$(branch_name)
+	docker push poetoec/dynamos-$@:latest
 
 all: $(targets)
 api: $(api_targets)
