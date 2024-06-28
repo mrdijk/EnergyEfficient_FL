@@ -8,14 +8,14 @@ wsl
 echo $<variableName>
 ```
 
+You can run the steps explained in the different files (running the scripts). Or you can run the commands from the scripts individually (e.g. when you already completed some of the steps of the script to avoid problems).
+
 ## Table of Contents
 - [Prerequisites](./1_Prerequisites.md)
 - [Preparing Kubernetes Cluster](./2_PreparingKubernetesCluster.md)
 - [Preparing RabbitMQ](./3_PreparingRabbitMQ.md)
 - [Deploying Other Components](./4_DeployingOtherComponents.md)
 - [Building DYNAMOS Components](./5_BuildingDYNAMOSComponents.md)
-
-# TODO: stranded at final step: cd go/make agent (the part of making the services)
 
 
 # After completing getting started steps
