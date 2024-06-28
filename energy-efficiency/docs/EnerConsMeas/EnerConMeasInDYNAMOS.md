@@ -27,7 +27,7 @@ minikube start --extra-config=kubelet.cgroup-driver=systemd
 ## Installing Kepler in Kubernetes (minikube used in this example)
 ```sh
 # Kepler setup:
-# Install prometheus (already done in step 3_PreparingRabbitMQ of getting started, but to make sure do it again)
+# Install prometheus
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 helm upgrade -i -f "$corePath/prometheus-values.yaml" monitoring prometheus-community/prometheus
