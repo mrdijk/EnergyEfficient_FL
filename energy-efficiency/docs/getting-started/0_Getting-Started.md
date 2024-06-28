@@ -3,6 +3,9 @@
 It is recommended to use WSL (Linux OS). Install WSL and open the terminal, for example in VSC, by running:
 ```sh
 wsl
+
+# Extra info: you can print variables in wsl with:
+echo $<variableName>
 ```
 
 ## Table of Contents

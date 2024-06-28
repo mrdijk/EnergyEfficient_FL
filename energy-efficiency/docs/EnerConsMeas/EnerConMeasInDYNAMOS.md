@@ -63,7 +63,10 @@ Then search for kepler metrics to view the Kepler metrics:
 
 See this guide for detailed information about Kepler metrics: https://sustainable-computing.io/design/metrics/
 
-## Optional: Configuring Grafana
+# TODO: convert everything to WSL and then retest running DYNAMOS.
+
+
+<!-- ## Optional: Configuring Grafana
 This is only optional. Grafana requires extra steps to setup and is way slower than Prometheus, so this is only if it is ever needed, but not mandatory. Prometheus is more than good enough!
 ```sh
 # Grafana setup
@@ -105,7 +108,7 @@ kubectl cp kepler_dashboard.json monitoring/$($GF_POD):/tmp/dashboards/kepler_da
 # 1. go to http://localhost:3000/
 # 2. Navigate to Dashboards > New > Import
 # 3. Import the kepler_dashboard.json file
-``` 
+```  -->
 
 
 

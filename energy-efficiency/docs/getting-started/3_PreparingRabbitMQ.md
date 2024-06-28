@@ -2,20 +2,16 @@
 First, create the namespaces required for all operations:
 ```sh
 # First, create the namespace in the Kubernetes cluster (if not exists)
-kubectl create namespace orchestrator; `
-kubectl create namespace uva; `
-kubectl create namespace vu; `
-kubectl create namespace surf; `
-kubectl create namespace agents; `
-kubectl create namespace ingress; `
-kubectl create namespace core
+kubectl create namespace core && kubectl create namespace orchestrator && kubectl create namespace uva && kubectl create namespace vu && kubectl create namespace surf && kubectl create namespace ingress
 ```
 
 Then perform the preparations. Run these commands individually:
 ```sh
-# e.g. $corePath="C:\Users\cpoet\IdeaProjects\EnergyEfficiency_DYNAMOS\charts\core"
-$corePath="<path to core in DYNAMOS project>"
-$coreValues="$corePath/values.yaml"
+# Define corePath with the path to core in DYNAMOS project
+# Example: corePath="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core"
+corePath="<path to core in DYNAMOS project>"
+coreValues="$corePath/values.yaml"
+# Upgrade or install core
 helm upgrade -i -f "$coreValues" core $corePath
 
 # Uninstall core (it will fail anyway)
@@ -25,7 +21,7 @@ helm uninstall core
 # Import System.Web assembly
 Add-Type -AssemblyName System.Web
 # Generate a random 12-character password
-$pw = [System.Web.Security.Membership]::GeneratePassword(12, 1)
+pw=$(openssl rand -base64 12)
 
 # Add password to all namespaces
 kubectl create secret generic rabbit --from-literal=password=$pw -n orchestrator
@@ -47,7 +43,7 @@ helm repo update
 helm upgrade -i -f "$corePath/prometheus-values.yaml" monitoring prometheus-community/prometheus
 
 # Install Nginx
-helm install -f "$corePath\ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress -n ingress --version 0.18.0
+helm install -f "$corePath/ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress -n ingress --version 0.18.0
 
 # Install core
 helm upgrade -i -f "$coreValues" core $corePath
