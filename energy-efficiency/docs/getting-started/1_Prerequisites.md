@@ -35,6 +35,14 @@ go version
 # Then you can remove the downloaded tar file from step 1 if you want, this is not required anymore after unpacking it.
 ```
 
+## Install make
+```sh
+# Open wsl
+wsl
+# Install make
+sudo apt install make
+```
+
 ## Installing and running Kubernetes
 1. Make sure Docker is installed: https://docs.docker.com/desktop/
 (And the Docker Desktop is using WSL2 as backend: https://docs.docker.com/desktop/wsl/).
