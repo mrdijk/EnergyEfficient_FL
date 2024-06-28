@@ -18,7 +18,7 @@ kubectl create namespace vu &&
 kubectl create namespace surf && 
 kubectl create namespace ingress
 
-# Replace with URL from your project
+# Initialize coreValues
 coreValues="$corePath/values.yaml"
 # Upgrade or install core
 helm upgrade -i -f "$coreValues" core $corePath

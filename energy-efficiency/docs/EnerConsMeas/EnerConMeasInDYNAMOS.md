@@ -16,24 +16,11 @@ The cgroup v2 version is required for metrics to not end up with zeros for Keple
 minikube start --driver=docker
 ```
 
-## Installing Kepler and Prometheus in Kubernetes (minikube used in this example)
+## Prometheus to view measurements
+For the energy consumption measurements the prometheus-values.yaml file has been configured appropriately, see: C:\Users\cpoet\IdeaProjects\EnergyEfficiency_DYNAMOS\charts\core\prometheus-values.yaml
+
+Run the following commands to view the measurements:
 ```sh
-# Kepler setup:
-# Install prometheus
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-helm upgrade -i -f "$corePath/prometheus-values.yaml" monitoring prometheus-community/prometheus
-# Install prometheus stack
-helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace --wait
-
-# Add Kepler
-helm repo add kepler https://sustainable-computing-io.github.io/kepler-helm-chart
-helm repo update
-helm search repo kepler
-# Install Kepler
-helm install kepler kepler/kepler --namespace kepler --create-namespace --set serviceMonitor.enabled=true --set serviceMonitor.labels.release=prometheus 
-# After this final installation you should be able to view the Kepler namespace in minikube dashboard
-
 # Verify ServiceMonitor Configuration
 kubectl get servicemonitors -n kepler
 
