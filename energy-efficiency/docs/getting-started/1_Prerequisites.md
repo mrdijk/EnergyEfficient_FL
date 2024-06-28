@@ -49,7 +49,7 @@ sudo apt install make
 
 2. Make sure Kubernetes is installed (kubectl and minikube for local development). 
 
-Install minikube (local Kubernetes development): https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fbinary+download
+Install minikube (local Kubernetes development): https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fbinary+download. Setup cgroupv2 driver (see Configure_cgroupv2.md file for a tutorial).
 
 Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 

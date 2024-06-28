@@ -1,13 +1,5 @@
 # Energy Consumption Measurements in DYNAMOS
 
-# TODO: if it is not possible for some reason to use Scaphandre, a backup could be Kernel: https://sustainable-computing.io/
-Probably NOT possible, since:
-![alt text](./assets/ScaphandreMinikubePowercapError.png)
-
-This is because powercap is not visible and does not exist:
-![alt text](./assets/MinikubeSSHPowercapNotExists.png)
-
-Therefore, it is unfortunately not possible to use Scaphandre in the current setup. This is probably due to the fact that Scaphandre is only run on physical machines and running Kubernetes using minikube with the Docker engine is creating a Virtual Machine (VM) environment. Therefore, an alternative is considered: Kubernetes Efficient Power Level Exporter (Kepler). This is a Prometheus exporter that is specialized for Kubernetes.
 # TODO: add in master thesis when Kernel is working. With above explanation and add short explanation on Kernel using the documentation as a reference!
 # TODO: add documentation on how I added energy consumption measurements to DYNAMOS in Prometheus.
 # TODO: probably I need to add grafana so that I can persist the metrics from Kernel in Prometheus with Grafana.
@@ -21,10 +13,10 @@ The cgroup v2 version is required for metrics to not end up with zeros for Keple
 2. 
 ```sh
 # Run minikube with:
-minikube start --extra-config=kubelet.cgroup-driver=systemd
+minikube start --driver=docker
 ```
 
-## Installing Kepler in Kubernetes (minikube used in this example)
+## Installing Kepler and Prometheus in Kubernetes (minikube used in this example)
 ```sh
 # Kepler setup:
 # Install prometheus

@@ -16,3 +16,4 @@ chmod +x prepareKubernetesCluster.sh
 Set-ExecutionPolicy RemoteSigned
 # 5. Close VSC / 6. Open VSC how you normally do and rerun the script
 ```
+It may take a minute or two for the control plan to finish installing, it generally took about 10 minutes when I tried it.

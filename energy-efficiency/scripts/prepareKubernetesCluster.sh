@@ -9,4 +9,4 @@ linkerd check
 # Install jaegar
 linkerd jaeger install | kubectl apply -f -
 # Optional command:
-linkerd viz install | kubectl apply -f -
+# linkerd viz install | kubectl apply -f -
