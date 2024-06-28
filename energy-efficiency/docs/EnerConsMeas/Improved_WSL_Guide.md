@@ -49,3 +49,4 @@ wsl --shutdown
 
 ## Copy and paste in WSL (Linux environment)
 In 2024 it was possible to use ctrl+c/ctrl+v to copy and paste when opening the terminal in wsl. However, in some Linux environments it is not possible and you need to do this manually with the right mouse click and then select copy/paste. Test this out to see what works and what does not in your specific environments. In some environments it automatically pastes the copied content for you when using the right mouse click (e.g. in a terminal).
+In some cases it even works to use ctrl+arrow to quickly navigate through the terminal lines for example!

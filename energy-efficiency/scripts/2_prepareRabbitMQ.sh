@@ -19,15 +19,18 @@ helm repo update
 # Install and upgrade prometheus stack (required for Kepler). 
 # This may take a while, since prometheus-stack contains various tools (sometimes even up to 10 minutes)
 # Also, the path to the prometheus-values.yaml file is provided to add extra configurations
-helm upgrade -i -f "$corePath/prometheus-values.yaml" prometheus prometheus-community/kube-prometheus-stack --namespace monitoring 
+# (if you get this error: 'cannot re-use a name that is still in use', the namespace already exists and you can remove it and rerun:)
+helm upgrade -i -f "$corePath/prometheus-values.yaml" prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
 
 # Add Kepler
 helm repo add kepler https://sustainable-computing-io.github.io/kepler-helm-chart
 helm repo update
 helm search repo kepler
-# Install Kepler
+# Install Kepler 
+# (if you get this error: 'cannot re-use a name that is still in use', the namespace already exists and you can remove it and rerun:)
 helm install kepler kepler/kepler --namespace kepler --create-namespace --set serviceMonitor.enabled=true --set serviceMonitor.labels.release=prometheus 
 # After this final installation you should be able to view the Kepler namespace in minikube dashboard
+# See EnerConMeasInDYNAMOS.md file for how to run Prometheus and see the metrics.
 
 # Install Nginx
 helm install -f "$corePath/ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress -n ingress --version 0.18.0

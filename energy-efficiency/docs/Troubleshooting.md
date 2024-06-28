@@ -32,9 +32,31 @@ helm uninstall <releaseName>
 # Delete namespaces
 kubectl delete namespace <namespaceName>
 ```
+The example error above is because the namespace already existed, after removing it and rerunning the command it worked again.
 
 # Grafana (or other forwarded port taking too long)
 ```sh
 E0626 17:29:45.184192   11096 portforward.go:351] error creating error stream for port 3000 -> 3000: Timeout occurred
 ```
-This is an example of the error that can occur when the loading takes too long
+This is an example of the error that can occur when the loading takes too long. What you can then do is restart the minikube cluster:
+```sh
+# Stop the cluster
+minikube stop
+# Restart the cluster
+minikube start
+```
+
+If something else is taking very long, such as the port forward operation, you could try restarting wsl:
+```sh
+# exit wsl session (if you have a wsl session (terminal) open)
+exit
+# Restart wsl
+wsl --shutdown
+
+# Restart Docker Desktop to start the Docker engine
+# Restart Kubernetes
+minikube start
+
+# Then retry the command
+```
+An alternative would be to restart your computer.
