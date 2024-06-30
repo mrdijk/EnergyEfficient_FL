@@ -59,4 +59,22 @@ minikube start
 
 # Then retry the command
 ```
-An alternative would be to restart your computer.
+If that not works, there is probably something with the resources/services in the namespace. You can try to remove the namespace and change the configuration and recreate it. For example, I had a prometheus-values.yaml file that was not properly configured and therefore prometheus could not be used, while there where no error messages anywhere, it just took too long to access.
+
+# Cluster role exists
+```sh
+poetoec@LAPTOP-IA1OBTR5:/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/energy-efficiency/scripts$ helm install prometheus prometheus-community/kube-prometheus-stack -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-values.yaml"
+Error: INSTALLATION FAILED: Unable to continue with install: ClusterRole "prometheus-kube-state-metrics" in namespace "" exists and cannot be imported into the current release: invalid ownership metadata; annotation validation error: key "meta.helm.sh/release-namespace" must equal "default": current value is "monitoring"
+```
+The easiest is to remove the cluster role with for example:
+```sh
+kubectl delete clusterrole prometheus-kube-state-metrics
+```
+This is a solution that can be used for all errors similar to the above example. Alternatively, you could delete the Kubernetes cluster and recreate it if there are too many issues with all the different resources in the Kubernetes cluster:
+```sh
+# Delete minikube Kubernetes cluster
+minikube delete
+# Recreate 
+minikube start
+# Follow all getting started steps again to see if it is working
+```
