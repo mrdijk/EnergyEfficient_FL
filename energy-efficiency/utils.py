@@ -16,7 +16,7 @@ def query_prometheus(query):
 
 # Save energy data to file
 def save_energy_data_to_file(data, filename, indent=4):
-    output_dir = 'energy-data'
+    output_dir = 'data'
 
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
