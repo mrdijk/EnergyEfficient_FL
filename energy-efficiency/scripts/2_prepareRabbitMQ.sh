@@ -21,9 +21,10 @@ helm repo update
 # This may take a while, since prometheus-stack contains various tools (sometimes even up to 10 minutes)
 # Also, the path to the prometheus-values.yaml file is provided to add extra configurations
 # (if you get this error: 'cannot re-use a name that is still in use', the namespace already exists and you can remove it and rerun:)
-helm install prometheus prometheus-community/kube-prometheus-stack --namespace prometheus --create-namespace -f "$corePath/prometheus-values.yaml"
+# It will install Prometheus in the default namespace (required for configmap in the charts/core directory)
+helm install prometheus prometheus-community/kube-prometheus-stack -f "$corePath/prometheus-values.yaml"
 # Alternative:
-# helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace prometheus --create-namespace -f "$corePath/prometheus-values.yaml"
+# helm upgrade -i prometheus prometheus-community/kube-prometheus-stack -f "$corePath/prometheus-values.yaml"
 
 
 # Add Kepler

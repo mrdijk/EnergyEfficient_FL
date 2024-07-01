@@ -6,7 +6,7 @@ MAX_RESOLUTION = 11_000  # Maximum resolution of Prometheus
 DURATION = "1m"
 
 # TODO: fix queries not working with by, needs to be something different
-# TODO: convert to by namespace. Convert containers to NAMESPACES, others is namespace, power is: "power": 'sum by (container_namespace, node)(irate(kepler_container_joules_total{}[{DURATION}]))',
+
 # Prometheus queries to get relevant energy metrics (same as study from Ivano and colleagues)
 QUERIES = {
     "cpu": f"sum(rate(container_cpu_usage_seconds_total[{DURATION}])) by (name)",
