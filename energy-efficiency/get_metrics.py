@@ -26,7 +26,7 @@ def calculate_energy_consumption():
     # Check if the query was successful
     if result['status'] == 'success':
         # Add the data to the output with the key 'energy_consumption'
-        output_data['energy_consumption'] = result['data']['result']
+        output_data['energy_consumption'] = result
     else:
         raise Exception(f"Failed to retrieve data: {result['error']}")
 
@@ -46,7 +46,7 @@ def get_relevant_metrics():
             # Filter out metrics with 0 values (not measured in Kepler)
             # The value will look like this: {metric: [{metric: {key: value}..., value: [timestamp, value]}]
             filtered_data = [
-                item for item in result['data']['result'] if float(item['value'][1]) != 0
+                item for item in result if float(item['value'][1]) != 0
             ]
             if filtered_data:
                 output_data[metric] = filtered_data
@@ -60,9 +60,19 @@ def get_relevant_metrics():
         # Check if the query was successful
         if result['status'] == 'success':
             # Add the data to the output with the key {metric}
-            output_data[metric] = result['data']['result']
+            output_data[metric] = result
         else:
             print(f"Failed to retrieve data for metric {metric}: {result['error']}")
 
     # Return the data
     return output_data
+
+
+
+# Merge two dictionaries of lists by appending the entries to the list.
+# y will be append at the end of x
+def _merge(x, y):
+    data = x
+    for key in y:
+        data[key] = x.get(key, []) + y[key]
+    return data
