@@ -17,14 +17,11 @@ coreValues="$corePath/values.yaml"
 # Add Prometheus
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-# Install prometheus stack (required for Kepler). 
-# This may take a while, since prometheus-stack contains various tools (sometimes even up to 10 minutes)
+# Install prometheus
+# This may take a while before the pods are running (sometimes even up to more than 20 minutes)
 # Also, the path to the prometheus-values.yaml file is provided to add extra configurations
-# (if you get this error: 'cannot re-use a name that is still in use', the namespace already exists and you can remove it and rerun:)
 # It will install Prometheus in the default namespace (required for configmap in the charts/core directory)
-helm upgrade -i prometheus prometheus-community/kube-prometheus-stack -f "$corePath/prometheus-values.yaml"
-# Alternative:
-# helm install prometheus prometheus-community/kube-prometheus-stack -f "$corePath/prometheus-values.yaml"
+helm upgrade -i prometheus prometheus-community/prometheus -f "$corePath/prometheus-values.yaml"
 
 # Add Kepler
 helm repo add kepler https://sustainable-computing-io.github.io/kepler-helm-chart
