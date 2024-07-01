@@ -5,6 +5,8 @@ METRIC_STEP = 5  # In seconds
 MAX_RESOLUTION = 11_000  # Maximum resolution of Prometheus
 DURATION = "1m"
 
+# TODO: fix queries not working with by, needs to be something different
+# TODO: convert to by namespace. Convert containers to NAMESPACES, others is namespace, power is: "power": 'sum by (container_namespace, node)(irate(kepler_container_joules_total{}[{DURATION}]))',
 # Prometheus queries to get relevant energy metrics (same as study from Ivano and colleagues)
 QUERIES = {
     "cpu": f"sum(rate(container_cpu_usage_seconds_total[{DURATION}])) by (name)",
@@ -14,7 +16,7 @@ QUERIES = {
     # Total bytes read by the container
     "disk": f"sum(rate(container_fs_reads_bytes_total[{DURATION}])) by (name)",
     # Power consumption using Kepler (https://sustainable-computing.io/design/metrics/)
-    "power": 'sum by (pod_name, container_name, container_namespace, node)(irate(kepler_container_joules_total{}[1m]))',
+    "power": 'sum by (pod_name, container_name, container_namespace, node)(irate(kepler_container_joules_total{}[{DURATION}]))',
 }
 
 # Relevant containers to monitor the energy consumption 
