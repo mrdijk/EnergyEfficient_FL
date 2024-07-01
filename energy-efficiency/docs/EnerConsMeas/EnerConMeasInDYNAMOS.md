@@ -17,7 +17,7 @@ minikube start --driver=docker
 ```
 
 ## Prometheus to view measurements
-For the energy consumption measurements the prometheus-values.yaml file has been configured appropriately, see: C:\Users\cpoet\IdeaProjects\EnergyEfficiency_DYNAMOS\charts\core\prometheus-values.yaml
+For the energy consumption measurements the prometheus-config.yaml file has been configured appropriately, see: C:\Users\cpoet\IdeaProjects\EnergyEfficiency_DYNAMOS\charts\core\prometheus-config.yaml
 
 Run the following commands to view the measurements:
 ```sh

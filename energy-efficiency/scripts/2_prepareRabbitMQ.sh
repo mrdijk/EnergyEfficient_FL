@@ -19,9 +19,9 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 # Install prometheus
 # This may take a while before the pods are running (sometimes even up to more than 20 minutes)
-# Also, the path to the prometheus-values.yaml file is provided to add extra configurations
+# Also, the path to the prometheus-config.yaml file is provided to add extra configurations
 # It will install Prometheus in the default namespace (required for configmap in the charts/core directory)
-helm upgrade -i prometheus prometheus-community/prometheus -f "$corePath/prometheus-values.yaml"
+helm upgrade -i prometheus prometheus-community/prometheus -f "$corePath/prometheus-config.yaml"
 
 # Add Kepler
 helm repo add kepler https://sustainable-computing-io.github.io/kepler-helm-chart
