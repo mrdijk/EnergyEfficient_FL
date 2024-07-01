@@ -28,6 +28,35 @@ chmod +x 2_prepareRabbitMQ.sh
 
 ## Example Prometheus yaml file
 ```yaml
+extraScrapeConfigs: |
+  - job_name: 'kubelet'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    scrape_interval: 5s
+    kubernetes_sd_configs:
+    - role: node
+    relabel_configs:
+    - action: labelmap
+      regex: __meta_kubernetes_node_label_(.+)
+    - target_label: __address__
+      replacement: kubernetes.default.svc:443
+    - source_labels: [__address__]
+      target_label: __metrics_path__
+      replacement: /metrics
+
+  - job_name: 'rabbitmq'
+    tls_config:
+      insecure_skip_verify: true
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['rabbitmq.core.svc.cluster.local:15692']
+    basic_auth:
+      username: 'guest'
+      password: 'guest'
+
 serverFiles:
   prometheus.yml:
     global:

@@ -22,6 +22,9 @@ helm repo update
 # Also, the path to the prometheus-values.yaml file is provided to add extra configurations
 # (if you get this error: 'cannot re-use a name that is still in use', the namespace already exists and you can remove it and rerun:)
 helm install prometheus prometheus-community/kube-prometheus-stack --namespace prometheus --create-namespace -f "$corePath/prometheus-values.yaml"
+# Alternative:
+# helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace prometheus --create-namespace -f "$corePath/prometheus-values.yaml"
+
 
 # Add Kepler
 helm repo add kepler https://sustainable-computing-io.github.io/kepler-helm-chart
