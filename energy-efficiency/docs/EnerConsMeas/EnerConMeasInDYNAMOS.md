@@ -24,10 +24,10 @@ Run the following commands to view the measurements:
 # Verify ServiceMonitor Configuration
 kubectl get servicemonitors -n kepler
 
-# Run the following command to get the services in the prometheus namespace
-kubectl get services -n prometheus
+# Run the following command to get the services in the default namespace
+kubectl get services -n default
 # Port-forward to Prometheus, using the above information, Examples:
-kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n prometheus 9090:9090
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n default 9090:9090
 # Or (depending on output of get services): kubectl port-forward svc/prometheus-server -n monitoring 9090:9090
 ```
 
