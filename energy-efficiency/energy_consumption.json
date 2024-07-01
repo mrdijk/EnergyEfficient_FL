@@ -1,0 +1,338 @@
+[
+    {
+        "pod_name": "linkerd-destination-6b456fb8c7-5fvwj",
+        "container_name": "linkerd-proxy",
+        "namespace": "linkerd",
+        "node": "unknown",
+        "power_watts": 1.8666666666666667
+    },
+    {
+        "pod_name": "collector-9554bf96-q9rfr",
+        "container_name": "linkerd-proxy",
+        "namespace": "linkerd-jaeger",
+        "node": "unknown",
+        "power_watts": 1.6333333333333333
+    },
+    {
+        "pod_name": "nginx-nginx-ingress-controller-56cf6877d6-ch57l",
+        "container_name": "nginx-ingress",
+        "namespace": "ingress",
+        "node": "unknown",
+        "power_watts": 2.966666666666667
+    },
+    {
+        "pod_name": "linkerd-identity-7577d7cfdb-lkxvx",
+        "container_name": "linkerd-proxy",
+        "namespace": "linkerd",
+        "node": "unknown",
+        "power_watts": 1.5333333333333332
+    },
+    {
+        "pod_name": "linkerd-destination-6b456fb8c7-5fvwj",
+        "container_name": "linkerd-init",
+        "namespace": "linkerd",
+        "node": "unknown",
+        "power_watts": 0.0
+    },
+    {
+        "pod_name": "kepler-xjm9h",
+        "container_name": "kepler-exporter",
+        "namespace": "kepler",
+        "node": "unknown",
+        "power_watts": 13.933333333333334
+    },
+    {
+        "pod_name": "jaeger-868788fcd7-rnwdk",
+        "container_name": "jaeger",
+        "namespace": "linkerd-jaeger",
+        "node": "unknown",
+        "power_watts": 1.5999999999999999
+    },
+    {
+        "pod_name": "storage-provisioner",
+        "container_name": "storage-provisioner",
+        "namespace": "kube-system",
+        "node": "unknown",
+        "power_watts": 2.4333333333333336
+    },
+    {
+        "pod_name": "jaeger-868788fcd7-rnwdk",
+        "container_name": "linkerd-proxy",
+        "namespace": "linkerd-jaeger",
+        "node": "unknown",
+        "power_watts": 1.1666666666666667
+    },
+    {
+        "pod_name": "etcd-1",
+        "container_name": "etcd",
+        "namespace": "core",
+        "node": "unknown",
+        "power_watts": 7.8
+    },
+    {
+        "pod_name": "kubernetes-dashboard-779776cb65-wqbv6",
+        "container_name": "kubernetes-dashboard",
+        "namespace": "kubernetes-dashboard",
+        "node": "unknown",
+        "power_watts": 0.5666666666666667
+    },
+    {
+        "pod_name": "jaeger-injector-bf56d4c68-vnlr2",
+        "container_name": "linkerd-init",
+        "namespace": "linkerd-jaeger",
+        "node": "unknown",
+        "power_watts": 0.0
+    },
+    {
+        "pod_name": "debug",
+        "container_name": "debug",
+        "namespace": "core",
+        "node": "unknown",
+        "power_watts": 0.0
+    },
+    {
+        "pod_name": "collector-9554bf96-q9rfr",
+        "container_name": "linkerd-init",
+        "namespace": "linkerd-jaeger",
+        "node": "unknown",
+        "power_watts": 0.0
+    },
+    {
+        "pod_name": "linkerd-proxy-injector-7f6b45d6bf-kkb5s",
+        "container_name": "linkerd-init",
+        "namespace": "linkerd",
+        "node": "unknown",
+        "power_watts": 0.0
+    },
+    {
+        "pod_name": "etcd-2",
+        "container_name": "etcd",
+        "namespace": "core",
+        "node": "unknown",
+        "power_watts": 7.633333333333334
+    },
+    {
+        "pod_name": "linkerd-destination-6b456fb8c7-5fvwj",
+        "container_name": "policy",
+        "namespace": "linkerd",
+        "node": "unknown",
+        "power_watts": 1.7666666666666666
+    },
+    {
+        "pod_name": "prometheus-kube-prometheus-operator-f894bcf5f-xfg52",
+        "container_name": "kube-prometheus-stack",
+        "namespace": "prometheus",
+        "node": "unknown",
+        "power_watts": 1.5
+    },
+    {
+        "pod_name": "collector-9554bf96-q9rfr",
+        "container_name": "ot-collector",
+        "namespace": "linkerd-jaeger",
+        "node": "unknown",
+        "power_watts": 6.0
+    },
+    {
+        "pod_name": "prometheus-prometheus-kube-prometheus-prometheus-0",
+        "container_name": "init-config-reloader",
+        "namespace": "prometheus",
+        "node": "unknown",
+        "power_watts": 0.0
+    },
+    {
+        "pod_name": "jaeger-injector-bf56d4c68-vnlr2",
+        "container_name": "jaeger-injector",
+        "namespace": "linkerd-jaeger",
+        "node": "unknown",
+        "power_watts": 1.1333333333333335
+    },
+    {
+        "pod_name": "linkerd-destination-6b456fb8c7-5fvwj",
+        "container_name": "destination",
+        "namespace": "linkerd",
+        "node": "unknown",
+        "power_watts": 2.8666666666666663
+    },
+    {
+        "pod_name": "jaeger-injector-bf56d4c68-vnlr2",
+        "container_name": "linkerd-proxy",
+        "namespace": "linkerd-jaeger",
+        "node": "unknown",
+        "power_watts": 1.5666666666666667
+    },
+    {
+        "pod_name": "prometheus-kube-state-metrics-558db85bb5-kbr2r",
+        "container_name": "kube-state-metrics",
+        "namespace": "prometheus",
+        "node": "unknown",
+        "power_watts": 1.9333333333333333
+    },
+    {
+        "pod_name": "etcd-0",
+        "container_name": "etcd",
+        "namespace": "core",
+        "node": "unknown",
+        "power_watts": 8.866666666666667
+    },
+    {
+        "pod_name": "prometheus-prometheus-kube-prometheus-prometheus-0",
+        "container_name": "config-reloader",
+        "namespace": "prometheus",
+        "node": "unknown",
+        "power_watts": 0.8333333333333333
+    },
+    {
+        "pod_name": "kube-apiserver-minikube",
+        "container_name": "kube-apiserver",
+        "namespace": "kube-system",
+        "node": "unknown",
+        "power_watts": 83.30000000000001
+    },
+    {
+        "pod_name": "prometheus-prometheus-node-exporter-cxhfj",
+        "container_name": "node-exporter",
+        "namespace": "prometheus",
+        "node": "unknown",
+        "power_watts": 3.1
+    },
+    {
+        "pod_name": "linkerd-proxy-injector-7f6b45d6bf-kkb5s",
+        "container_name": "linkerd-proxy",
+        "namespace": "linkerd",
+        "node": "unknown",
+        "power_watts": 1.5666666666666667
+    },
+    {
+        "pod_name": "linkerd-proxy-injector-7f6b45d6bf-kkb5s",
+        "container_name": "proxy-injector",
+        "namespace": "linkerd",
+        "node": "unknown",
+        "power_watts": 1.4666666666666666
+    },
+    {
+        "pod_name": "linkerd-identity-7577d7cfdb-lkxvx",
+        "container_name": "linkerd-init",
+        "namespace": "linkerd",
+        "node": "unknown",
+        "power_watts": 0.0
+    },
+    {
+        "pod_name": "promtail-h4pfc",
+        "container_name": "promtail",
+        "namespace": "core",
+        "node": "unknown",
+        "power_watts": 13.3
+    },
+    {
+        "pod_name": "alertmanager-prometheus-kube-prometheus-alertmanager-0",
+        "container_name": "alertmanager",
+        "namespace": "prometheus",
+        "node": "unknown",
+        "power_watts": 1.2666666666666666
+    },
+    {
+        "pod_name": "linkerd-destination-6b456fb8c7-5fvwj",
+        "container_name": "sp-validator",
+        "namespace": "linkerd",
+        "node": "unknown",
+        "power_watts": 1.3333333333333335
+    },
+    {
+        "pod_name": "coredns-7db6d8ff4d-rdpf9",
+        "container_name": "coredns",
+        "namespace": "kube-system",
+        "node": "unknown",
+        "power_watts": 3.2333333333333334
+    },
+    {
+        "pod_name": "jaeger-868788fcd7-rnwdk",
+        "container_name": "linkerd-init",
+        "namespace": "linkerd-jaeger",
+        "node": "unknown",
+        "power_watts": 0.0
+    },
+    {
+        "pod_name": "alertmanager-prometheus-kube-prometheus-alertmanager-0",
+        "container_name": "config-reloader",
+        "namespace": "prometheus",
+        "node": "unknown",
+        "power_watts": 0.16666666666666666
+    },
+    {
+        "pod_name": "alertmanager-prometheus-kube-prometheus-alertmanager-0",
+        "container_name": "init-config-reloader",
+        "namespace": "prometheus",
+        "node": "unknown",
+        "power_watts": 0.0
+    },
+    {
+        "pod_name": "kube-scheduler-minikube",
+        "container_name": "kube-scheduler",
+        "namespace": "kube-system",
+        "node": "unknown",
+        "power_watts": 3.2333333333333334
+    },
+    {
+        "pod_name": "prometheus-prometheus-kube-prometheus-prometheus-0",
+        "container_name": "prometheus",
+        "namespace": "prometheus",
+        "node": "unknown",
+        "power_watts": 34.9
+    },
+    {
+        "pod_name": "kube-proxy-q7s46",
+        "container_name": "kube-proxy",
+        "namespace": "kube-system",
+        "node": "unknown",
+        "power_watts": 2.2
+    },
+    {
+        "pod_name": "linkerd-identity-7577d7cfdb-lkxvx",
+        "container_name": "identity",
+        "namespace": "linkerd",
+        "node": "unknown",
+        "power_watts": 1.0
+    },
+    {
+        "pod_name": "etcd-minikube",
+        "container_name": "etcd",
+        "namespace": "kube-system",
+        "node": "unknown",
+        "power_watts": 18.566666666666666
+    },
+    {
+        "pod_name": "kube-controller-manager-minikube",
+        "container_name": "kube-controller-manager",
+        "namespace": "kube-system",
+        "node": "unknown",
+        "power_watts": 9.433333333333334
+    },
+    {
+        "pod_name": "loki-64b9797f4-rvpw9",
+        "container_name": "loki",
+        "namespace": "core",
+        "node": "unknown",
+        "power_watts": 7.533333333333333
+    },
+    {
+        "pod_name": "dashboard-metrics-scraper-b5fc48f67-jh8rj",
+        "container_name": "dashboard-metrics-scraper",
+        "namespace": "kubernetes-dashboard",
+        "node": "unknown",
+        "power_watts": 0.6
+    },
+    {
+        "pod_name": "kernel_processes",
+        "container_name": "kernel_processes",
+        "namespace": "kernel",
+        "node": "unknown",
+        "power_watts": 90.93333333333334
+    },
+    {
+        "pod_name": "system_processes",
+        "container_name": "system_processes",
+        "namespace": "system",
+        "node": "unknown",
+        "power_watts": 349.7333333333333
+    }
+]
