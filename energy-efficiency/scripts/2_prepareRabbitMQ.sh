@@ -7,8 +7,9 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-# First argument is the corePath (the path to core folder in DYNAMOS project)
-corePath="$1"
+# First argument is the chartsPath (the path to core folder in DYNAMOS project)
+chartsPath="$1"
+corePath="$chartsPath/core"
 # Initialize coreValues
 coreValues="$corePath/values.yaml"
 
@@ -35,5 +36,7 @@ helm install kepler kepler/kepler --namespace kepler --create-namespace --set se
 # Install Nginx
 helm install -f "$corePath/ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress -n ingress --version 0.18.0
 
-# Install core
+# Install core (apply charts in core helm release)
 helm upgrade -i -f "$coreValues" core $corePath
+# Apply the rabbit-pvc chart
+helm upgrade -i -f "$chartsPath/namespaces/templates/rabbit-pvc.yaml" core $corePath

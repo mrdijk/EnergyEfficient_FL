@@ -22,6 +22,6 @@ Then run the next script to prepare RabbitMQ:
 ```sh
 # Make the script executable
 chmod +x 2_prepareRabbitMQ.sh
-# Execute the script with the core path, such as:
-./2_prepareRabbitMQ.sh /mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core
+# Execute the script with the charts path, such as:
+./2_prepareRabbitMQ.sh /mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts
 ```

@@ -8,7 +8,7 @@ wsl
 echo $<variableName>
 ```
 
-You can run the steps explained in the different files (running the scripts). Or you can run the commands from the scripts individually (e.g. when you already completed some of the steps of the script to avoid problems).
+You can run the steps explained in the different files (running the scripts). Or you can choose to comment out specific parts from the script and then run it again (or run commands individually). This can be useful when you already completed some of the steps of the script for example.
 
 ## Table of Contents
 - [Prerequisites](./1_Prerequisites.md)
