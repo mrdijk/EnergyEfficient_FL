@@ -1,6 +1,12 @@
 from utils import query_prometheus, save_energy_data_to_file
 from constants import RELEVANT_PROMETHEUS_CONTAINER_METRICS, RELEVANT_KEPLER_CONTAINER_METRICS, PROMETHEUS_QUERIES
 
+# TODO: make the same as the study by Ivano and his colleagues! https://github.com/uDEVOPS2020/Anomaly-Detection-and-Root-Cause-Analysis-of-Microservices-Energy-Consumption/blob/main/vuDevOps/data_collection/metrics/get_metrics.py
+
+# TODO: convert to microWatts not necessary, energy consumption is already in watts (study by Ivano and his colleagues uses this)
+
+# TODO: convert to csv and use pandas everywhere
+
 def main():
     # Calculate energy consumption
     energy_data = calculate_energy_consumption()
