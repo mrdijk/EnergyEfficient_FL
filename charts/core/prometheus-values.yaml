@@ -16,7 +16,6 @@ serverFiles:
 grafana:
   enabled: false
 
-
 # Old solution (original file from DYNAMOS, keep for going back to this)
 # extraScrapeConfigs: |
 #   - job_name: 'kubelet'
