@@ -23,10 +23,17 @@ ts=2024-07-01T15:35:06.232Z caller=main.go:537 level=error msg="Error loading co
 ```
 Then I viewed the configMaps in the Kubernetes dashboard under Config and Storage section > Config Maps. Here I saw "prometheus-server" config map had two global sections. I then fixed my prometheus-values.yaml file and updated it:
 ```sh
-# Example update
+# Delete the config map in the minikube dashboard (Config and Storage section > Config Maps > prometheus-server)
+# Upgrade using helm (will automatically add the new config map)
 helm upgrade -i prometheus prometheus-community/prometheus -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-values.yaml"
+
+# Then I had to manually remove the second global entry in the config map (Config and Storage section > Config Maps > prometheus-server)
+
+# Apply Cluster role
+kubectl apply -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-rbac.yaml"
+
 # Then I ran (where the prometheus-server-<string> was the pod name)
-kubectl delete pod prometheus-server-5787759b8c-bfmrq -n default
+kubectl delete pod prometheus-server-5787759b8c-fq7xm -n default
 # Kubernetes automatically restarted this pod for me and then it worked!
 ```
 
