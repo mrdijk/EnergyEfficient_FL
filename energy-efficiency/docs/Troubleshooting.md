@@ -12,6 +12,25 @@ minikube start
 ```
 Possibly also restarting other things, such as forwarding Grafana.
 
+# Using Kubernetes dashboard
+Run
+```sh
+minikube dashboard
+```
+To open the dashboard. Here you can see pods running and debug it that way. For example, if you click on the three dots and select "Logs" you can view the logs of the different containers in the pod. For instance, the following error was present in one of my earlier issues:
+```
+ts=2024-07-01T15:35:06.232Z caller=main.go:537 level=error msg="Error loading config (--config.file=/etc/config/prometheus.yml)" file=/etc/config/prometheus.yml err="parsing YAML file /etc/config/prometheus.yml: yaml: unmarshal errors:\n  line 5: field global already set in type config.plain"
+```
+Then I viewed the configMaps in the Kubernetes dashboard under Config and Storage section > Config Maps. Here I saw "prometheus-server" config map had two global sections. I then fixed my prometheus-values.yaml file and updated it:
+```sh
+# Example update
+helm upgrade -i prometheus prometheus-community/prometheus -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-values.yaml"
+# Then I ran (where the prometheus-server-<string> was the pod name)
+kubectl delete pod prometheus-server-5787759b8c-bfmrq -n default
+# Kubernetes automatically restarted this pod for me and then it worked!
+```
+
+
 # Helm issues
 Example:
 ```sh
