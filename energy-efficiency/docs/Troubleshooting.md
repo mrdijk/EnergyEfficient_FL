@@ -88,3 +88,23 @@ minikube delete
 minikube start
 # Follow all getting started steps again to see if it is working
 ```
+
+## Script file (.sh) error
+Error (or similar):
+```sh
+./2_prepareRabbitMQ.sh: line 1: $'\r': command not found
+./2_prepareRabbitMQ.sh: line 3: $'\r': command not found
+./2_prepareRabbitMQ.sh: line 47: syntax error: unexpected end of file
+```
+This suggests that the file has Windows style line endings (CRLF) instead of Unix/Linux-style line endings (LF).
+
+This can be fixed by using dos2unix package:
+```sh
+# Install first if necessary
+sudo apt-get update
+sudo apt-get install dos2unix
+
+# Convert script file to LF
+# e.g.: dos2unix /mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/energy-efficiency/scripts/2_prepareRabbitMQ.sh
+dos2unix <pathToFile>
+```
