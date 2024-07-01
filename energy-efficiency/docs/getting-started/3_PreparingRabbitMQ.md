@@ -25,3 +25,21 @@ chmod +x 2_prepareRabbitMQ.sh
 # Execute the script with the charts path, such as:
 ./2_prepareRabbitMQ.sh /mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts
 ```
+
+## Example Prometheus yaml file
+```yaml
+serverFiles:
+  prometheus.yml:
+    global:
+      evaluation_interval: 1m
+      scrape_interval: 1m
+      scrape_timeout: 10s
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+# Disable grafana (not used currently)
+grafana:
+  enabled: false
+```

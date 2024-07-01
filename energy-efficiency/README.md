@@ -7,6 +7,9 @@ Navigate to the energy-efficiency folder and run the main python file:
 # Navigate to energy-efficiency folder
 cd energy-efficiency
 
+# Install requirements using pip
+pip install -r requirements.txt
+
 # Run specific script 
 python main.py
 ```

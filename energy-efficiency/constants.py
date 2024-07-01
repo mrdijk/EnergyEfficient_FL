@@ -24,7 +24,6 @@ CONTAINERS = {
     "etcd",
     "rabbitmq",
     "loki",
-    "debug",
     "nginx-ingress",
     "policy",
 }

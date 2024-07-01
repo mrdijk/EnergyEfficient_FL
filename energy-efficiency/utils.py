@@ -1,21 +1,17 @@
 import requests
-import json
 import os
 import time
+import pandas as pd
 
-from constants import PROMETHEUS_URL, METRIC_STEP
+from constants import PROMETHEUS_URL, METRIC_STEP, CONTAINERS
 
 
-def query_prometheus(query, start_time=None, end_time=None):
+def exec_query(query, start_time, end_time):
     """
     TODO: Add docstring. Function to query Prometheus.
 
     
     """
-    # Default is now and 30 minutes ago.
-    if start_time is None or end_time is None:
-        start_time, end_time = get_time_range()
-
     # Query Prometheus with a time range
     response = requests.get(
         f"{PROMETHEUS_URL}/api/v1/query_range",
@@ -29,7 +25,23 @@ def query_prometheus(query, start_time=None, end_time=None):
 
     # If the query was successful, return the results
     if response.status_code == 200:
-        return response.json()["data"]["result"]
+        # Initialize a dictoinary to store the data
+        data = {}
+        # Get the result from the response
+        results = response.json()["data"]["result"]
+
+        # Loop through the results
+        for result in results:
+            print(result["metric"].keys())
+            # Check if the container name is in the result (Otherwise do nothing)
+            if "container_name" in result["metric"]:
+                # Get the container name from the result
+                container_name = result["metric"]["container_name"]
+                # Only add the data if the container name is in the containers list
+                if container_name in CONTAINERS:
+                    data[container_name] = result["values"]
+        # Return the data
+        return data
     else:
         raise Exception(
             f"Query failed with status code {response.status_code}: {response.content}")
@@ -43,6 +55,15 @@ def query_prometheus(query, start_time=None, end_time=None):
     #     raise Exception(
     #         f"Query failed with status code {response.status_code}: {response.content}")
 
+def _merge(x, y):
+    """
+    Merge two dictionaries of lists by appending the entries to the list.
+    y will be append at the end of x.
+    """
+    data = x
+    for key in y:
+        data[key] = x.get(key, []) + y[key]
+    return data
 
 def get_time_range(minutes_before=30):
     """
@@ -58,21 +79,19 @@ def get_time_range(minutes_before=30):
 
     return start_time, end_time
 
-def save_energy_data_to_file(data, filename, indent=4):
+def save_energy_data_to_file(df: pd.DataFrame, filename: str):
     """
     TODO: Add docstring. Function to save energy data to a file.
     """
-    # TODO: use pandas and write to csv
     output_dir = 'data'
 
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
     # Save to a file in the specified directory
-    output_file = os.path.join(output_dir, f'{filename}.json')
+    output_file = os.path.join(output_dir, f'{filename}.csv')
 
     # Write the data to the output file
-    with open(output_file, 'w') as f:
-        json.dump(data, f, indent=indent)
+    df.to_csv(output_file, index=False)
 
     print(f'Saved data to {output_file}')
