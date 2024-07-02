@@ -4,12 +4,11 @@ Extra information: https://linkerd.io/2.15/getting-started/#step-3-install-linke
 Run the script file to prepare the kubernetes cluster:
 ```sh
 # Go to the scripts path
-cd cd energy-efficiency/scripts/
+cd cd energy-efficiency/scripts/prepare-cluster
 # Make the script executable (probably only needs to be done once)
-chmod +x prepareKubernetesCluster.sh
+chmod +x linkerd.sh
 # Execute the script:
-./prepareKubernetesCluster.sh
- 
+./linkerd.sh 
 
 # "running scripts is disabled on this system" error:
 # 1. Close VSC/ 2. Run VSC as administrator / 3. Open powershell terminal (outside wsl) / 4. Run:
@@ -23,3 +22,33 @@ If you have installed linkerd (see prerequisites) already but it does not recogn
 export PATH=$HOME/.linkerd2/bin:$PATH
 ```
 This will export it to the current terminal (you may need to repeat this step every time in the terminal when you open a new terminal and you want to use linkerd).
+
+## Further steps: namespaces
+Wait for the resources above to be created. You can use:
+```sh
+linkerd check
+```
+to see if it is created. This takes a while, so be patient and wait until all is installed.
+
+After everything is created, you can execute the next script:
+```sh
+# Go to the scripts path
+cd cd energy-efficiency/scripts/prepare-cluster
+# Make the script executable (probably only needs to be done once)
+chmod +x namespaces.sh
+
+# Execute the script with the charts path, such as:
+./namespaces.sh /mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts
+```
+
+## Further steps: api-gateway
+Then perform the necessary steps for the api-gateway:
+```sh
+# Go to the scripts path
+cd cd energy-efficiency/scripts/prepare-cluster
+# Make the script executable (probably only needs to be done once)
+chmod +x api-gateway.sh
+
+# Execute the script with the charts path, such as:
+./api-gateway.sh /mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts
+```

@@ -10,13 +10,7 @@ fi
 # First argument is the corePath (the path to core folder in DYNAMOS project)
 corePath="$1"
 
-# Create the namespace in the Kubernetes cluster (if not exists)
-kubectl create namespace core &&
-kubectl create namespace orchestrator &&
-kubectl create namespace uva && 
-kubectl create namespace vu && 
-kubectl create namespace surf && 
-kubectl create namespace ingress
+# Create the namespaces not required, already done in preparing kubernetes cluster step!
 
 # Initialize coreValues
 coreValues="$corePath/values.yaml"
