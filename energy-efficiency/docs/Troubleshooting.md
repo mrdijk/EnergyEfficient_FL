@@ -49,7 +49,7 @@ kubectl create configmap prometheus-server --from-file=prometheus.yml="/mnt/c/Us
  
 # Restart the promtheus-server pod (delete will automatically cretae a new one)
 # Replace will real pod name (prometheus-server-<string>)
-kubectl delete pod prometheus-server-5787759b8c-6cmcs -n default
+kubectl delete pod prometheus-server-5787759b8c-7m6xg -n default
 
 # Then port forward promtheus and see if it is working
 kubectl port-forward svc/prometheus-server 9090:80 -n default
