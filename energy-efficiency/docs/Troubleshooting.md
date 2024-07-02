@@ -66,8 +66,7 @@ minikube status
 
 If a service does not work or takes unusually long for example, you can view the logs and pods using kubectl:
 ```sh
-# Example error when running minikube dashboard:
-❌  Exiting due to SVC_URL_TIMEOUT: http://127.0.0.1:46465/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/ is not accessible: Temporary Error: unexpected response code: 503
+# Example for minikube dashboard (this works with all other namespaces/pods/etc.., if you replace it with the corresponding names)
 
 # You can get the pods using this command (namespace = kubernetes-dashboard)
 kubectl get pods -n kubernetes-dashboard
