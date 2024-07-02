@@ -25,4 +25,4 @@ chmod +x 2_prepareRabbitMQ.sh
 # Execute the script with the charts path, such as:
 ./2_prepareRabbitMQ.sh /mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts
 ```
-It may take a while before all the pods are running, sometimes even up to more than 20 minutes.
+It may take a while before all the pods are running, sometimes even up to more than 10 minutes.

@@ -17,7 +17,7 @@ Then prometheus needs to be configured appropriately:
 ./reconfigurePrometheusServer.sh prometheus-server-string-id
 
 # Then port forward promtheus and see if it is working
-kubectl port-forward svc/prometheus-server 9090:80 -n default
+kubectl port-forward svc/prometheus-server 9090:80 -n monitoring
 ```
 Go to the Prometheus UI and navigate to Status > Targets. Here you should see that cadvisor is in the targets:
 

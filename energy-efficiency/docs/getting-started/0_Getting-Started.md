@@ -10,6 +10,8 @@ echo $<variableName>
 
 You can run the steps explained in the different files (running the scripts). Or you can choose to comment out specific parts from the script and then run it again (or run commands individually). This can be useful when you already completed some of the steps of the script for example.
 
+Keep in mind, it takes a while until all the different services are running, so you may want to take a small break in between each steps to wait until all the services are running before you go to the next step.
+
 ## Table of Contents
 - [Prerequisites](./1_Prerequisites.md)
 - [Preparing Kubernetes Cluster](./2_PreparingKubernetesCluster.md)
@@ -42,7 +44,7 @@ Local environment (this is the one currently used):
 ```sh
 minikube dashboard
 ```
-It may take a while for it to start up (it will automatically open a webbrowser tab for you).
+It may take a while before you can access the dashboard after creating the Kubernetes cluster using minikube. It may take a while for it to start up (it will automatically open a webbrowser tab for you).
 
 Production environments. Run these commands individually::
 ```sh

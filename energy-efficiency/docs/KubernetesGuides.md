@@ -106,14 +106,14 @@ Of course, this is just an example and you should change this to your specific u
 # Configuring config map in Prometheus (standalone, so NOT stack, this is an old guide and prometheus-stack is better to use, but may be useful sometime)
 ```sh
 # Create or update the configmap for prometheus-server
-kubectl create configmap prometheus-server --from-file=prometheus.yml="<pathToconfigFile>prometheus-config.yaml" -n default --dry-run=client -o yaml | kubectl apply -f-
+kubectl create configmap prometheus-server --from-file=prometheus.yml="<pathToconfigFile>prometheus-config.yaml" -n monitoring --dry-run=client -o yaml | kubectl apply -f-
 
 # Restart the promtheus-server pod (delete will automatically cretae a new one)
 # e.g. prometheus-server-5787759b8c-h2qj6 (but view exact pod name in kubennetes dashboard)
-kubectl delete pod prometheus-server-<stringid> -n default
+kubectl delete pod prometheus-server-<stringid> -n monitoring
 
 # Then port forward promtheus and see if it is working (assuming you are using standalone prometheus)
-kubectl port-forward svc/prometheus-server 9090:80 -n default
+kubectl port-forward svc/prometheus-server 9090:80 -n monitoring
 ```
 ## Minimal cadvisor setup for Prometheus (standalone, so NOT stack, this is an old guide and prometheus-stack is better to use, but may be useful sometime)
 ```yaml

@@ -15,6 +15,7 @@ The cgroup v2 version is required for metrics to not end up with zeros for Keple
 # Run minikube with:
 minikube start --driver=docker
 ```
+Then use the getting started guide and start from the beginning to configure the Kubernetes cluster.
 
 # TODO: change to new Prometheus stack
 ## Prometheus to view measurements
@@ -25,15 +26,14 @@ Run the following commands to view the measurements:
 # Verify ServiceMonitor Configuration
 kubectl get servicemonitors -n kepler
 
-# Run the following command to get the services in the default namespace
-kubectl get services -n default
+# Run the following command to get the services in the monitoring namespace
+kubectl get services -n monitoring
 
-# Restart the prometheus instance after applying changes
-# This can be done by deleting the pod (it will automatically recreate it for you)
+# TODO: add new startup
 
 # Port-forward to Prometheus, using the above information, Examples:
-kubectl port-forward svc/prometheus-server 9090:80 -n default
-# Or (depending on output of get services): kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n default 9090:9090
+kubectl port-forward svc/prometheus-server 9090:80 -n monitoring
+# Or (depending on output of get services): kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
 ```
 
 It may take a while before Kepler is running, in the first attempt it took 7 minutes:
