@@ -1,5 +1,12 @@
 # Apply configuration to Prometheus
+```sh
+# Run the script to apply the configmap and delete the pod (recreates it automatically == restart pod)
+# Replace with real string-id of the pod name (e.g. prometheus-server-5787759b8c-46gwn)
+./reconfigurePrometheusServer.sh prometheus-server-string-id
 
+# Then port forward promtheus and see if it is working
+kubectl port-forward svc/prometheus-server 9090:80 -n default
+```
 
 # Minimal cadvisor setup for Prometheus
 ```yaml
@@ -10,6 +17,7 @@ global:
   scrape_timeout: 25s
 
 scrape_configs:
+  # Job to gather metrics like CPU and memory using cadvisor daemonset
   - job_name: 'cadvisor'
     # Configures Kubernetes service discovery to find pods
     kubernetes_sd_configs:

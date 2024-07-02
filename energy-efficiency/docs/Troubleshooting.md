@@ -34,10 +34,13 @@ Then I viewed the configMaps in the Kubernetes dashboard under Config and Storag
 This is due to the reason that you may use Kubernetes service discovery to find pods. In this example you can see a prometheus config for the job name that adds the data for cadvisor:
 ```yaml
 global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
+  scrape_interval: 1m
+  evaluation_interval: 1m
+  # Avoids cadvisor to exceed the timeout range for example (increase when jobs are exceeding this time)
+  scrape_timeout: 25s
 
 scrape_configs:
+  # Job to gather metrics like CPU and memory using cadvisor daemonset
   - job_name: 'cadvisor'
     # Configures Kubernetes service discovery to find pods
     kubernetes_sd_configs:
@@ -54,6 +57,8 @@ scrape_configs:
         target_label: __address__
         regex: (.+)
         replacement: ${1}:8080
+      # No custom labels/replacements are set here (do NOT change this, because now it works!), so that the defaults of 
+      # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
 ```
 Here you can see that 'kubernetes_sd_configs' is used. The issue I had was that I first used:
 ```yaml
