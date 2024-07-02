@@ -1,3 +1,10 @@
+prometheus:
+  prometheusSpec:
+    # Additional scrape configs (includes cadvisor, so that these metrics can be scraped!)
+    additionalScrapeConfigs:
+      name: additional-scrape-configs
+      key: additional-scrape-configs.yaml
+
 # Disable grafana from prometheus stack (not needed anyway)
 grafana:
   enabled: false
