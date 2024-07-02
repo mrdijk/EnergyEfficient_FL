@@ -27,9 +27,8 @@ kubectl get servicemonitors -n kepler
 # Run the following command to get the services in the default namespace
 kubectl get services -n default
 
-# # Restart the prometheus instance after applying changes
-# kubectl rollout restart deployment prometheus-kube-prometheus-operator -n default
-# kubectl rollout restart deployment prometheus-kube-state-metrics -n default
+# Restart the prometheus instance after applying changes
+# This can be done by deleting the pod (it will automatically recreate it for you)
 
 # Port-forward to Prometheus, using the above information, Examples:
 kubectl port-forward svc/prometheus-server 9090:80 -n default

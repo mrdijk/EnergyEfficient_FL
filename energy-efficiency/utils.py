@@ -30,6 +30,7 @@ def exec_query(query, start_time, end_time):
         # Get the result from the response
         results = response.json()["data"]["result"]
 
+        # TODO: check contains substring, because it includes some string id
         # Loop through the results
         for result in results:
             print(result["metric"].keys())

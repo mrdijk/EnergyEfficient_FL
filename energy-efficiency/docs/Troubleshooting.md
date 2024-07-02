@@ -23,19 +23,46 @@ ts=2024-07-01T15:35:06.232Z caller=main.go:537 level=error msg="Error loading co
 ```
 Then I viewed the configMaps in the Kubernetes dashboard under Config and Storage section > Config Maps. Here I saw "prometheus-server" config map had two global sections. I then fixed my prometheus-config.yaml file and updated it:
 ```sh
-# Delete the config map in the minikube dashboard (Config and Storage section > Config Maps > prometheus-server)
-# Upgrade using helm (will automatically add the new config map)
-# helm upgrade -i prometheus prometheus-community/prometheus -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-config.yaml"
-kubectl apply -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-config.yaml"
+# Create or update the config map
+kubectl create configmap prometheus-server --from-file=prometheus.yml="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-config.yaml" -n default --dry-run=client -o yaml | kubectl apply -f-
 
 # Apply Cluster role
 kubectl apply -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-rbac.yaml"
 
 # Then I ran (where the prometheus-server-<string> was the pod name)
-kubectl delete pod prometheus-server-5787759b8c-6ps9z -n default
+kubectl delete pod prometheus-server-5787759b8c-kmt9d -n default
 # Kubernetes automatically restarted this pod for me and then it worked!
 ```
 
+# cadvisor metrics not container 'name' label
+Make sure that you have applied the correct configmap to Prometheus and that cadvisor is running as a separate daemonset.
+Firstly, run cadvisor as a separate daemonset:
+```sh
+# Create the daemonset using the cadvisor daemonset yaml file
+kubectl apply -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/cadvisor-daemonset.yaml"
+```
+
+Then prometheus needs to be configured appropriately:
+```sh
+# Create or update the configmap for prometheus-server
+kubectl create configmap prometheus-server --from-file=prometheus.yml="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-config.yaml" -n default --dry-run=client -o yaml | kubectl apply -f-
+ 
+# Restart the promtheus-server pod (delete will automatically cretae a new one)
+# Replace will real pod name (prometheus-server-<string>)
+kubectl delete pod prometheus-server-5787759b8c-6cmcs -n default
+
+# Then port forward promtheus and see if it is working
+kubectl port-forward svc/prometheus-server 9090:80 -n default
+```
+Go to the Prometheus UI and navigate to Status > Targets. Here you should see that cadvisor is in the targets:
+
+![alt text](./assets/cadvisorInPrometheusTargetsDown.png)
+
+At first it will say down/unhealthy, because it is still initializing. (Except if there are errors shown). In a minute (you could try refreshing the page to see it faster) it should say up and when it says you can see something like this:
+
+![alt text](./assets/cadvisorInPrometheusTargetsUp.png)
+
+Then you can see that the target is up and new metrics have been collected. Then you can go to /graph in the Prometheus UI to view the changes.
 
 # Helm issues
 Example:
