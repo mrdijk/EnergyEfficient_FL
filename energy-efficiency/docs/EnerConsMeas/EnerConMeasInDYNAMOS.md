@@ -16,6 +16,7 @@ The cgroup v2 version is required for metrics to not end up with zeros for Keple
 minikube start --driver=docker
 ```
 
+# TODO: change to new Prometheus stack
 ## Prometheus to view measurements
 For the energy consumption measurements the prometheus-config.yaml file has been configured appropriately, see: C:\Users\cpoet\IdeaProjects\EnergyEfficiency_DYNAMOS\charts\core\prometheus-config.yaml
 

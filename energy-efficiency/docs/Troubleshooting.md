@@ -57,7 +57,36 @@ In this case you can see that we filter by 'container_label_io_kubernetes_contai
 
 
 
-# Using Kubernetes dashboard for trouble shooting
+
+# Minikube status and logs for troubleshooting
+You can use minikube status to view the status of the Kubernetes cluster to see if everything is running for example:
+```sh
+minikube status
+```
+
+If a service does not work or takes unusually long for example, you can view the logs and pods using kubectl:
+```sh
+# Example error when running minikube dashboard:
+❌  Exiting due to SVC_URL_TIMEOUT: http://127.0.0.1:46465/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/ is not accessible: Temporary Error: unexpected response code: 503
+
+# You can get the pods using this command (namespace = kubernetes-dashboard)
+kubectl get pods -n kubernetes-dashboard
+
+# Check services and endpoints
+kubectl get svc -n kubernetes-dashboard
+kubectl get endpoints -n kubernetes-dashboard
+
+# Check logs
+kubectl logs -n kubernetes-dashboard <kubernetes-dashboard-pod-name>
+
+# Restart dashboard service
+kubectl delete pod -n kubernetes-dashboard <kubernetes-dashboard-pod-name>
+```
+
+
+
+
+# Using Kubernetes dashboard for troubleshooting
 Run
 ```sh
 minikube dashboard

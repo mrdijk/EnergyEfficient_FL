@@ -1,3 +1,47 @@
+# Helm charts
+The presence of multiple folders, each containing a Chart.yaml and a templates directory, suggests that you have a Helm chart repository or a collection of Helm charts. Each folder represents a separate Helm chart. Here's an explanation of how Helm uses these components:
+
+## Helm Chart Structure
+Each Helm chart has a specific structure, which includes:
+
+- Chart.yaml: Contains metadata about the chart, such as its name, version, description, and dependencies.
+- values.yaml: Default configuration values for the chart.
+- templates: A directory containing Kubernetes resource templates that Helm will render using the values from values.yaml and other sources.
+- charts: A directory containing any dependencies the chart has, in the form of other charts.
+- README.md (optional): A markdown file containing information about the chart.
+
+## Example of Chart Structure
+charts/
+├── mychart/
+│   ├── Chart.yaml
+│   ├── values.yaml
+│   ├── templates/
+│   │   ├── deployment.yaml
+│   │   ├── service.yaml
+│   │   └── ... other template files ...
+│   └── charts/
+│       └── ... dependency charts ...
+├── anotherchart/
+│   ├── Chart.yaml
+│   ├── values.yaml
+│   ├── templates/
+│   │   ├── deployment.yaml
+│   │   ├── service.yaml
+│   │   └── ... other template files ...
+│   └── charts/
+│       └── ... dependency charts ...
+└── ... other charts ...
+
+## How Helm uses this
+
+When you run helm install, Helm looks for the specified chart in your local directory or a remote repository. It reads the Chart.yaml for metadata and renders the templates in the templates directory using the default values from values.yaml and any overrides you provide with --values or --set.
+```sh
+helm install myrelease ./charts/mychart -f custom-values.yaml
+```
+This command installs the mychart chart from the charts directory, using overrides from custom-values.yaml.
+
+Similar to install, helm upgrade updates an existing release with the new configuration or chart version.
+
 # Prometheus (using prometheus-stack over standalone prometheus)
 
 Using the `kube-prometheus-stack` over a standalone Prometheus setup offers several advantages, particularly in terms of ease of deployment, integration, and feature set. Here are some key benefits:

@@ -1,9 +1,9 @@
----
+# charts/mychart/templates/cadvisor-daemonset.yaml
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: cadvisor
-  namespace: kube-system
+  namespace: {{ .Values.cadvisor.namespace }}
   labels:
     k8s-app: cadvisor
 spec:
@@ -17,16 +17,16 @@ spec:
     spec:
       containers:
       - name: cadvisor
-        image: gcr.io/cadvisor/cadvisor:v0.49.1
+        image: {{ .Values.cadvisor.image.repository }}:{{ .Values.cadvisor.image.tag }}
         resources:
           requests:
-            cpu: 100m
-            memory: 50Mi
+            cpu: {{ .Values.cadvisor.resources.requests.cpu }}
+            memory: {{ .Values.cadvisor.resources.requests.memory }}
           limits:
-            cpu: 200m
-            memory: 100Mi
+            cpu: {{ .Values.cadvisor.resources.limits.cpu }}
+            memory: {{ .Values.cadvisor.resources.limits.memory }}
         ports:
-        - containerPort: 8080
+        - containerPort: {{ .Values.cadvisor.service.port }}
           name: http
         volumeMounts:
         - name: rootfs
@@ -54,33 +54,3 @@ spec:
       - name: docker
         hostPath:
           path: /var/lib/docker
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: cadvisor
-  namespace: kube-system
-  labels:
-    k8s-app: cadvisor
-spec:
-  ports:
-  - name: http
-    port: 8080
-    targetPort: 8080
-  selector:
-    k8s-app: cadvisor
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: cadvisor
-  namespace: kube-system
-  labels:
-    release: prometheus
-spec:
-  selector:
-    matchLabels:
-      k8s-app: cadvisor
-  endpoints:
-  - port: http
-    interval: 15s

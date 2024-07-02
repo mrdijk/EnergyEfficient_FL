@@ -9,6 +9,7 @@ fi
 # First argument is the chartsPath (the path to core folder in DYNAMOS project)
 chartsPath="$1"
 monitoringPath="$chartsPath/monitoring"
+monitoringValues="$monitoringPath/monitoring-values.yaml"
 
 # Create the namespace in the Kubernetes cluster (if not exists)
 kubectl create namespace monitoring &&
@@ -21,7 +22,7 @@ helm repo update
 # Use the monitoring namcespace for prometheus (and use config file, excludes grafana for now for example, because it is not needed at the moment)
 # Using upgrade ensures that helm manages it correctly, this will upgrade or install if not exists
 # This names the release 'prometheus'. This is VERY IMPORTANT, because this release will be used by Kepler and others to create ServiceMonitors for example
-helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoringPath/prometheus-values.yaml"
+helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoringPath/prometheus-config.yaml"
 
 # TODO: install prometheus stack
 # Advantages like using 'ServiceMonitor' or 'PodMonitor' to monitor the services and pods automatically 
@@ -39,5 +40,6 @@ helm install kepler kepler/kepler --namespace kepler --set serviceMonitor.enable
 # After this final installation you should be able to view the Kepler namespace in minikube dashboard
 # See EnerConMeasInDYNAMOS.md file for how to run Prometheus and see the metrics.
 
-# Finally, apply the cadvisor operations (creates daemonset, service and service monitor)
-kubectl apply -f "$monitoringPath/cadvisor-daemonset.yaml"
+# Finally, apply/install the monitoring release (will use the monitoring charts,
+# which includes the deamonset, service and sesrvicemonitor for cadvisor for example)
+helm upgrade -i -f "$monitoringPath" monitoring $monitoringValues

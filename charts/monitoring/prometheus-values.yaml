@@ -1,3 +1,0 @@
-# Disable grafana from prometheus stack (not needed anyway)
-grafana:
-  enabled: false
