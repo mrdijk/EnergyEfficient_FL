@@ -1,5 +1,4 @@
 cadvisor:
-  namespace: kube-system
   image:
     repository: gcr.io/cadvisor/cadvisor
     tag: v0.49.1
@@ -16,6 +15,5 @@ cadvisor:
   monitor:
     interval: 15s
 prometheus:
-  namespace: monitoring
   rbac:
     enabled: true

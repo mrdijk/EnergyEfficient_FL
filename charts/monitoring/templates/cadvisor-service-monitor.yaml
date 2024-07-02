@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: cadvisor
-  namespace: {{ .Values.cadvisor.namespace }}
+  namespace: kube-system
   labels:
     release: prometheus
 spec:

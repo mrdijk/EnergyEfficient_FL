@@ -9,7 +9,7 @@ fi
 # First argument is the chartsPath (the path to core folder in DYNAMOS project)
 chartsPath="$1"
 monitoringChartsPath="$chartsPath/monitoring"
-monitoringValues="$monitoringPath/monitoring-values.yaml"
+monitoringValues="$monitoringChartsPath/monitoring-values.yaml"
 
 # Create the namespace in the Kubernetes cluster (if not exists)
 kubectl create namespace kepler
@@ -26,4 +26,4 @@ helm upgrade -i kepler kepler/kepler --namespace kepler --set serviceMonitor.ena
 
 # Finally, apply/install the monitoring release (will use the monitoring charts,
 # which includes the deamonset, service and sesrvicemonitor for cadvisor for example)
-helm upgrade -i -f "$monitoringChartsPath" monitoring $monitoringPath
+helm upgrade -i -f "$monitoringValues" monitoring $monitoringChartsPath

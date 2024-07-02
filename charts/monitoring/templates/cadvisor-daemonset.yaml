@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: cadvisor
-  namespace: {{ .Values.cadvisor.namespace }}
+  namespace: kube-system
   labels:
     k8s-app: cadvisor
 spec:
