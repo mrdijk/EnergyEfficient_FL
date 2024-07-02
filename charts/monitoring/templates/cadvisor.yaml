@@ -4,39 +4,57 @@ kind: Namespace
 metadata:
   name: cadvisor
 ---
+
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: cadvisor
   namespace: cadvisor
 ---
+
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: cadvisor
   namespace: cadvisor
-  annotations:
-      seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
+  labels:
+    k8s-app: cadvisor
 spec:
   selector:
     matchLabels:
-      name: cadvisor
+      k8s-app: cadvisor
   template:
     metadata:
       labels:
-        name: cadvisor
+        k8s-app: cadvisor
     spec:
       serviceAccountName: cadvisor
       containers:
       - name: cadvisor
-        image: gcr.io/cadvisor/cadvisor:v0.45.0
+        image: {{ .Values.cadvisor.image.repository }}:{{ .Values.cadvisor.image.tag }}
         resources:
           requests:
-            memory: 400Mi
-            cpu: 400m
+            memory: {{ .Values.cadvisor.resources.requests.memory }}
+            cpu: {{ .Values.cadvisor.resources.requests.cpu }}
           limits:
-            memory: 2000Mi
-            cpu: 800m
+            memory: {{ .Values.cadvisor.resources.limits.memory }}
+            cpu: {{ .Values.cadvisor.resources.limits.cpu }}
+        args:
+        # Housekeeping is the interval that cadvisor gathers metrics (Default is 1s, increase to reduce resource usage)
+        - --housekeeping_interval=60s
+        - --max_housekeeping_interval=60s
+        # Disable not needed metrics (saves resources) 
+        # If metrics are missing, see this link and remove the disable option here: https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md
+        - --disable_metrics=advtcp,cpuLoad,cpu_topology,cpuset,hugetlb,memory_numa,network,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp
+        # securityContext:
+        #   runAsUser: 0
+        #   privileged: true
+        #   capabilities:
+        #     add: ["SYS_ADMIN"]
+        #   ulimits:
+        #     - name: nofile
+        #       soft: 65536
+        #       hard: 65536
         volumeMounts:
         - name: rootfs
           mountPath: /rootfs
@@ -55,7 +73,7 @@ spec:
           readOnly: true
         ports:
           - name: http
-            containerPort: 8080
+            containerPort: {{ .Values.cadvisor.service.port }}
             protocol: TCP
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30

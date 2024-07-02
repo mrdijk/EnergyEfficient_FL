@@ -29,11 +29,9 @@ kubectl get servicemonitors -n kepler
 # Run the following command to get the services in the monitoring namespace
 kubectl get services -n monitoring
 
-# TODO: add new startup
-
 # Port-forward to Prometheus, using the above information, Examples:
-kubectl port-forward svc/prometheus-server 9090:80 -n monitoring
-# Or (depending on output of get services): kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
+# Or (depending on output of get services): kubectl port-forward svc/prometheus-server 9090:80 -n monitoring
 ```
 
 It may take a while before Kepler is running, in the first attempt it took 7 minutes:

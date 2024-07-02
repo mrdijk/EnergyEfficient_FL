@@ -9,7 +9,7 @@ fi
 # First argument is the chartsPath (the path to core folder in DYNAMOS project)
 chartsPath="$1"
 monitoringChartsPath="$chartsPath/monitoring"
-monitoringValues="$monitoringChartsPath/monitoring-values.yaml"
+monitoringValues="$monitoringChartsPath/values.yaml"
 
 # Create the namespace in the Kubernetes cluster (if not exists)
 kubectl create namespace kepler
