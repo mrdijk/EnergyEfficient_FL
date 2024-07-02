@@ -24,6 +24,6 @@ helm upgrade -i kepler kepler/kepler --namespace kepler --set serviceMonitor.ena
 # After this final installation you should be able to view the Kepler namespace in minikube dashboard
 # See EnerConMeasInDYNAMOS.md file for how to run Prometheus and see the metrics.
 
-# Finally, apply/install the monitoring release (will use the monitoring charts,
+# Finally, apply/install the monitoring helm release (will use the monitoring charts,
 # which includes the deamonset, service and sesrvicemonitor for cadvisor for example)
 helm upgrade -i -f "$monitoringValues" monitoring $monitoringChartsPath

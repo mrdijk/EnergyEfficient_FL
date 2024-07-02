@@ -18,5 +18,7 @@ helm install -f "$corePath/ingress-values.yaml" nginx oci://ghcr.io/nginxinc/cha
 
 # Install core (apply charts in core helm release)
 helm upgrade -i -f "$coreValues" core $corePath
+
+# TODO: add additional steps to prepare RabbitMQ (see mail with Jorrit, and things to get rabbitMQ pod working in Kubernetes cluster) 
 # Apply the rabbit-pvc chart
 helm upgrade -i -f "$chartsPath/namespaces/templates/rabbit-pvc.yaml" core $corePath

@@ -1,4 +1,4 @@
-# charts/mychart/templates/cadvisor-daemonset.yaml
+# Deamonset
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -18,29 +18,22 @@ spec:
       containers:
       - name: cadvisor
         image: {{ .Values.cadvisor.image.repository }}:{{ .Values.cadvisor.image.tag }}
-        resources:
-          requests:
-            cpu: {{ .Values.cadvisor.resources.requests.cpu }}
-            memory: {{ .Values.cadvisor.resources.requests.memory }}
-          limits:
-            cpu: {{ .Values.cadvisor.resources.limits.cpu }}
-            memory: {{ .Values.cadvisor.resources.limits.memory }}
-        ports:
-        - containerPort: {{ .Values.cadvisor.service.port }}
-          name: http
         volumeMounts:
         - name: rootfs
           mountPath: /rootfs
           readOnly: true
         - name: var-run
           mountPath: /var/run
-          readOnly: true
+          readOnly: false
         - name: sys
           mountPath: /sys
           readOnly: true
         - name: docker
           mountPath: /var/lib/docker
           readOnly: true
+        ports:
+        - containerPort: {{ .Values.cadvisor.service.port }}
+          name: http
       volumes:
       - name: rootfs
         hostPath:
@@ -54,3 +47,19 @@ spec:
       - name: docker
         hostPath:
           path: /var/lib/docker
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: cadvisor
+  namespace: kube-system
+spec:
+  type: NodePort
+  externalTrafficPolicy: Local
+  selector:
+    k8s-app: cadvisor
+  ports:
+  - name: http
+    port: {{ .Values.cadvisor.service.port }}
+    targetPort: {{ .Values.cadvisor.service.port }}

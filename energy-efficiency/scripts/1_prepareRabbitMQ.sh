@@ -20,10 +20,10 @@ kubectl create namespace ingress
 
 # Initialize coreValues
 coreValues="$corePath/values.yaml"
-# Upgrade or install core
+# Upgrade or install core helm release
 helm upgrade -i -f "$coreValues" core $corePath
 
-# Uninstall core (it will fail anyway)
+# Uninstall core helm release (it will fail anyway)
 helm uninstall core
 
 # Create password for a rabbit user (enerate a random 12-character password)
