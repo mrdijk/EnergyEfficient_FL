@@ -10,28 +10,34 @@ fi
 chartsPath="$1"
 monitoringPath="$chartsPath/monitoring"
 
-# Install Prometheus and Kepler for energy consumption measurements
-# Add Prometheus
+# Create the namespace in the Kubernetes cluster (if not exists)
+kubectl create namespace monitoring &&
+kubectl create namespace kepler
+
+# Install and add Prometheus
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-# Install prometheus
-# This may take a while before the pods are running (sometimes even up to more than 20 minutes)
-# Also, the path to the yaml file for the values to install prometheus
-# It will install Prometheus in the default namespace (required for configmap in the charts/core directory)
-helm upgrade -i prometheus prometheus-community/prometheus -f "$monitoringPath/prometheus-values.yaml"
-
+# Install prometheus stack (this may take a while before the pods are running (sometimes even up to more than 15 minutes))
+# Use the monitoring namcespace for prometheus (and use config file, excludes grafana for now for example, because it is not needed at the moment)
+# Using upgrade ensures that helm manages it correctly, this will upgrade or install if not exists
+# This names the release 'prometheus'. This is VERY IMPORTANT, because this release will be used by Kepler and others to create ServiceMonitors for example
+helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoringPath/prometheus-values.yaml"
 
 # TODO: install prometheus stack
 # Advantages like using 'ServiceMonitor' or 'PodMonitor' to monitor the services and pods automatically 
 # (no need to manually add the services to be monitored in scrape configs for example)
 # TODO: apply the cadvisor.yaml file to create the daemonset, service and servicemonitor
 
+# TODO: remove rbac file if it works without having to do it here!
 
-# Add Kepler
+# Install and add Kepler
 helm repo add kepler https://sustainable-computing-io.github.io/kepler-helm-chart
 helm repo update
-# Install Kepler 
-# (if you get this error: 'cannot re-use a name that is still in use', the namespace already exists and you can remove it and rerun:)
-helm install kepler kepler/kepler --namespace kepler --create-namespace --set serviceMonitor.enabled=true --set serviceMonitor.labels.release=prometheus 
+# Install Kepler
+# This also creates a service monitor for the prometheus stack
+helm install kepler kepler/kepler --namespace kepler --set serviceMonitor.enabled=true --set serviceMonitor.labels.release=prometheus 
 # After this final installation you should be able to view the Kepler namespace in minikube dashboard
 # See EnerConMeasInDYNAMOS.md file for how to run Prometheus and see the metrics.
+
+# Finally, apply the cadvisor operations (creates daemonset, service and service monitor)
+kubectl apply -f "$monitoringPath/cadvisor-daemonset.yaml"

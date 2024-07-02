@@ -5,7 +5,7 @@ Run the script file to prepare the kubernetes cluster:
 ```sh
 # Go to the scripts path
 cd cd energy-efficiency/scripts/
-# Make the script executable
+# Make the script executable (probably only needs to be done once)
 chmod +x prepareKubernetesCluster.sh
 # Execute the script:
 ./prepareKubernetesCluster.sh

@@ -4,7 +4,7 @@ First, replace the corePath variable with the correct path of your project (an e
 ```sh
 # Go to the scripts path
 cd energy-efficiency/scripts/
-# Make the script executable
+# Make the script executable (probably only needs to be done once)
 chmod +x 1_prepareRabbitMQ.sh
 # Execute the script with the core path, such as:
 ./1_prepareRabbitMQ.sh /mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core
