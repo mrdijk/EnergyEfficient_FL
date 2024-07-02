@@ -23,14 +23,10 @@ ts=2024-07-01T15:35:06.232Z caller=main.go:537 level=error msg="Error loading co
 ```
 Then I viewed the configMaps in the Kubernetes dashboard under Config and Storage section > Config Maps. Here I saw "prometheus-server" config map had two global sections. I then fixed my prometheus-config.yaml file and updated it:
 ```sh
-# Create or update the config map
-kubectl create configmap prometheus-server --from-file=prometheus.yml="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-config.yaml" -n default --dry-run=client -o yaml | kubectl apply -f-
+# Run the script to apply the configmap and delete the pod (recreates it automatically == restart pod)
+# Replace with real string-id of the pod name (e.g. prometheus-server-5787759b8c-46gwn)
+./reconfigurePrometheusServer.sh prometheus-server-string-id
 
-# Apply Cluster role
-kubectl apply -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-rbac.yaml"
-
-# Then I ran (where the prometheus-server-<string> was the pod name)
-kubectl delete pod prometheus-server-5787759b8c-kmt9d -n default
 # Kubernetes automatically restarted this pod for me and then it worked!
 ```
 
@@ -44,12 +40,9 @@ kubectl apply -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/chart
 
 Then prometheus needs to be configured appropriately:
 ```sh
-# Create or update the configmap for prometheus-server
-kubectl create configmap prometheus-server --from-file=prometheus.yml="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-config.yaml" -n default --dry-run=client -o yaml | kubectl apply -f-
- 
-# Restart the promtheus-server pod (delete will automatically cretae a new one)
-# Replace will real pod name (prometheus-server-<string>)
-kubectl delete pod prometheus-server-5787759b8c-7m6xg -n default
+# Run the script to apply the configmap and delete the pod (recreates it automatically == restart pod)
+# Replace with real string-id of the pod name (e.g. prometheus-server-5787759b8c-46gwn)
+./reconfigurePrometheusServer.sh prometheus-server-string-id
 
 # Then port forward promtheus and see if it is working
 kubectl port-forward svc/prometheus-server 9090:80 -n default
