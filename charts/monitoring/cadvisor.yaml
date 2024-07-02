@@ -1,0 +1,86 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cadvisor
+  namespace: kube-system
+  labels:
+    k8s-app: cadvisor
+spec:
+  selector:
+    matchLabels:
+      k8s-app: cadvisor
+  template:
+    metadata:
+      labels:
+        k8s-app: cadvisor
+    spec:
+      containers:
+      - name: cadvisor
+        image: gcr.io/cadvisor/cadvisor:v0.49.1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 50Mi
+          limits:
+            cpu: 200m
+            memory: 100Mi
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: rootfs
+          mountPath: /rootfs
+          readOnly: true
+        - name: var-run
+          mountPath: /var/run
+          readOnly: true
+        - name: sys
+          mountPath: /sys
+          readOnly: true
+        - name: docker
+          mountPath: /var/lib/docker
+          readOnly: true
+      volumes:
+      - name: rootfs
+        hostPath:
+          path: /
+      - name: var-run
+        hostPath:
+          path: /var/run
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: docker
+        hostPath:
+          path: /var/lib/docker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cadvisor
+  namespace: kube-system
+  labels:
+    k8s-app: cadvisor
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  selector:
+    k8s-app: cadvisor
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cadvisor
+  namespace: kube-system
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      k8s-app: cadvisor
+  endpoints:
+  - port: http
+    interval: 15s

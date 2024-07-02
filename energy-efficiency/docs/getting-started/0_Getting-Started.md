@@ -14,8 +14,9 @@ You can run the steps explained in the different files (running the scripts). Or
 - [Prerequisites](./1_Prerequisites.md)
 - [Preparing Kubernetes Cluster](./2_PreparingKubernetesCluster.md)
 - [Preparing RabbitMQ](./3_PreparingRabbitMQ.md)
-- [Deploying Other Components](./4_DeployingOtherComponents.md)
-- [Building DYNAMOS Components](./5_BuildingDYNAMOSComponents.md)
+- [Preparing Monitoring](./4_PreparingMonitoring.md)
+- [Deploying Other Components](./5_DeployingOtherComponents.md)
+- [Building DYNAMOS Components](./6_BuildingDYNAMOSComponents.md)
 
 
 # After completing getting started steps

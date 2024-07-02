@@ -11,7 +11,7 @@ DURATION = "2m"
 
 # TODO: fix queries not working with by, needs to be something different
 
-# Prometheus queries to get relevant energy metrics (same as study from Ivano and colleagues)
+# Prometheus queries to get relevant energy metrics
 # Group by container_label_io_kubernetes_container_name because cadvisor uses this label to identify container names 
 # (see TroubleShooting.md for explanation of container label in cadvisor)
 QUERIES = {
@@ -26,14 +26,23 @@ QUERIES = {
 }
 
 # Relevant containers to monitor the energy consumption 
-# # (use scripts/describeContainers.sh to print containers in the Kubernetes cluster)
-# TODO: replace with containers used by DYNAMOS later (containers from orchestrator, vu, uva, etc.)
+# (use scripts/describeContainers.sh to print containers in the Kubernetes cluster)
+# TODO: use containers used by DYNAMOS later (containers from orchestrator, vu, uva, etc.)
 CONTAINERS = {
     "etcd",
     "rabbitmq",
-    "loki",
     "nginx-ingress",
     "policy",
+    "linkerd-proxy",
+    "kube-state-metrics",
+    "proxy-injector",
+    "node-exporter",
+    "identity",
+    "ot-collector",
+    "kube-proxy",
+    "destination",
+    "jaeger",
+    "prometheus-server"
 }
 
 

@@ -17,3 +17,9 @@ Set-ExecutionPolicy RemoteSigned
 # 5. Close VSC / 6. Open VSC how you normally do and rerun the script
 ```
 It may take a minute or two for the control plan to finish installing, it generally took about 10 minutes when I tried it.
+
+If you have installed linkerd (see prerequisites) already but it does not recognize it, you can export it again using this command in the terminal:
+```sh
+export PATH=$HOME/.linkerd2/bin:$PATH
+```
+This will export it to the current terminal (you may need to repeat this step every time in the terminal when you open a new terminal and you want to use linkerd).
