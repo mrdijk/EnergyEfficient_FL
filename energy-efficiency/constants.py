@@ -9,7 +9,7 @@ DURATION = "1m"
 
 # Prometheus queries to get relevant energy metrics (same as study from Ivano and colleagues)
 QUERIES = {
-    "cpu": f"sum(rate(container_cpu_usage_seconds_total[{DURATION}])) by (name)",
+    "cpu": f"sum(rate(container_cpu_usage_seconds_total[{DURATION}])) by (container_label_io_kubernetes_container_name)",
     "memory": f"sum(rate(container_memory_usage_bytes[{DURATION}])) by (name)",
     "memory_rss": f"sum(rate(container_memory_rss[{DURATION}])) by (name)",
     "memory_cache": f"sum(rate(container_memory_cache[{DURATION}])) by (name)",

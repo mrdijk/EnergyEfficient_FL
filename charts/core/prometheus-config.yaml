@@ -1,6 +1,7 @@
 global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
+  scrape_interval: 1m
+  evaluation_interval: 1m
+  scrape_timeout: 25s
 
 scrape_configs:
   - job_name: 'cadvisor'
@@ -19,3 +20,7 @@ scrape_configs:
         target_label: __address__
         regex: (.+)
         replacement: ${1}:8080
+      # Replace container_label_io_kubernetes_container_name with container_name (e.g. container_label_io_kubernetes_container_name="linkerd-proxy")
+      # This allows to use the container_name label in queries and easily find containers
+      - source_labels: [container_label_io_kubernetes_container_name]
+        target_label: container_name
