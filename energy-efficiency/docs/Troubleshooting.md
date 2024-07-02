@@ -12,7 +12,7 @@ minikube start
 ```
 Possibly also restarting other things, such as forwarding Grafana.
 
-# Using Kubernetes dashboard
+# Using Kubernetes dashboard for trouble shooting
 Run
 ```sh
 minikube dashboard
@@ -30,7 +30,54 @@ Then I viewed the configMaps in the Kubernetes dashboard under Config and Storag
 # Kubernetes automatically restarted this pod for me and then it worked!
 ```
 
-# cadvisor metrics not container 'name' label
+# Prometheus not showing target, while it is displayed in my configmap
+This is due to the reason that you may use Kubernetes service discovery to find pods. In this example you can see a prometheus config for the job name that adds the data for cadvisor:
+```yaml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'cadvisor'
+    # Configures Kubernetes service discovery to find pods
+    kubernetes_sd_configs:
+      - role: pod
+    # Configures relabeling rules
+    relabel_configs:
+      # Keep only pods with the label app=cadvisor (otherwise all other metrics will be included, but you only want cadvisor metrics)
+      - source_labels: [__meta_kubernetes_pod_label_name]
+        action: keep
+        regex: cadvisor
+      # Replace target with pod IP and port 8080 (where cadvisor runs)
+      - source_labels: [__meta_kubernetes_pod_ip]
+        action: replace
+        target_label: __address__
+        regex: (.+)
+        replacement: ${1}:8080
+```
+Here you can see that 'kubernetes_sd_configs' is used. The issue I had was that I first used:
+```yaml
+- source_labels: [__meta_kubernetes_pod_label_app]
+```
+Here I used app instead of name for the labels to discover pods. However, that label did not exist. You can list labels of the pods using this command:
+```sh
+# Replace the part after -n with the namespace the pod is in
+kubectl get pods -n kube-system --show-labels
+
+# Example output:
+NAME                               READY   STATUS    RESTARTS       AGE    LABELS
+cadvisor-p7bbr                     1/1     Running   1 (98m ago)    100m   controller-revision-hash=7d9b7fb895,name=cadvisor,pod-template-generation=1
+coredns-7db6d8ff4d-d86gf           1/1     Running   2 (125m ago)   16h    k8s-app=kube-dns,pod-template-hash=7db6d8ff4d
+etcd-minikube                      1/1     Running   2 (125m ago)   16h    component=etcd,tier=control-plane
+kube-apiserver-minikube            1/1     Running   2 (125m ago)   16h    component=kube-apiserver,tier=control-plane
+kube-controller-manager-minikube   1/1     Running   2 (125m ago)   16h    component=kube-controller-manager,tier=control-plane
+kube-proxy-q5v85                   1/1     Running   2 (125m ago)   16h    controller-revision-hash=79cf874c65,k8s-app=kube-proxy,pod-template-generation=1
+kube-scheduler-minikube            1/1     Running   2 (125m ago)   16h    component=kube-scheduler,tier=control-plane
+storage-provisioner                1/1     Running   3 (125m ago)   16h    addonmanager.kubernetes.io/mode=Reconcile,integration-test=storage-provisioner
+```
+In the example output you can see that only the name label is present for cadvisor, and not the app label. Therefore, I changed the label to the original yaml code snippet above and restarted Prometheus (see issue below: this restarts Prometheus (1. create/update configmap/2. delete prometheus-server pod to automatically restart it./3. port forward to view changes)).
+
+# cadvisor metrics not including 'name' label
 Make sure that you have applied the correct configmap to Prometheus and that cadvisor is running as a separate daemonset.
 Firstly, run cadvisor as a separate daemonset:
 ```sh
