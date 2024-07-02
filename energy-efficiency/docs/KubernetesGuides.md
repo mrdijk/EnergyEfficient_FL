@@ -1,1 +1,31 @@
 # Apply configuration to Prometheus
+
+
+# Minimal cadvisor setup for Prometheus
+```yaml
+global:
+  scrape_interval: 1m
+  evaluation_interval: 1m
+  # Avoids cadvisor to exceed the timeout range for example (increase when jobs are exceeding this time)
+  scrape_timeout: 25s
+
+scrape_configs:
+  - job_name: 'cadvisor'
+    # Configures Kubernetes service discovery to find pods
+    kubernetes_sd_configs:
+      - role: pod
+    # Configures relabeling rules
+    relabel_configs:
+      # Keep only pods with the label app=cadvisor (otherwise all other metrics will be included, but you only want cadvisor metrics)
+      - source_labels: [__meta_kubernetes_pod_label_name]
+        action: keep
+        regex: cadvisor
+      # Replace target with pod IP and port 8080 (where cadvisor runs)
+      - source_labels: [__meta_kubernetes_pod_ip]
+        action: replace
+        target_label: __address__
+        regex: (.+)
+        replacement: ${1}:8080
+      # No custom labels/replacements are set here (do NOT change this, because now it works!), so that the defaults of 
+      # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
+```

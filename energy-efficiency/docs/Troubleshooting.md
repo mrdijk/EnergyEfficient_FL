@@ -80,7 +80,7 @@ storage-provisioner                1/1     Running   3 (125m ago)   16h    addon
 ```
 In the example output you can see that only the name label is present for cadvisor, and not the app label. Therefore, I changed the label to the original yaml code snippet above and restarted Prometheus (see issue below: this restarts Prometheus (1. create/update configmap/2. delete prometheus-server pod to automatically restart it./3. port forward to view changes)).
 
-# cadvisor metrics not including 'name' label
+# cadvisor metrics not including label for container name
 Make sure that you have applied the correct configmap to Prometheus and that cadvisor is running as a separate daemonset.
 Firstly, run cadvisor as a separate daemonset:
 ```sh
@@ -128,6 +128,22 @@ The 'linkerd-proxy-injector-67945967d6-r9vg7' pod contains the container with na
 container_label_io_kubernetes_pod_name="linkerd-proxy-injector-67945967d6-r9vg7"
 
 This is also what it should be for grouping the results by name, then you can filter by containers for example:
+
+![alt text](./assets/cadvisorFilterByContainer.png)
+
+In this case you can see that we filter by 'container_label_io_kubernetes_container_name', which is equal to the container name that is provided by cadvisor in the used version. This is how you can filter these results by container.
+
+
+# Prometheus query not returning any results, while you do expect results
+This can happen if you have a time included, such as a time interval of 1m:
+
+![alt text](./assets/PrometheusNoResultsQueryTimeinterval.png)
+
+To fix this, you can try to increase the time to find data:
+
+![alt text](./assets/PrometheusNoResultsFix.png)
+
+Here you can see that there are results available (if not you can try to keep increasing the interval until you have data, such as 3m, 5m, 10m, etc.). This issue is related to the (global or job specific) configuration of prometheus. For example, if you have a scrape interval of 1m, then there is probably no data available at the time interval of 1m. 
 
 
 # Helm issues
@@ -189,7 +205,7 @@ error: unable to forward port because pod is not running. Current status=Pending
 
 If that not works, there is probably something with the resources/services in the namespace. You can try to remove the namespace and change the configuration and recreate it. For example, I had a prometheus-config.yaml file that was not properly configured and therefore prometheus could not be used, while there where no error messages anywhere, it just took too long to access.
 
-# Cluster role exists
+# Cluster role exists or other data exists
 ```sh
 poetoec@LAPTOP-IA1OBTR5:/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/energy-efficiency/scripts$ helm install prometheus prometheus-community/kube-prometheus-stack -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/prometheus-config.yaml"
 Error: INSTALLATION FAILED: Unable to continue with install: ClusterRole "prometheus-kube-state-metrics" in namespace "" exists and cannot be imported into the current release: invalid ownership metadata; annotation validation error: key "meta.helm.sh/release-namespace" must equal "default": current value is "monitoring"

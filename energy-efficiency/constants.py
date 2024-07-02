@@ -1,20 +1,26 @@
 # Prometheus server URL (make sure you port forwarded Prometheus to localhost:9090)
 PROMETHEUS_URL = 'http://localhost:9090'
 
-METRIC_STEP = 5  # In seconds
-MAX_RESOLUTION = 11_000  # Maximum resolution of Prometheus
-DURATION = "1m"
+# The steps used for the metrics (in seconds)
+METRIC_STEP = 5
+# Maximum resolution of Prometheus (i.e. the maximum number of data points that can be returned in a single query)
+MAX_RESOLUTION = 11_000
+# How far back in time Prometheus should look to calculate the rate of change
+# Set to two minutes to get more data points for the rate calculation (1m sometimes gives no data)
+DURATION = "2m" 
 
 # TODO: fix queries not working with by, needs to be something different
 
 # Prometheus queries to get relevant energy metrics (same as study from Ivano and colleagues)
+# Group by container_label_io_kubernetes_container_name because cadvisor uses this label to identify container names 
+# (see TroubleShooting.md for explanation of container label in cadvisor)
 QUERIES = {
     "cpu": f"sum(rate(container_cpu_usage_seconds_total[{DURATION}])) by (container_label_io_kubernetes_container_name)",
-    "memory": f"sum(rate(container_memory_usage_bytes[{DURATION}])) by (name)",
-    "memory_rss": f"sum(rate(container_memory_rss[{DURATION}])) by (name)",
-    "memory_cache": f"sum(rate(container_memory_cache[{DURATION}])) by (name)",
+    "memory": f"sum(rate(container_memory_usage_bytes[{DURATION}])) by (container_label_io_kubernetes_container_name)",
+    "memory_rss": f"sum(rate(container_memory_rss[{DURATION}])) by (container_label_io_kubernetes_container_name)",
+    "memory_cache": f"sum(rate(container_memory_cache[{DURATION}])) by (container_label_io_kubernetes_container_name)",
     # Total bytes read by the container
-    "disk": f"sum(rate(container_fs_reads_bytes_total[{DURATION}])) by (name)",
+    "disk": f"sum(rate(container_fs_reads_bytes_total[{DURATION}])) by (container_label_io_kubernetes_container_name)",
     # Power consumption using Kepler (https://sustainable-computing.io/design/metrics/)
     "power": 'sum by (pod_name, container_name, container_namespace, node)(irate(kepler_container_joules_total{}[{DURATION}]))',
 }
