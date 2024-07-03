@@ -57,6 +57,86 @@ In this case you can see that we filter by 'container_label_io_kubernetes_contai
 
 
 
+# Too many files open, pod not starting (or other unexplainable errors)
+The example error for this section is:
+
+
+Happened after uninstalling using helm (uninstall monitoring chart). Then re-applying (helm upgrade) and the issue was there.
+What fixed it was that I left the issue for about a day. Then I came back and started up minikube and all of a sudden it worked! So, when you restart minikube it fixes a lot of these weird issues, because it then re-initializes a lot of resources and that can fix these issues, so for example run:
+```sh
+# What you can do first is to restart the pod/service/etc... This is an example of a pod restart:
+
+# If that does not work you can try to restart minikube
+# Stop minikube
+minikube stop
+
+# Wait for about 30 seconds
+
+# Restart minikube
+minikube start
+```
+
+**This approach can fix a lot of problems that may occur that you do not know why they are occurring. This is an easy method to try before applying drastic changes, because this fixes a lot of those issues most of the time.**
+
+If this does not fix the issue, you may try to analyse the issue further:
+```sh
+# Get the pods from the namespace:
+kubectl get pods -n cadvisor
+
+# Get the uulimit (max number of files open setting):
+kubectl exec -it -n cadvisor <pod-name> -- sh -c "ulimit -n"
+# In my case it displayed: 1048576, which is a more than high enough number for cadvisor probably. So, that is why it worked again when I restarted minikube.
+# If this displays something very low, then you might need to increase this.
+```
+To increase the ulimit, you can try to 
+
+
+
+# Prometheus does not see a Target
+For example, when you go to the Prometheus UI > Status > Targets and you do not see it, or it is empty when you select it, it means that it is not properly configured or cannot be discovered by Prometheus. When I had this issue, it was because I discovered the pod using the label: name:
+```yaml
+prometheus:
+  prometheusSpec:
+    additionalScrapeConfigs:
+      # Job to gather metrics like CPU and memory using cadvisor daemonset
+      - job_name: 'cadvisor'
+        # Configures Kubernetes service discovery to find pods
+        kubernetes_sd_configs:
+          - role: pod
+        # Configures relabeling rules
+        relabel_configs:
+          # Keep only pods with the label name=cadvisor (otherwise all other metrics will be included, but you only want cadvisor metrics)
+          # Make sure that the name label is present in the pod (or in this case daemonset) you are creating! Otherwise, Prometheus cannot see it
+          - source_labels: [__meta_kubernetes_pod_label_name]
+            action: keep
+            regex: cadvisor
+          # Replace target with pod IP and port 8080 (where cadvisor runs)
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            target_label: __address__
+            regex: (.+)
+            replacement: ${1}:8080
+          # No custom labels/replacements are set here (do NOT change this, because now it works!), so that the defaults of 
+          # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
+```
+However, I had the daemonset configured like this (the label part):
+```yaml
+spec:
+  selector:
+    matchLabels:
+      k8s-app: cadvisor
+```
+As you can see, I did not have the label 'name'. So, I fixed it with changing the label to name:
+```yaml
+spec:
+  selector:
+    matchLabels:
+      name: cadvisor
+```
+And then I redeployed/re-applied the daemonset and then it worked!
+
+
+
 
 # Minikube status and logs for troubleshooting
 You can use minikube status to view the status of the Kubernetes cluster to see if everything is running for example:

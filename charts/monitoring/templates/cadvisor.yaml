@@ -18,15 +18,15 @@ metadata:
   name: cadvisor
   namespace: cadvisor
   labels:
-    k8s-app: cadvisor
+    name: cadvisor
 spec:
   selector:
     matchLabels:
-      k8s-app: cadvisor
+      name: cadvisor
   template:
     metadata:
       labels:
-        k8s-app: cadvisor
+        name: cadvisor
     spec:
       serviceAccountName: cadvisor
       containers:
@@ -46,15 +46,6 @@ spec:
         # Disable not needed metrics (saves resources) 
         # If metrics are missing, see this link and remove the disable option here: https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md
         - --disable_metrics=advtcp,cpuLoad,cpu_topology,cpuset,hugetlb,memory_numa,network,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp
-        # securityContext:
-        #   runAsUser: 0
-        #   privileged: true
-        #   capabilities:
-        #     add: ["SYS_ADMIN"]
-        #   ulimits:
-        #     - name: nofile
-        #       soft: 65536
-        #       hard: 65536
         volumeMounts:
         - name: rootfs
           mountPath: /rootfs

@@ -9,6 +9,7 @@ prometheus:
         # Configures relabeling rules
         relabel_configs:
           # Keep only pods with the label app=cadvisor (otherwise all other metrics will be included, but you only want cadvisor metrics)
+          # Make sure that the name label is present in the pod (or in this case daemonset) you are creating! Otherwise, Prometheus cannot see it
           - source_labels: [__meta_kubernetes_pod_label_name]
             action: keep
             regex: cadvisor
