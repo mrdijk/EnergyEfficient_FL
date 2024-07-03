@@ -1,14 +1,9 @@
-from utils import exec_query, _merge, save_energy_data_to_file, get_time_range
+from utils import get_time_range, save_energy_data_to_file
 import numpy as np
 import pandas as pd
-from constants import QUERIES, METRIC_STEP, MAX_RESOLUTION
-# from constants import RELEVANT_PROMETHEUS_CONTAINER_METRICS, RELEVANT_KEPLER_CONTAINER_METRICS, PROMETHEUS_QUERIES
+import requests
+from constants import QUERIES, METRIC_STEP, MAX_RESOLUTION, CONTAINERS, PROMETHEUS_URL, KEPLER_CONTAINER_NAME_LABEL, CADVISOR_CONTAINER_NAME_LABEL
 
-# TODO: make the same as the study by Ivano and his colleagues! https://github.com/uDEVOPS2020/Anomaly-Detection-and-Root-Cause-Analysis-of-Microservices-Energy-Consumption/blob/main/vuDevOps/data_collection/metrics/get_metrics.py
-
-# TODO: convert to microWatts not necessary, energy consumption is already in watts (study by Ivano and his colleagues uses this)
-
-# TODO: convert to csv and use pandas everywhere
 
 def main():
     # Get the time using the util function
@@ -21,6 +16,62 @@ def main():
 
     # Save the data to a file
     save_energy_data_to_file(df, 'energy_metrics')
+
+
+def exec_query(query, start_time, end_time):
+    """
+    TODO: Add docstring. Function to query Prometheus.
+    """
+    print(f"Querying Prometheus with query: {query}")
+    print(f"Start time: {start_time}, End time: {end_time}")
+    
+    # Query Prometheus with a time range
+    response = requests.get(
+        f"{PROMETHEUS_URL}/api/v1/query_range",
+        params={
+            "query": query,
+            "start": start_time,
+            "end": end_time,
+            "step": f"{METRIC_STEP}s",
+        },
+    )
+
+    # If the query was successful, return the results
+    if response.status_code == 200:
+        # Initialize a dictoinary to store the data
+        data = {}
+        # Get the result from the response
+        results = response.json()["data"]["result"]
+
+        # Loop through the results
+        for result in results:
+            # Initialize container_name as None
+            container_name = None
+
+            # Check if the result contains specific keys (required to identify the container used)
+            if not all(
+                k not in result["metric"].keys() for k in [KEPLER_CONTAINER_NAME_LABEL, CADVISOR_CONTAINER_NAME_LABEL]
+            ):
+                return
+
+            print(result["metric"].keys())
+
+            # Get the container name from the result
+            if KEPLER_CONTAINER_NAME_LABEL in result["metric"]:
+                container_name = result["metric"][KEPLER_CONTAINER_NAME_LABEL]
+            elif CADVISOR_CONTAINER_NAME_LABEL in result["metric"]:
+                container_name = result["metric"][CADVISOR_CONTAINER_NAME_LABEL]
+        
+            # Only add the data if the container name is in the containers list
+            if container_name in CONTAINERS:
+                data[container_name] = result["values"]
+
+        # Return the data
+        return data
+    else:
+        raise Exception(
+            f"Query failed with status code {response.status_code}: {response.content}")
+
 
 def get_data_for_query(query, start, end):
     """
@@ -43,9 +94,21 @@ def get_data_for_query(query, start, end):
         data = _merge(data, d)
         # Update the start time for the next query
         start_time = end_time + 1
-    
+
     # Return the data
     return data
+
+
+def _merge(x, y):
+    """
+    Merge two dictionaries of lists by appending the entries to the list.
+    y will be append at the end of x.
+    """
+    data = x
+    for key in y:
+        data[key] = x.get(key, []) + y[key]
+    return data
+
 
 def get_data(start, end):
     """
@@ -55,7 +118,7 @@ def get_data(start, end):
     # Use Default if start_time and end_time are not provided
     if start is None or end is None:
         start, end = get_time_range()
-    
+
     data = {}
 
     # Get the data for each query (name, query)
@@ -93,6 +156,7 @@ def make_dict_list_equal(dict_list):
             new_list = old_list[:l_min]
         new_dict[key] = new_list
     return new_dict
+
 
 # TODO: old solution, remove later
 # # Function to calculate energy consumption and save to a file

@@ -7,22 +7,26 @@ METRIC_STEP = 5
 MAX_RESOLUTION = 11_000
 # How far back in time Prometheus should look to calculate the rate of change
 # Set to two minutes to get more data points for the rate calculation (1m sometimes gives no data)
-DURATION = "2m" 
+DURATION = "5m" 
 
 # TODO: fix queries not working with by, needs to be something different
+
+# Labels used to identify the container name in the Prometheus metrics
+KEPLER_CONTAINER_NAME_LABEL = "container_name"
+CADVISOR_CONTAINER_NAME_LABEL = "container_label_io_kubernetes_container_name"
 
 # Prometheus queries to get relevant energy metrics
 # Group by container_label_io_kubernetes_container_name because cadvisor uses this label to identify container names 
 # (see TroubleShooting.md for explanation of container label in cadvisor)
 QUERIES = {
-    "cpu": f"sum(rate(container_cpu_usage_seconds_total[{DURATION}])) by (container_label_io_kubernetes_container_name)",
-    "memory": f"sum(rate(container_memory_usage_bytes[{DURATION}])) by (container_label_io_kubernetes_container_name)",
-    "memory_rss": f"sum(rate(container_memory_rss[{DURATION}])) by (container_label_io_kubernetes_container_name)",
-    "memory_cache": f"sum(rate(container_memory_cache[{DURATION}])) by (container_label_io_kubernetes_container_name)",
+    "cpu": f"sum(rate(container_cpu_usage_seconds_total[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
+    "memory": f"sum(rate(container_memory_usage_bytes[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
+    "memory_rss": f"sum(rate(container_memory_rss[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
+    "memory_cache": f"sum(rate(container_memory_cache[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
     # Total bytes read by the container
-    "disk": f"sum(rate(container_fs_reads_bytes_total[{DURATION}])) by (container_label_io_kubernetes_container_name)",
+    "disk": f"sum(rate(container_fs_reads_bytes_total[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
     # Power consumption using Kepler (https://sustainable-computing.io/design/metrics/)
-    "power": 'sum by (pod_name, container_name, container_namespace, node)(irate(kepler_container_joules_total{}[{DURATION}]))',
+    "power": f"sum by (pod_name, {KEPLER_CONTAINER_NAME_LABEL}, container_namespace, node)(irate(kepler_container_joules_total[{DURATION}]))"
 }
 
 # Relevant containers to monitor the energy consumption 
