@@ -1,23 +1,143 @@
 # cadvisor metrics not including label for container name
-Make sure that you have applied the correct configmap to Prometheus and that cadvisor is running as a separate daemonset.
-This issue is coming from the fact that cadvisor is probably not correctly running correctly. This can be fixed by running cadvisor as a daemonset in the Kubernetes cluster.
+This issue was occurring because I had not deployed cadvisor as a separate daemonset in my Kubernetes cluster. Therefore, it did not display the metrics correctly, even though Kubelet contains cadvisor. So, you need to deploy cadvisor as a separate daemonset to allow it to gather metrics on all nodes/pods/containers, etc.
 
-TODO: update
+Firstly, add cavisor as a daemonset (this includes the namespace and serviceaccount), such as:
+```yaml
+# cadvisor (namespace, serviceaccount and daemonset)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cadvisor
+---
 
-Firstly, run cadvisor as a separate daemonset:
-```sh
-# Create the daemonset using the cadvisor daemonset yaml file
-kubectl apply -f "/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/core/cadvisor-daemonset.yaml"
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cadvisor
+  namespace: cadvisor
+---
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cadvisor
+  namespace: cadvisor
+  labels:
+    name: cadvisor
+spec:
+  selector:
+    matchLabels:
+      name: cadvisor
+  template:
+    metadata:
+      labels:
+        name: cadvisor
+    spec:
+      serviceAccountName: cadvisor
+      containers:
+      - name: cadvisor
+        image: {{ .Values.cadvisor.image.repository }}:{{ .Values.cadvisor.image.tag }}
+        resources:
+          requests:
+            memory: {{ .Values.cadvisor.resources.requests.memory }}
+            cpu: {{ .Values.cadvisor.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.cadvisor.resources.limits.memory }}
+            cpu: {{ .Values.cadvisor.resources.limits.cpu }}
+        args:
+        # Housekeeping is the interval that cadvisor gathers metrics (Default is 1s, increase to reduce resource usage)
+        - --housekeeping_interval=60s
+        - --max_housekeeping_interval=60s
+        # Disable not needed metrics (saves resources) 
+        # If metrics are missing, see this link and remove the disable option here: https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md
+        - --disable_metrics=advtcp,cpuLoad,cpu_topology,cpuset,hugetlb,memory_numa,network,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp
+        volumeMounts:
+        - name: rootfs
+          mountPath: /rootfs
+          readOnly: true
+        - name: var-run
+          mountPath: /var/run
+          readOnly: true
+        - name: sys
+          mountPath: /sys
+          readOnly: true
+        - name: docker
+          mountPath: /var/lib/docker
+          readOnly: true
+        - name: disk
+          mountPath: /dev/disk
+          readOnly: true
+        ports:
+          - name: http
+            containerPort: {{ .Values.cadvisor.service.port }}
+            protocol: TCP
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: rootfs
+        hostPath:
+          path: /
+      - name: var-run
+        hostPath:
+          path: /var/run
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: docker
+        hostPath:
+          path: /var/lib/docker
+      - name: disk
+        hostPath:
+          path: /dev/disk
 ```
+Make sure that you deploy it as a helm chart, such as in the monitoring helm chart located in this project.
 
-Then prometheus needs to be configured appropriately:
+This is the .yaml file containing namespace.yaml, serviceaccount.yaml and daemonset.yaml from https://github.com/google/cadvisor/tree/master/deploy/kubernetes/base all in one, with the image changed to a newer one and including variables set in a helm chart:
+![alt text](./assets/GoogleCadvisorKubernetesDeploy.png)
+
+Then prometheus needs to be configured appropriately to scrape the metrics from cadvisor:
 ```sh
-# Run the script to apply the configmap and delete the pod (recreates it automatically == restart pod)
-# Replace with real string-id of the pod name (e.g. prometheus-server-5787759b8c-46gwn)
-./reconfigurePrometheusServer.sh prometheus-server-string-id
+# Set variables for the paths (example with the monitoring chart path)
+$monitoringChartsPath="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/monitoring"
+monitoringValues="$monitoringChartsPath/values.yaml"
+
+# Add the job to the prometheus config file:
+prometheus:
+  prometheusSpec:
+    additionalScrapeConfigs:
+      # Job to gather metrics like CPU and memory using cadvisor daemonset
+      - job_name: 'cadvisor'
+        # Configures Kubernetes service discovery to find pods
+        kubernetes_sd_configs:
+          - role: pod
+        # Configures relabeling rules
+        relabel_configs:
+          # Keep only pods with the label app=cadvisor (otherwise all other metrics will be included, but you only want cadvisor metrics)
+          # Make sure that the name label is present in the pod (or in this case daemonset) you are creating! Otherwise, Prometheus cannot see it
+          - source_labels: [__meta_kubernetes_pod_label_name]
+            action: keep
+            regex: cadvisor
+          # Replace target with pod IP and port 8080 (where cadvisor runs)
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            target_label: __address__
+            regex: (.+)
+            replacement: ${1}:8080
+          # No custom labels/replacements are set here (do NOT change this, because now it works!), so that the defaults of 
+          # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
+
+# Rerun/upgrade Prometheus stack with the file
+helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoringPath/prometheus-config.yaml"
+
+# Upgrade/apply the helm chart for the monitoring release:
+helm upgrade -i -f "$monitoringValues" monitoring $monitoringChartsPath
+
+# Then delete the prometheus operator pod (recreates it automatically == restart pod)
+kubectl delete pod prometheus-kube-prometheus-operator-<stringInPodName> -n monitoring
+# e.g.: kubectl delete pod prometheus-kube-prometheus-operator-6554f4464f-x2dw9 -n monitoring
 
 # Then port forward promtheus and see if it is working
-kubectl port-forward svc/prometheus-server 9090:80 -n monitoring
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
 ```
 Go to the Prometheus UI and navigate to Status > Targets. Here you should see that cadvisor is in the targets:
 
@@ -57,11 +177,23 @@ In this case you can see that we filter by 'container_label_io_kubernetes_contai
 
 
 
+
+
 # Too many files open, pod not starting (or other unexplainable errors)
+This should NOT be done with all errors! An error like this for example:
+```sh
+0/1 nodes are available: persistentvolumeclaim "rabbit-pvc" not found. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.
+```
+Is descriptive and is not unexplainable. Here you need to create the Persistent Volume Claim (PVC) rabbit-pvc for it to work and you should not apply the below solutions, because that will not work. So, only apply the below solutions when the error is unexplainable and you do not really know what to do. This is an easy fix that might be worth a try.
+
 The example error for this section is:
+```sh
+E0702 14:44:35.994664       1 manager.go:294] Registration of the raw container factory failed: inotify_init: too many open files
+F0702 14:44:35.994677       1 cadvisor.go:170] Failed to start manager: inotify_init: too many open files
+```
+The container/pod itself might say something like 'crashloopbackof ...' or something else related, but when I took a look at the logs and then the container, it said the above error.
 
-
-Happened after uninstalling using helm (uninstall monitoring chart). Then re-applying (helm upgrade) and the issue was there.
+This occured after uninstalling using helm (uninstall monitoring chart). Then re-applying (helm upgrade) and the issue was there.
 What fixed it was that I left the issue for about a day. Then I came back and started up minikube and all of a sudden it worked! So, when you restart minikube it fixes a lot of these weird issues, because it then re-initializes a lot of resources and that can fix these issues, so for example run:
 ```sh
 # What you can do first is to restart the pod/service/etc... This is an example of a pod restart:
@@ -75,8 +207,97 @@ minikube stop
 # Restart minikube
 minikube start
 ```
+You may try this several times, since it does not always work the first time. So, you can try to do it a couple of times before giving up on this fix, waiting some time in between. The waiting in between is very important, since this lets the resources and operations cool down. For example, start it, wait about a minute, then stop and wait some time again and retry.
 
 **This approach can fix a lot of problems that may occur that you do not know why they are occurring. This is an easy method to try before applying drastic changes, because this fixes a lot of those issues most of the time.**
+
+
+I also tried to reduce the amount of resources it consumed by adding these arguments:
+```yaml
+# args only:
+        args:
+        # Housekeeping is the interval that cadvisor gathers metrics (Default is 1s, increase to reduce resource usage)
+        - --housekeeping_interval=60s
+        - --max_housekeeping_interval=60s
+        # Disable not needed metrics (saves resources) 
+        # If metrics are missing, see this link and remove the disable option here: https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md
+        - --disable_metrics=advtcp,cpuLoad,cpu_topology,cpuset,hugetlb,memory_numa,network,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp
+
+# Full daemonset:
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cadvisor
+  namespace: cadvisor
+  labels:
+    name: cadvisor
+spec:
+  selector:
+    matchLabels:
+      name: cadvisor
+  template:
+    metadata:
+      labels:
+        name: cadvisor
+    spec:
+      serviceAccountName: cadvisor
+      containers:
+      - name: cadvisor
+        image: {{ .Values.cadvisor.image.repository }}:{{ .Values.cadvisor.image.tag }}
+        resources:
+          requests:
+            memory: {{ .Values.cadvisor.resources.requests.memory }}
+            cpu: {{ .Values.cadvisor.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.cadvisor.resources.limits.memory }}
+            cpu: {{ .Values.cadvisor.resources.limits.cpu }}
+        args:
+        # Housekeeping is the interval that cadvisor gathers metrics (Default is 1s, increase to reduce resource usage)
+        - --housekeeping_interval=60s
+        - --max_housekeeping_interval=60s
+        # Disable not needed metrics (saves resources) 
+        # If metrics are missing, see this link and remove the disable option here: https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md
+        - --disable_metrics=advtcp,cpuLoad,cpu_topology,cpuset,hugetlb,memory_numa,network,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp
+        volumeMounts:
+        - name: rootfs
+          mountPath: /rootfs
+          readOnly: true
+        - name: var-run
+          mountPath: /var/run
+          readOnly: true
+        - name: sys
+          mountPath: /sys
+          readOnly: true
+        - name: docker
+          mountPath: /var/lib/docker
+          readOnly: true
+        - name: disk
+          mountPath: /dev/disk
+          readOnly: true
+        ports:
+          - name: http
+            containerPort: {{ .Values.cadvisor.service.port }}
+            protocol: TCP
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: rootfs
+        hostPath:
+          path: /
+      - name: var-run
+        hostPath:
+          path: /var/run
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: docker
+        hostPath:
+          path: /var/lib/docker
+      - name: disk
+        hostPath:
+          path: /dev/disk
+```
+
 
 If this does not fix the issue, you may try to analyse the issue further:
 ```sh
@@ -88,7 +309,36 @@ kubectl exec -it -n cadvisor <pod-name> -- sh -c "ulimit -n"
 # In my case it displayed: 1048576, which is a more than high enough number for cadvisor probably. So, that is why it worked again when I restarted minikube.
 # If this displays something very low, then you might need to increase this.
 ```
-To increase the ulimit, you can try to 
+To increase the ulimit, you can try a few different things:
+```sh
+# Try to increase the ulimit in the daemonset/pod/etc..., such as adding this:
+    spec:
+      securityContext:
+        sysctls:
+        - name: fs.file-max
+          value: "1048576"
+# After that you can try to check the ulimit again to see if the changes have applied:
+kubectl exec -it -n cadvisor <pod-name> -- sh -c "ulimit -n"
+
+
+
+# Or you can try to increase the docker ulimit globally:
+# Open minikube ssh
+minikube ssh
+# Check docker configurations
+ps aux | grep dockerd
+# Example display:
+root         973  5.5  1.2 8545664 100112 ?      Ssl  12:15   1:34 /usr/bin/dockerd -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --default-ulimit=nofile=1048576:1048576 --tlsverify --tlscacert /etc/docker/ca.pem --tlscert /etc/docker/server.pem --tlskey /etc/docker/server-key.pem --label provider=docker --insecure-registry 10.96.0.0/12
+root        1302  4.3  0.3 1278400 31388 ?       Ssl  12:15   1:15 /usr/bin/cri-dockerd --container-runtime-endpoint fd:// --pod-infra-container-image=registry.k8s.io/pause:3.9 --network-plugin=cni --hairpin-mode=hairpin-veth
+docker     15208  0.0  0.0   3604  1652 pts/1    S+   12:44   0:00 grep --color=auto dockerd
+# Here you can see that the global default ulimit is: --default-ulimit=nofile=1048576:1048576
+# But you can increase this manually by doing this for example (or even higher):
+minikube start --docker-opt="default-ulimit=nofile=102400:102400"
+# You may need to restart minikube or even delete and then recreate minikube again
+```
+
+And if this does not fix the issue, you may need to analyse the issue further and see if you can find a solution on the internet or using AI for example.
+
 
 
 
