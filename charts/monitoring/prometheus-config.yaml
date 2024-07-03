@@ -1,5 +1,13 @@
+# Keep this format for this part, because this works for adding additional scrape configs!
 prometheus:
   prometheusSpec:
+    # Set global scrape interval and scrape timeout
+    scrape_interval: '1m'
+    evaluation_interval: '1m'
+    # Set this to higher to avoid cadvisor sometimes timing out
+    scrape_timeout: '25s'
+
+    # Additional scrape configs (on top of already present/default ones)
     additionalScrapeConfigs:
       # Job to gather metrics like CPU and memory using cadvisor daemonset
       - job_name: 'cadvisor'
