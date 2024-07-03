@@ -1,10 +1,10 @@
 # Energy Consumption Measurements in DYNAMOS
 
-# TODO: add in master thesis when Kernel is working. With above explanation and add short explanation on Kernel using the documentation as a reference!
-# TODO: add documentation on how I added energy consumption measurements to DYNAMOS in Prometheus.
-# TODO: probably I need to add grafana so that I can persist the metrics from Kernel in Prometheus with Grafana.
+For the energy measurement Prometheus is used. This file shortly explains how you can run Prometheus to view the metrics.
 
 ## Configure minikube to use cgroup2 driver
+If you have not already done this:
+
 See this guide for detailed instructions: https://kubernetes.io/docs/concepts/architecture/cgroups/
 The cgroup v2 version is required for metrics to not end up with zeros for Kepler.
 
@@ -34,9 +34,8 @@ $ minikube ssh "ps axw | grep docker"
 ```
 Then use the getting started guide and start from the beginning to configure the Kubernetes cluster.
 
-# TODO: change to new Prometheus stack
 ## Prometheus to view measurements
-For the energy consumption measurements the prometheus-config.yaml file has been configured appropriately, see: C:\Users\cpoet\IdeaProjects\EnergyEfficiency_DYNAMOS\charts\core\prometheus-config.yaml
+For the energy consumption measurements the prometheus-config.yaml file has been configured appropriately.
 
 Run the following commands to view the measurements:
 ```sh
@@ -62,10 +61,8 @@ Then search for kepler metrics to view the Kepler metrics:
 
 See this guide for detailed information about Kepler metrics: https://sustainable-computing.io/design/metrics/
 
-# TODO: convert everything to WSL and then retest running DYNAMOS.
 
-
-<!-- ## Optional: Configuring Grafana
+<!-- ## Optional (removed, but kept here because I spend a lot of time on this, but it is not required for my master project, Prometheus only suffices!): Configuring Grafana
 This is only optional. Grafana requires extra steps to setup and is way slower than Prometheus, so this is only if it is ever needed, but not mandatory. Prometheus is more than good enough!
 ```sh
 # Grafana setup
@@ -108,51 +105,3 @@ kubectl cp kepler_dashboard.json monitoring/$($GF_POD):/tmp/dashboards/kepler_da
 # 2. Navigate to Dashboards > New > Import
 # 3. Import the kepler_dashboard.json file
 ```  -->
-
-
-
-<!-- ## Installing scaphandre in Kubernetes cluster
-```sh
-# Clone the git repository in the new project
-git clone https://github.com/hubblo-org/scaphandre
-
-# Go to the scaphandre folder
-cd scaphandre
-
-# Install scaphandre in the Kubernetes cluster using helm
-helm install scaphandre helm/scaphandre --namespace monitoring
-# Or: move the scaphandre folder into the charts folder and then run
-helm install scaphandre --namespace monitoring
-
-# Install Prometheus
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo add kube-state-metrics https://kubernetes.github.io/kube-state-metrics
-helm repo update
-helm install prometheus prometheus-community/prometheus --set alertmanager.persistentVolume.enabled=false --set server.persistentVolume.enabled=false
-
-# Access prometheus
-kubectl port-forward deploy/prometheus-server 9090:9090
-
-# Remove cloned scaphandre afterwards to save space (not needed anymore)
-rm -rf ./scaphandre
-
-# Verify installation
-helm list
-```  -->
-
-<!-- TODO: prometheus-values.yaml file needs to be configured to add scaphandre?
-C:\Users\cpoet\IdeaProjects\EnergyEfficiency_DYNAMOS\charts\core\prometheus-values.yaml
-Add this?
-```yaml
-- job_name: 'scaphandre'
-    scrape_interval: 10s
-    kubernetes_sd_configs:
-    - role: endpoints
-      namespaces:
-        names:
-        - monitoring
-    relabel_configs:
-    - source_labels: [__meta_kubernetes_service_label_app]
-      action: keep
-      regex: scaphandre
-``` -->
