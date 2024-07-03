@@ -2,10 +2,17 @@ from utils import get_time_range, save_energy_data_to_file
 import numpy as np
 import pandas as pd
 import requests
+from query_prometheus import exec_query
 from constants import QUERIES, METRIC_STEP, MAX_RESOLUTION, CONTAINERS, PROMETHEUS_URL, KEPLER_CONTAINER_NAME_LABEL, CADVISOR_CONTAINER_NAME_LABEL
+
+# Running Prometheus: kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
 
 
 def main():
+    """
+    Main function of the energy measurements gathering. 
+    Run this file to gather the energy measurements that can be used for the algorithms.
+    """
     # Get the time using the util function
     start, end = get_time_range(15)
 
@@ -16,61 +23,6 @@ def main():
 
     # Save the data to a file
     save_energy_data_to_file(df, 'energy_metrics')
-
-
-def exec_query(query, start_time, end_time):
-    """
-    TODO: Add docstring. Function to query Prometheus.
-    """
-    print(f"Querying Prometheus with query: {query}")
-    print(f"Start time: {start_time}, End time: {end_time}")
-    
-    # Query Prometheus with a time range
-    response = requests.get(
-        f"{PROMETHEUS_URL}/api/v1/query_range",
-        params={
-            "query": query,
-            "start": start_time,
-            "end": end_time,
-            "step": f"{METRIC_STEP}s",
-        },
-    )
-
-    # If the query was successful, return the results
-    if response.status_code == 200:
-        # Initialize a dictoinary to store the data
-        data = {}
-        # Get the result from the response
-        results = response.json()["data"]["result"]
-
-        # Loop through the results
-        for result in results:
-            # Initialize container_name as None
-            container_name = None
-
-            # Check if the result contains specific keys (required to identify the container used)
-            if not all(
-                k not in result["metric"].keys() for k in [KEPLER_CONTAINER_NAME_LABEL, CADVISOR_CONTAINER_NAME_LABEL]
-            ):
-                return
-
-            print(result["metric"].keys())
-
-            # Get the container name from the result
-            if KEPLER_CONTAINER_NAME_LABEL in result["metric"]:
-                container_name = result["metric"][KEPLER_CONTAINER_NAME_LABEL]
-            elif CADVISOR_CONTAINER_NAME_LABEL in result["metric"]:
-                container_name = result["metric"][CADVISOR_CONTAINER_NAME_LABEL]
-        
-            # Only add the data if the container name is in the containers list
-            if container_name in CONTAINERS:
-                data[container_name] = result["values"]
-
-        # Return the data
-        return data
-    else:
-        raise Exception(
-            f"Query failed with status code {response.status_code}: {response.content}")
 
 
 def get_data_for_query(query, start, end):
@@ -99,7 +51,7 @@ def get_data_for_query(query, start, end):
     return data
 
 
-def _merge(x, y):
+def _merge(x: dict, y: dict) -> dict:
     """
     Merge two dictionaries of lists by appending the entries to the list.
     y will be append at the end of x.
@@ -156,6 +108,10 @@ def make_dict_list_equal(dict_list):
             new_list = old_list[:l_min]
         new_dict[key] = new_list
     return new_dict
+
+
+if __name__ == '__main__':
+    main()
 
 
 # TODO: old solution, remove later

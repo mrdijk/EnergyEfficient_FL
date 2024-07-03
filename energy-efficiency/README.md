@@ -1,21 +1,41 @@
 # Energy Efficiency in DYNAMOS
 Project for Collin Poetoehena's Master thesis on energy efficiency in DYNAMOS.
 
-## Running python scripts
-Navigate to the energy-efficiency folder and run the main python file:
-```sh
-# Navigate to energy-efficiency folder
-cd energy-efficiency
+Follow the getting started guide to get DYNAMOS up and running, including the Prometheus setup for gathering energy consumption metrics.
 
-# Install requirements using pip
-pip install -r requirements.txt
-
-# Run specific script 
-python main.py
-```
-Running the scripts from this location is crucial, since the imports are assuming the scripts are run from this location.
+This project contains of two parts:
+1. **Data collection**: see data-collection folder.
+2. **Data analysis**: see data-analysis folder.
 
 ## Getting Started
 - [Getting Started with DYNAMOS](docs/getting-started/0_Getting-Started.md)
 
-# TODO: create the documentation for the files in the docs folder.
+
+# Running data collection
+Navigate to the energy-efficiency/data-collection folder and run the main python file:
+```sh
+# Navigate to energy-efficiency/data-collection folder
+cd energy-efficiency/data-collection
+
+# Install requirements using pip
+pip install -r requirements.txt
+
+# Run specific scripts
+python get_metrics.py
+```
+Running the scripts from this location is crucial, since the imports are assuming the scripts are run from this location.
+
+
+# Running data analysis
+Navigate to the energy-efficiency/data-analysis folder and run the main python file:
+```sh
+# Navigate to energy-efficiency/data-analysis folder
+cd energy-efficiency/data-analysis
+
+# Install requirements using pip
+pip install -r requirements.txt
+
+# Run specific scripts
+python main.py
+```
+Running the scripts from this location is crucial, since the imports are assuming the scripts are run from this location.
