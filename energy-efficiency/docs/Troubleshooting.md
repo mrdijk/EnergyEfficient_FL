@@ -1,3 +1,26 @@
+# Troubleshooting
+This file contains documentation about Kubernetes related problems that I found very useful during my first time working with Kubernetes. It probably does not contain detailed information about general topics, like how Kubernetes works, because this is all available in the Kubernetes documentation for example. However, things that are not generally available in documentation and things I found very helpful during my time working with Kubernetes are explained (and fixed) here. So, use the documentation for general things, such as Kubernetes, Helm, etc., but for more understanding or useful steps, use this document.
+
+Do NOT add unnecessary extra information here, because that will only consume time, while it is available in the general documentation of Kubernetes for example. Only add information that you find very helpful and only when you have time, because this is just extra information!
+
+# Table of contents
+<!-- TOC -->
+- [cadvisor metrics not including label for container name](#cadvisor-metrics-not-including-label-for-container-name)
+- [Too many files open, pod not starting (or other unexplainable errors)](#too-many-files-open-pod-not-starting-or-other-unexplainable-errors)
+- [Prometheus does not see a Target](#prometheus-does-not-see-a-target)
+- [Minikube status and logs for troubleshooting](#minikube-status-and-logs-for-troubleshooting)
+- [Using Kubernetes dashboard for troubleshooting](#using-kubernetes-dashboard-for-troubleshooting)
+- [Prometheus not showing Target (Status > Targets in Prometheus UI), while it is displayed in my configmap](#prometheus-not-showing-target-status--targets-in-prometheus-ui-while-it-is-displayed-in-my-configmap)
+- [Prometheus query not returning any results, while you do expect results](#prometheus-query-not-returning-any-results-while-you-do-expect-results)
+- [Helm issues](#helm-issues)
+- [Grafana (or other forwarded port taking too long)](#grafana-or-other-forwarded-port-taking-too-long)
+- [Cluster role exists or other data exists](#cluster-role-exists-or-other-data-exists)
+- [Script file (.sh) error](#script-file-sh-error)
+- [Infinite loading with local Kubernetes (e.g. Grafana or other Kubernetes related sources)](#infinite-loading-with-local-kubernetes-eg-grafana-or-other-kubernetes-related-sources)
+<!-- /TOC -->
+
+
+
 # cadvisor metrics not including label for container name
 This issue was occurring because I had not deployed cadvisor as a separate daemonset in my Kubernetes cluster. Therefore, it did not display the metrics correctly, even though Kubelet contains cadvisor. So, you need to deploy cadvisor as a separate daemonset to allow it to gather metrics on all nodes/pods/containers, etc.
 
@@ -102,8 +125,16 @@ $monitoringChartsPath="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/
 monitoringValues="$monitoringChartsPath/values.yaml"
 
 # Add the job to the prometheus config file:
+# Keep this format for this part, because this works for adding additional scrape configs!
 prometheus:
   prometheusSpec:
+    # Set global scrape interval and scrape timeout
+    scrape_interval: '1m'
+    evaluation_interval: '1m'
+    # Set this to higher to avoid cadvisor sometimes timing out
+    scrape_timeout: '25s'
+
+    # Additional scrape configs (on top of already present/default ones)
     additionalScrapeConfigs:
       # Job to gather metrics like CPU and memory using cadvisor daemonset
       - job_name: 'cadvisor'
@@ -125,6 +156,10 @@ prometheus:
             replacement: ${1}:8080
           # No custom labels/replacements are set here (do NOT change this, because now it works!), so that the defaults of 
           # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
+# Disable grafana from prometheus stack (not needed anyway)
+grafana:
+  enabled: false
+
 
 # Rerun/upgrade Prometheus stack with the file
 helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoringPath/prometheus-config.yaml"

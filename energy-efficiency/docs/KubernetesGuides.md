@@ -1,3 +1,21 @@
+# Kubernetes guides
+This file contains documentation about Kubernetes related topics that I found very useful during my first time working with Kubernetes. It probably does not contain detailed information about general topics, like how Kubernetes works, because this is all available in the Kubernetes documentation for example. However, things that are not generally available in documentation and things I found very helpful during my time working with Kubernetes are explained here. So, use the documentation for general things, such as Kubernetes, Helm, etc., but for more understanding or useful steps, use this document.
+
+Do NOT add unnecessary extra information here, because that will only consume time, while it is available in the general documentation of Kubernetes for example. Only add information that you find very helpful and only when you have time, because this is just extra information!
+
+# Table of contents
+<!-- TOC -->
+- [Helm charts](#helm-charts)
+  - [Helm Chart Structure](#helm-chart-structure)
+  - [Example of Chart Structure](#example-of-chart-structure)
+  - [How Helm uses this](#how-helm-uses-this)
+- [Prometheus (using prometheus-stack over standalone prometheus)](#prometheus-using-prometheus-stack-over-standalone-prometheus)
+- [Configuring Prometheus stack](#configuring-prometheus-stack)
+- [Configuring config map in Prometheus (standalone, so NOT stack, this is an old guide and prometheus-stack is better to use, but may be useful sometime)](#configuring-config-map-in-prometheus-standalone-so-not-stack-this-is-an-old-guide-and-prometheus-stack-is-better-to-use-but-may-be-useful-sometime)
+- [Minimal cadvisor setup for Prometheus (standalone, so NOT stack, this is an old guide and prometheus-stack is better to use, but may be useful sometime)](#minimal-cadvisor-setup-for-prometheus-standalone-so-not-stack-this-is-an-old-guide-and-prometheus-stack-is-better-to-use-but-may-be-useful-sometime)
+<!-- /TOC -->
+
+
 # Helm charts
 The presence of multiple folders, each containing a Chart.yaml and a templates directory, suggests that you have a Helm chart repository or a collection of Helm charts. Each folder represents a separate Helm chart. Here's an explanation of how Helm uses these components:
 
@@ -100,6 +118,62 @@ kubectl apply -f my-service-monitor.yaml
 This command will create the ServiceMonitor resource, and the Prometheus Operator will automatically configure Prometheus to scrape metrics from services labeled app: my-app on the metrics port at 30-second intervals.
 
 Of course, this is just an example and you should change this to your specific use case/app you are currently configuring.
+
+
+# Configuring Prometheus stack
+You can configure everything using a .yaml file. For example, this file:
+```yaml
+# Keep this format for this part, because this works for adding additional scrape configs!
+prometheus:
+  prometheusSpec:
+    # Set global scrape interval and scrape timeout
+    scrape_interval: '1m'
+    evaluation_interval: '1m'
+    # Set this to higher to avoid cadvisor sometimes timing out
+    scrape_timeout: '25s'
+
+    # Additional scrape configs (on top of already present/default ones)
+    additionalScrapeConfigs:
+      # Job to gather metrics like CPU and memory using cadvisor daemonset
+      - job_name: 'cadvisor'
+        # Configures Kubernetes service discovery to find pods
+        kubernetes_sd_configs:
+          - role: pod
+        # Configures relabeling rules
+        relabel_configs:
+          # Keep only pods with the label app=cadvisor (otherwise all other metrics will be included, but you only want cadvisor metrics)
+          # Make sure that the name label is present in the pod (or in this case daemonset) you are creating! Otherwise, Prometheus cannot see it
+          - source_labels: [__meta_kubernetes_pod_label_name]
+            action: keep
+            regex: cadvisor
+          # Replace target with pod IP and port 8080 (where cadvisor runs)
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            target_label: __address__
+            regex: (.+)
+            replacement: ${1}:8080
+          # No custom labels/replacements are set here (do NOT change this, because now it works!), so that the defaults of 
+          # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
+
+# Disable grafana from prometheus stack (not needed anyway)
+grafana:
+  enabled: false
+```
+This can be used to install and/or upgrade Prometheus stack by appending additional scrape configs and adding scrape intervals globally for example. You can upgrade Prometheus by following these steps:
+```sh
+# Upgrade or install Prometheus stack with the configuration file (assuming the config file is present in the specified path):
+$monitoringChartsPath="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/monitoring"
+helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoringChartsPath/prometheus-config.yaml"
+
+# Then delete the prometheus operator pod (recreates it automatically == restart pod)
+kubectl delete pod prometheus-kube-prometheus-operator-<stringInPodName> -n monitoring
+# e.g.: kubectl delete pod prometheus-kube-prometheus-operator-6554f4464f-x2dw9 -n monitoring
+
+# Then port forward promtheus and see if it is working
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
+# You can view configurations by going to Status > Configuration in Prometheus
+```
+If a configuration is not being added in the configuration, then it is probably because the syntax is not correct. If the syntax is not correct, then the configuration will not be applied! For example, if you replace the "scrape_interval: '1m'" with 1m, instead of '1m' (as a string), it will not be applied, because the syntax is wrong for the number type: 1m.
 
 
 
