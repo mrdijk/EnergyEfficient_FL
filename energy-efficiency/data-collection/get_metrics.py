@@ -14,7 +14,8 @@ def main():
     Run this file to gather the energy measurements that can be used for the algorithms.
     """
     # Get the time using the util function
-    start, end = get_time_range(15)
+    start, end = get_time_range(45)
+    # TODO: the results are not completely working yet, because the queries do not really return results. See temp file where I left off
 
     # Get the data for all the queries
     df = pd.DataFrame(

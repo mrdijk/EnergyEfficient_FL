@@ -32,11 +32,12 @@ def parse_prometheus_response(response: Response) -> dict:
         # Initialize a dictoinary to store the data
         data = {}
         # Get the result from the response
-        results = response.json()
+        results = response.json()["data"]["result"]
+        # print(f"Results: {results}")
         
         # Convert results to string and print the first 500 characters
         results_str = str(results)
-        print(f"Results: {results_str[:500]}")   
+        print(f"Results: {results_str[:500]}")
 
         # Loop through the results
         for result in results:

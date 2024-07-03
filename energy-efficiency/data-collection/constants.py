@@ -14,19 +14,20 @@ DURATION = "1m"
 # Labels used to identify the container name in the Prometheus metrics
 KEPLER_CONTAINER_NAME_LABEL = "container_name"
 CADVISOR_CONTAINER_NAME_LABEL = "container_label_io_kubernetes_container_name"
+CADVISOR_GROUP_BY = f"{CADVISOR_CONTAINER_NAME_LABEL}, name, container_label_io_kubernetes_pod_namespace, node"
 
 # Prometheus queries to get relevant energy metrics
 # Group by container_label_io_kubernetes_container_name because cadvisor uses this label to identify container names 
 # (see TroubleShooting.md for explanation of container label in cadvisor)
 QUERIES = {
-    # "cpu": f"sum(rate(container_cpu_usage_seconds_total[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
-    # "memory": f"sum(rate(container_memory_usage_bytes[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
-    # "memory_rss": f"sum(rate(container_memory_rss[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
-    # "memory_cache": f"sum(rate(container_memory_cache[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
-    # # Total bytes read by the container
-    # "disk": f"sum(rate(container_fs_reads_bytes_total[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
+    "cpu": f"sum(rate(container_cpu_usage_seconds_total[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
+    "memory": f"sum(rate(container_memory_usage_bytes[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
+    "memory_rss": f"sum(rate(container_memory_rss[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
+    "memory_cache": f"sum(rate(container_memory_cache[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
+    # Total bytes read by the container
+    "disk": f"sum(rate(container_fs_reads_bytes_total[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
     # Power consumption using Kepler (https://sustainable-computing.io/design/metrics/)
-    "power": f"sum by (pod_name, {KEPLER_CONTAINER_NAME_LABEL}, container_namespace, node)(irate(kepler_container_joules_total[{DURATION}]))"
+    # "power": f"sum by (pod_name, {KEPLER_CONTAINER_NAME_LABEL}, container_namespace, node)(irate(kepler_container_joules_total[{DURATION}]))"
 }
 
 # Relevant containers to monitor the energy consumption 
