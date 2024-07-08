@@ -31,7 +31,6 @@ def exec_query(query: str, start_time: float, end_time: float) -> dict:
     # else:
     #     print("No data found in response.")
 
-    # print(f"Response: {response.json()["data"]}")
     # Use the helper function to return the parsed data from the response
     return parse_prometheus_response(response)
 
@@ -43,11 +42,6 @@ def parse_prometheus_response(response: Response) -> dict:
         data = {}
         # Get the result from the response
         results = response.json()["data"]["result"]
-        # print(f"Results: {results}")
-        
-        # Convert results to string and print the first 500 characters
-        results_str = str(results)
-        print(f"Results: {results_str[:500]}")
 
         # Loop through the results
         for result in results:
@@ -55,19 +49,18 @@ def parse_prometheus_response(response: Response) -> dict:
             container_name = None
 
             # Check if the result contains specific keys (required to identify the container used)
-            if not all(
+            if all(
                 k not in result["metric"].keys() for k in [KEPLER_CONTAINER_NAME_LABEL, CADVISOR_CONTAINER_NAME_LABEL]
             ):
-                return
-
-            print(result["metric"].keys())
+                # Skip the result if it does not contain the required keys (avoids further processing errors)
+                continue
 
             # Get the container name from the result
             if KEPLER_CONTAINER_NAME_LABEL in result["metric"]:
                 container_name = result["metric"][KEPLER_CONTAINER_NAME_LABEL]
             elif CADVISOR_CONTAINER_NAME_LABEL in result["metric"]:
                 container_name = result["metric"][CADVISOR_CONTAINER_NAME_LABEL]
-        
+
             # Only add the data if the container name is in the containers list
             if container_name in CONTAINERS:
                 data[container_name] = result["values"]

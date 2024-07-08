@@ -16,16 +16,6 @@ def main():
     """
     # Get the time interval from the last 45 minutes
     start, end = get_time_range(45)
-    # Get the current time
-    # time_str = '2024-07-08 13:41:01'
-    # start = convert_time_string_to_float(time_str)
-    # end = convert_time_string_to_float(time_str)
-    # print(f"Start time: {convert_float_time_to_string(1720435630.17)}, End time: {convert_float_time_to_string(1720439230.17)}")
-    # print(f"Start time: {convert_float_time_to_string(start)}, End time: {convert_float_time_to_string(end)}")
-
-    # start = 1720435630.17
-    # end = 1720439230.17
-    # TODO: the results are not completely working yet, because the queries do not really return results. See temp file where I left off
 
     # Get the data for all the queries
     df = pd.DataFrame(
