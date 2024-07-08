@@ -1,7 +1,8 @@
-from utils import get_time_range, save_energy_data_to_file
+from utils import get_time_range, save_energy_data_to_file, convert_float_time_to_string
 import numpy as np
 import pandas as pd
 import requests
+import time
 from query_prometheus import exec_query
 from constants import QUERIES, METRIC_STEP, MAX_RESOLUTION, CONTAINERS, PROMETHEUS_URL, KEPLER_CONTAINER_NAME_LABEL, CADVISOR_CONTAINER_NAME_LABEL
 
@@ -13,8 +14,17 @@ def main():
     Main function of the energy measurements gathering. 
     Run this file to gather the energy measurements that can be used for the algorithms.
     """
-    # Get the time using the util function
+    # Get the time interval from the last 45 minutes
     start, end = get_time_range(45)
+    # Get the current time
+    # time_str = '2024-07-08 13:41:01'
+    # start = convert_time_string_to_float(time_str)
+    # end = convert_time_string_to_float(time_str)
+    # print(f"Start time: {convert_float_time_to_string(1720435630.17)}, End time: {convert_float_time_to_string(1720439230.17)}")
+    # print(f"Start time: {convert_float_time_to_string(start)}, End time: {convert_float_time_to_string(end)}")
+
+    # start = 1720435630.17
+    # end = 1720439230.17
     # TODO: the results are not completely working yet, because the queries do not really return results. See temp file where I left off
 
     # Get the data for all the queries

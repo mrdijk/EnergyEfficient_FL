@@ -20,6 +20,16 @@ def exec_query(query: str, start_time: float, end_time: float) -> dict:
             "step": f"{METRIC_STEP}s",
         },
     )
+    
+    # # TODO: remove later (used to verify metrics included in the response)
+    # response_data = response.json()
+    # # Extract the metrics part
+    # if "data" in response_data and "result" in response_data["data"]:
+    #     data = response_data["data"]["result"]
+    #     metrics = [entry["metric"] for entry in data]
+    #     print(f"Metrics: {metrics}")
+    # else:
+    #     print("No data found in response.")
 
     # print(f"Response: {response.json()["data"]}")
     # Use the helper function to return the parsed data from the response
