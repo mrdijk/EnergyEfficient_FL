@@ -14,7 +14,7 @@ make agent
 # Tutorial to deploy agents specifically (you can do the same for all others, such as orchestrator)
 # Create required variables (replace with correct path)
 agentsPath="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/agents"
-orchestratorValues="$orchestratorPath/values.yaml" 
+agentsValues="$agentsPath/values.yaml"
 # Re-deploy by uninstalling agent
 helm uninstall agent
 helm upgrade -i -f "$agentsValues" agents $agentsPath
