@@ -71,7 +71,7 @@ def cpu_to_percentage() -> None:
     temp_df.to_csv(output_file, index=False)
 
 
-def run_BIRCH_AD_with_smoothing(temp_df: pd.DataFrame, df: pd.DataFrame, column):
+def run_BIRCH_AD_with_smoothing(temp_df: pd.DataFrame, df: pd.DataFrame, column) -> pd.DataFrame:
     # Define anomaly detection threshold for BIRCH clustering
     ad_threshold = 0.045
     # Define window size for smoothing the data
@@ -126,7 +126,7 @@ def run_BIRCH_AD_with_smoothing(temp_df: pd.DataFrame, df: pd.DataFrame, column)
             test_df['anomaly_label'] = np.where(
                 min_distances > threshold, 1, 0)
 
-            # Update the original dataframe with the anomaly labels and scores
+            # Update the original dataframe with the anomaly labels and scores as new columns
             temp_df = temp_df.assign(
                 **{
                     # Anomaly labels (0 or 1)
@@ -148,9 +148,12 @@ def execute_BIRCH_AD_algorithm():
 
     # Iterate over each column in the dataframe
     for column in df.columns:
-        # Run BIRCH algorithm and save the converted file in the data folder
-        birch_results = run_BIRCH_AD_with_smoothing(temp_df, df, column)
-        model_result_path = os.path.join(
-            ALGORITHMS_DATA_FOLDER, 'BIRCH_AD_results.csv')
-        # Write the data to the output file
-        birch_results.to_csv(model_result_path, index=False)
+        # Run BIRCH algorithm and accumulate the results. Update the temp_df with 
+        # the new results for this column (next iteration will use this updated data)
+        temp_df = run_BIRCH_AD_with_smoothing(temp_df, df, column)
+
+    # Save the combined results to the CSV file
+    # temp_df contains the results for all columns
+    results_path = os.path.join(ALGORITHMS_DATA_FOLDER, 'BIRCH_AD_results.csv')
+    print(f"Saving BIRCH AD results data to {results_path}...")
+    temp_df.to_csv(results_path, index=False)
