@@ -133,7 +133,7 @@ prometheus:
     evaluationInterval: "30s"
     scrapeInterval: "30s"
     # Set this to higher to avoid cadvisor sometimes timing out
-    scrapeTimeout: "25"
+    scrapeTimeout: "25s"
 
     # Additional scrape configs (on top of already present/default ones)
     additionalScrapeConfigs:
@@ -480,7 +480,7 @@ prometheus:
     evaluationInterval: "30s"
     scrapeInterval: "30s"
     # Set this to higher to avoid cadvisor sometimes timing out
-    scrapeTimeout: "25"
+    scrapeTimeout: "25s"
 
     # Additional scrape configs (on top of already present/default ones)
     additionalScrapeConfigs:
