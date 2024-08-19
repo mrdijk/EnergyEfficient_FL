@@ -26,14 +26,13 @@ def main():
     # Convert the CPU metrics to percentage
     cpu_to_percentage()                      
 
-    # # Create model training dataset with a 'normal' dataset
-    # train_BIRCH_AD_model() 
+    # Training not required for BIRCH here, it is done in the BIRCH function itself
 
-    # # Create the Ground Truth
-    # create_ground_truth()
+    # Create the Ground Truth
+    create_ground_truth()
 
-    # # Execute BIRCH AD algorithm
-    # execute_BIRCH()
+    # Execute BIRCH AD algorithm
+    execute_BIRCH()
 
 
 def cpu_to_percentage() -> None:
@@ -60,80 +59,75 @@ def cpu_to_percentage() -> None:
     print(f"Saving the converted data to {output_file}...")
     # Write the data to the output file
     temp_df.to_csv(output_file, index=False)
-    
 
-# TODO: only BIRCH needs to be trained, and the combinations can be skipped probably!
-def combine_normal_operations_and_train_AD_models() -> None:
+
+def run_BIRCH_AD_with_smoothing(temp_df: pd.DataFrame, df: pd.DataFrame, column):
     """
-    This function combines all the CSV files in the data/normal folder into a single CSV file.
-    The combined file is stored in data/normal/normal_combined.csv.
-    The combined file is also stored in the current working directory.
-
-    The function returns nothing.
+    Main function of the anomaly detection. 
     """
-    user_factors = [folder for folder in os.listdir(NORMAL_DATA_PATH) if os.path.isdir(os.path.join(NORMAL_DATA_PATH, folder))]
-    for user in user_factors:        
-        scenario_factors = [folder for folder in os.listdir(os.path.join(NORMAL_DATA_PATH, user)) if os.path.isdir(os.path.join(NORMAL_DATA_PATH, user, folder))]
-        for scenario in scenario_factors:
-            time_windows = [folder for folder in os.listdir(os.path.join(NORMAL_DATA_PATH, user, scenario)) if os.path.isdir(os.path.join(NORMAL_DATA_PATH, user, scenario, folder))]
-            for time_window in time_windows:            
-                # Initialize an empty list to store DataFrames
-                dfs = []            
-                trials = [folder for folder in os.listdir(os.path.join(NORMAL_DATA_PATH, user, scenario, time_window)) if os.path.isdir(os.path.join(NORMAL_DATA_PATH, user, scenario, time_window, folder))]
-                for trial in trials:            
-                    trial_path = os.path.join(NORMAL_DATA_PATH, user, scenario, time_window, trial)
-                    # Iterate over all the files in the folder
-                    for filename in os.listdir(trial_path):
-                        if not filename.endswith(".csv"):
-                            continue
-                        if "combined" in filename:
-                            continue
-                        if not "data" in filename:
-                            continue
+    # Define anomaly detection threshold for BIRCH clustering
+    ad_threshold = 0.045
+    # Define window size for smoothing the data
+    smoothing_window = 12
+    # Extract the time and the specific column for analysis
+    test_df = df.loc[:, ["time", column]]
 
-                        # Ensure we only process CSV files, adjust the extension if necessary
-                        file_path = os.path.join(trial_path, filename)
-                        # Read the file data and append it to the list
-                        df = pd.read_csv(file_path)
-                        dfs.append(df)
+    # Iterate over each column in the test dataframe
+    for svc, energy in test_df.items():
+        # Skip the 'time' column since it's not relevant for clustering
+        if svc != 'time':
+            # Apply a rolling mean to smooth the energy data
+            energy = energy.rolling(window=smoothing_window, min_periods=1).mean()
 
-                normal_df = create_combined_df(dfs, 'load_0', user, scenario, time_window)
-                train_LSTM_AD_model(normal_df, user, scenario, time_window)
-                train_pycaret_AD_models(normal_df, user, scenario, time_window)
-            
-def train_pycaret_AD_models(train_df, user, scenario, time_window):
-    models_dir = create_dir_if_not_exists(
-            os.path.join(AD_FOLDER, "anomaly_detection_models")
-        )
+            # Convert the smoothed series to a NumPy array
+            x = np.array(energy)
+            # Replace NaN values with 0 to ensure no missing data is passed to the algorithm
+            x = np.where(np.isnan(x), 0, x)
+            # Normalize the data to ensure all values are on a similar scale
+            normalized_x = preprocessing.normalize([x])
+            # Reshape the normalized data to a 2D array as required by BIRCH
+            X = normalized_x.reshape(-1, 1)
 
-    train_df.replace(0, np.nan, inplace=True)
-    train_df["time"] = pd.to_datetime(train_df["time"], unit="s")
-    
-    # For each type of AD model to be used, create and train a model instance on the normal data
-    for model in AD_MODELS:
-        for column in train_df.columns:
-            if "time" in column or "_energy" not in column:
-                continue 
-            print("Training anomaly detection models on normal data...")
-            print(f"Training {model} model for {user}-{scenario} factors...")
+            # Initialize the BIRCH model with the specified parameters
+            birch = Birch(branching_factor=50, n_clusters=None, threshold=ad_threshold, compute_labels=True)
             
-            # Train model on Time & Energy dataframe
-            col_data = train_df.loc[:, ["time", column]]
-            setup(col_data, session_id = 123)
+            # Train the BIRCH model on the reshaped data
+            birch.fit(X)
+            # Use the trained model to predict the cluster labels for the data
+            birch.predict(X)
+
+            # Calculate the Euclidean distances (straight-line distance between two points in a plane or space) 
+            # from each data point to all cluster centers. `X` contains the data points, and `birch.subcluster_centers_` 
+            # contains the centers of the subclusters identified by BIRCH. `distance.cdist` computes the distance between 
+            # each data point and each cluster center.
+            distances = distance.cdist(X, birch.subcluster_centers_)
+            # For each data point, find the minimum distance to any of the cluster centers.
+            # This minimum distance represents how close the point is to the nearest cluster center.
+            # A smaller distance indicates that the point is well represented by the cluster, while a 
+            # larger distance might suggest that the point is an outlier or anomaly.
+            min_distances = np.min(distances, axis=1)
+
+            # Set a threshold to identify anomalies based on the distribution of minimum distances.
+            # Here, the 95th percentile is chosen, meaning that points with a distance greater than 95% 
+            # of all points are considered anomalies. This is based on the assumption that most data points 
+            # should be near a cluster center, and only a few should be far away.
+            threshold = np.percentile(min_distances, 95)
+
+            # Label data points as anomalies (1) if their distance exceeds the threshold, else normal (0)
+            test_df['anomaly_label'] = np.where(min_distances > threshold, 1, 0)
             
-            # Train the model
-            trained_model = create_model(model)
-            
-            resource_dir = create_dir_if_not_exists(
-                os.path.join(models_dir, SYSTEM, time_window, f'{user}_{scenario}_{column}')
-            )
-            # Save the model
-            save_model(
-                trained_model,
-                f"{resource_dir}/{model}_pipeline",
+            # Update the original dataframe with the anomaly labels and scores
+            temp_df = temp_df.assign(
+                **{
+                    # Anomaly labels (0 or 1)
+                    f"{column}_Anomaly": test_df['anomaly_label'],
+                    # Anomaly scores (distances)
+                    f"{column}_Anomaly_Score": min_distances,
+                }
             )
     
-    
-    
+    # Return the updated dataframe with the anomaly information
+    return temp_df
+
 
 
