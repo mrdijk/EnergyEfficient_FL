@@ -130,10 +130,10 @@ monitoringValues="$monitoringChartsPath/values.yaml"
 prometheus:
   prometheusSpec:
     # Set global scrape interval and scrape timeout
-    evaluationInterval: "30s"
-    scrapeInterval: "30s"
     # Set this to higher to avoid cadvisor sometimes timing out
+    scrapeInterval: "30s"
     scrapeTimeout: "25s"
+    evaluationInterval: "1m"
 
     # Additional scrape configs (on top of already present/default ones)
     additionalScrapeConfigs:
@@ -477,10 +477,10 @@ This is due to the reason that you may use Kubernetes service discovery to find 
 prometheus:
   prometheusSpec:
     # Set global scrape interval and scrape timeout
-    evaluationInterval: "30s"
-    scrapeInterval: "30s"
     # Set this to higher to avoid cadvisor sometimes timing out
+    scrapeInterval: "30s"
     scrapeTimeout: "25s"
+    evaluationInterval: "1m"
 
     # Additional scrape configs (on top of already present/default ones)
     additionalScrapeConfigs:

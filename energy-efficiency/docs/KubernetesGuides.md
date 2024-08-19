@@ -127,10 +127,10 @@ You can configure everything using a .yaml file. For example, this file:
 prometheus:
   prometheusSpec:
     # Set global scrape interval and scrape timeout
-    evaluationInterval: "30s"
-    scrapeInterval: "30s"
     # Set this to higher to avoid cadvisor sometimes timing out
+    scrapeInterval: "30s"
     scrapeTimeout: "25s"
+    evaluationInterval: "1m"
 
     # Additional scrape configs (on top of already present/default ones)
     additionalScrapeConfigs:
