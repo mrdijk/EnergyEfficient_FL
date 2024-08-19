@@ -9,54 +9,61 @@ import pandas as pd
 from sklearn.cluster import Birch
 from sklearn import preprocessing
 from scipy.spatial import distance
+# Import utils
+from utils import get_folder_path, unix_time_to_datetime
+
+# Folder where the gathered energy metrics are stored
+ENERGY_DATA_FOLDER = get_folder_path('data-collection/data', 1)
+ENERGY_DATA_FILE = os.path.join(ENERGY_DATA_FOLDER, 'energy_metrics.csv')
+# Folder where the algorithms data is stored
+ALGORITHMS_DATA_FOLDER = get_folder_path('data')
+print(ENERGY_DATA_FOLDER, ALGORITHMS_DATA_FOLDER)
 
 def main():
     """
     Main function of the anomaly detection. 
     """
-    power_to_energy_and_cpu_to_percentage()
+    # Convert the CPU metrics to percentage
+    cpu_to_percentage()                      
 
-    perform_time_analysis()                             
+    # # Create model training dataset with a 'normal' dataset
+    # train_BIRCH_AD_model() 
 
-    # Create model training dataset from the normal experiment folder
-    combine_normal_operations_and_train_AD_models() 
+    # # Create the Ground Truth
+    # create_ground_truth()
 
-    # Create the Ground Truth
-    create_ground_truth()
-
-    # Execute BIRCH AD algorithm
-    execute_BIRCH()
+    # # Execute BIRCH AD algorithm
+    # execute_BIRCH()
 
 
-def power_to_energy_and_cpu_to_percentage() -> None:
-    print("Converting power metrics to energy metrics...")
+def cpu_to_percentage() -> None:
+    print("Converting CPU metrics to percentage...")
 
-    for service in os.listdir(DATA_FOLDER):
-        service_path = os.path.join(DATA_FOLDER, service)
-        if not os.path.isdir(service_path):
-            continue
+    # Read the CSV file and parse the 'time' column while converting Unix timestamps
+    result_df = pd.read_csv(ENERGY_DATA_FILE, parse_dates=["time"], date_parser=unix_time_to_datetime)
 
-        if service == "normal":            
-            user_factors = [folder for folder in os.listdir(service_path) if os.path.isdir(os.path.join(service_path, folder))]
-            for user in user_factors:            
-                scenario_factors = [folder for folder in os.listdir(os.path.join(service_path, user)) if os.path.isdir(os.path.join(service_path, user, folder))]
-                for scenario in scenario_factors:
-                    scenario_path = os.path.join(service_path, user, scenario)
-                    for file in os.listdir(scenario_path):
-                        if file.endswith(".csv"):
-                            convert_to_energy_and_cpu_percentage(
-                                os.path.join(scenario_path, file), scenario_path, file, service
-                            )
-        else:          
-            stress_factors = [folder for folder in os.listdir(service_path) if os.path.isdir(os.path.join(service_path, folder))]
-            for stress in stress_factors:            
-                user_factors = [folder for folder in os.listdir(os.path.join(service_path, stress)) if os.path.isdir(os.path.join(service_path, stress, folder))]
-                for user in user_factors:            
-                    scenario_factors = [folder for folder in os.listdir(os.path.join(service_path, stress, user)) if os.path.isdir(os.path.join(service_path, stress, user, folder))]
-                    for scenario in scenario_factors:     
-                        scenario_path = os.path.join(service_path, stress, user, scenario)
-                        for file in os.listdir(scenario_path):
-                            if file.endswith(".csv"):
-                                convert_to_energy_and_cpu_percentage(
-                                    os.path.join(scenario_path, file), scenario_path, file, service
-                                )
+    # Additional processing remains the same
+    temp_df = pd.read_csv(ENERGY_DATA_FILE)
+
+    # Convert the cpu metrics to percentage
+    for col in result_df.columns:
+        if col.endswith("_cpu"):
+            # Multiply the value by 100 to get the cpu percentage
+            temp_df[col] = result_df[col] * 100
+
+    # Remove disk data due to the existing bug in Cadvisor
+    columns_to_drop = [col for col in temp_df.columns if '_disk' in col]
+    temp_df.drop(columns=columns_to_drop, inplace=True)
+    
+    # Save the converted file in the data folder
+    output_file = os.path.join(ALGORITHMS_DATA_FOLDER, f'converted_energy_metrics.csv')
+    print(f"Saving the converted data to {output_file}...")
+    # Write the data to the output file
+    temp_df.to_csv(output_file, index=False)
+    
+
+    
+    
+    
+
+
