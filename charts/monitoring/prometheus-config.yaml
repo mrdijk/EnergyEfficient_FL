@@ -2,10 +2,10 @@
 prometheus:
   prometheusSpec:
     # Set global scrape interval and scrape timeout
-    scrape_interval: '1m'
-    evaluation_interval: '1m'
+    evaluationInterval: "30s"
+    scrapeInterval: "30s"
     # Set this to higher to avoid cadvisor sometimes timing out
-    scrape_timeout: '25s'
+    scrapeTimeout: "25"
 
     # Additional scrape configs (on top of already present/default ones)
     additionalScrapeConfigs:

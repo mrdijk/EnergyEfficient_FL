@@ -121,7 +121,7 @@ This is the .yaml file containing namespace.yaml, serviceaccount.yaml and daemon
 Then prometheus needs to be configured appropriately to scrape the metrics from cadvisor:
 ```sh
 # Set variables for the paths (example with the monitoring chart path)
-$monitoringChartsPath="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/monitoring"
+monitoringChartsPath="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/monitoring"
 monitoringValues="$monitoringChartsPath/values.yaml"
 
 # Add the job to the prometheus config file:
@@ -129,10 +129,10 @@ monitoringValues="$monitoringChartsPath/values.yaml"
 prometheus:
   prometheusSpec:
     # Set global scrape interval and scrape timeout
-    scrape_interval: '1m'
-    evaluation_interval: '1m'
+    evaluationInterval: "30s"
+    scrapeInterval: "30s"
     # Set this to higher to avoid cadvisor sometimes timing out
-    scrape_timeout: '25s'
+    scrapeTimeout: "25"
 
     # Additional scrape configs (on top of already present/default ones)
     additionalScrapeConfigs:
@@ -162,7 +162,7 @@ grafana:
 
 
 # Rerun/upgrade Prometheus stack with the file
-helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoringPath/prometheus-config.yaml"
+helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoringChartsPath/prometheus-config.yaml"
 
 # Upgrade/apply the helm chart for the monitoring release:
 helm upgrade -i -f "$monitoringValues" monitoring $monitoringChartsPath
@@ -473,32 +473,36 @@ Then I viewed the configMaps in the Kubernetes dashboard under Config and Storag
 # Prometheus not showing Target (Status > Targets in Prometheus UI), while it is displayed in my configmap
 This is due to the reason that you may use Kubernetes service discovery to find pods. In this example you can see a prometheus config for the job name that adds the data for cadvisor:
 ```yaml
-global:
-  scrape_interval: 1m
-  evaluation_interval: 1m
-  # Avoids cadvisor to exceed the timeout range for example (increase when jobs are exceeding this time)
-  scrape_timeout: 25s
+prometheus:
+  prometheusSpec:
+    # Set global scrape interval and scrape timeout
+    evaluationInterval: "30s"
+    scrapeInterval: "30s"
+    # Set this to higher to avoid cadvisor sometimes timing out
+    scrapeTimeout: "25"
 
-scrape_configs:
-  # Job to gather metrics like CPU and memory using cadvisor daemonset
-  - job_name: 'cadvisor'
-    # Configures Kubernetes service discovery to find pods
-    kubernetes_sd_configs:
-      - role: pod
-    # Configures relabeling rules
-    relabel_configs:
-      # Keep only pods with the label app=cadvisor (otherwise all other metrics will be included, but you only want cadvisor metrics)
-      - source_labels: [__meta_kubernetes_pod_label_name]
-        action: keep
-        regex: cadvisor
-      # Replace target with pod IP and port 8080 (where cadvisor runs)
-      - source_labels: [__meta_kubernetes_pod_ip]
-        action: replace
-        target_label: __address__
-        regex: (.+)
-        replacement: ${1}:8080
-      # No custom labels/replacements are set here (do NOT change this, because now it works!), so that the defaults of 
-      # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
+    # Additional scrape configs (on top of already present/default ones)
+    additionalScrapeConfigs:
+      # Job to gather metrics like CPU and memory using cadvisor daemonset
+      - job_name: 'cadvisor'
+        # Configures Kubernetes service discovery to find pods
+        kubernetes_sd_configs:
+          - role: pod
+        # Configures relabeling rules
+        relabel_configs:
+          # Keep only pods with the label app=cadvisor (otherwise all other metrics will be included, but you only want cadvisor metrics)
+          # Make sure that the name label is present in the pod (or in this case daemonset) you are creating! Otherwise, Prometheus cannot see it
+          - source_labels: [__meta_kubernetes_pod_label_name]
+            action: keep
+            regex: cadvisor
+          # Replace target with pod IP and port 8080 (where cadvisor runs)
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            target_label: __address__
+            regex: (.+)
+            replacement: ${1}:8080
+          # No custom labels/replacements are set here (do NOT change this, because now it works!), so that the defaults of 
+          # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
 ```
 Here you can see that 'kubernetes_sd_configs' is used. The issue I had was that I first used:
 ```yaml

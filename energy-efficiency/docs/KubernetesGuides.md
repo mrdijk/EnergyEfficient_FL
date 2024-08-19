@@ -127,10 +127,10 @@ You can configure everything using a .yaml file. For example, this file:
 prometheus:
   prometheusSpec:
     # Set global scrape interval and scrape timeout
-    scrape_interval: '1m'
-    evaluation_interval: '1m'
+    evaluationInterval: "30s"
+    scrapeInterval: "30s"
     # Set this to higher to avoid cadvisor sometimes timing out
-    scrape_timeout: '25s'
+    scrapeTimeout: "25"
 
     # Additional scrape configs (on top of already present/default ones)
     additionalScrapeConfigs:
@@ -161,9 +161,15 @@ grafana:
 ```
 This can be used to install and/or upgrade Prometheus stack by appending additional scrape configs and adding scrape intervals globally for example. You can upgrade Prometheus by following these steps:
 ```sh
-# Upgrade or install Prometheus stack with the configuration file (assuming the config file is present in the specified path):
-$monitoringChartsPath="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/monitoring"
+# Set variables for the paths (example with the monitoring chart path)
+monitoringChartsPath="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/monitoring"
+monitoringValues="$monitoringChartsPath/values.yaml"
+
+# Rerun/upgrade Prometheus stack with the file
 helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoringChartsPath/prometheus-config.yaml"
+
+# Upgrade/apply the helm chart for the monitoring release:
+helm upgrade -i -f "$monitoringValues" monitoring $monitoringChartsPath
 
 # Then delete the prometheus operator pod (recreates it automatically == restart pod)
 kubectl delete pod prometheus-kube-prometheus-operator-<stringInPodName> -n monitoring

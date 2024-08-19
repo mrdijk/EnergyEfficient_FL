@@ -13,8 +13,6 @@ cadvisor:
   service:
     port: 8080
     targetPort: 8080
-  monitor:
-    interval: 15s
 prometheus:
   rbac:
     enabled: true
