@@ -24,8 +24,10 @@ QUERIES = {
     "memory_cache": f"sum(rate(container_memory_cache[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
     # Total bytes read by the container
     "disk": f"sum(rate(container_fs_reads_bytes_total[{DURATION}])) by ({CADVISOR_CONTAINER_NAME_LABEL})",
-    # Power consumption using Kepler (https://sustainable-computing.io/design/metrics/)
-    "power": f"sum by (pod_name, {KEPLER_CONTAINER_NAME_LABEL}, container_namespace, node)(irate(kepler_container_joules_total[{DURATION}]))"
+    # Energy metric, as stated by Kepler documentation (https://sustainable-computing.io/design/metrics/#exploring-node-exporter-metrics-through-the-prometheus-expression)
+    # This query gets the energy consumption. The query stated in the 
+    # documentation is suited to fit with the other queries (cpu, memory, ...) from the study by Ivano and colleagues 
+    "energy": f"sum(rate(kepler_container_joules_total[{DURATION}])) by (pod_name, {KEPLER_CONTAINER_NAME_LABEL}, container_namespace, node)"
 }
 
 # Relevant containers to monitor the energy consumption 

@@ -16,7 +16,7 @@ Navigate to the energy-efficiency/data-collection folder and run the main python
 ```sh
 # Navigate to the energy-efficiency folder
 cd energy-efficiency
-# Install requirements using pip
+# Install requirements using pip (only needs to be done once)
 pip install -r requirements.txt
 
 # Navigate to energy-efficiency/data-collection folder
@@ -32,7 +32,7 @@ Navigate to the energy-efficiency/data-analysis folder and run the main python f
 ```sh
 # Navigate to the energy-efficiency folder
 cd energy-efficiency
-# Install requirements using pip
+# Install requirements using pip (only needs to be done once)
 pip install -r requirements.txt
 
 # Navigate to energy-efficiency/data-collection folder
