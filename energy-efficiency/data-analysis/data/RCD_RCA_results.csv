@@ -1,4 +1,4 @@
 Root Cause
-node-exporter_energy
-identity_energy
 jaeger_energy
+kube-state-metrics_energy
+nginx-ingress_energy
