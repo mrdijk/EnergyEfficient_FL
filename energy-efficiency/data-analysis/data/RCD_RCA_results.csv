@@ -1,4 +1,4 @@
 Root Cause
-node-exporter_energy
-linkerd-proxy_energy
+nginx-ingress_energy
 policy_energy
+jaeger_energy
