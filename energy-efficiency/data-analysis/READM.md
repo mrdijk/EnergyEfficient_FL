@@ -1,0 +1,2 @@
+# Extra explanation on pyrca folder
+PyRCA is a PIP package that relies on Python 3.9. However, other packages used in the project (e.g. for AD) require Python 3.10 or higher. Therefore, the necessary source code of pyrca is added in this project to bypass this issue. This is the same solution that the study that inspired this pipeline used.
