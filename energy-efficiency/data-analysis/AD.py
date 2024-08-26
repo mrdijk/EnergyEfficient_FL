@@ -100,9 +100,9 @@ def run_BIRCH_AD_with_smoothing(temp_df: pd.DataFrame, df: pd.DataFrame, column)
             birch = Birch(branching_factor=50, n_clusters=None,
                           threshold=ad_threshold, compute_labels=True)
 
-            # Train the BIRCH model on the reshaped data
+            # Build the CF tree for the input data (i.e. perform clustering)
             birch.fit(X)
-            # Use the trained model to predict the cluster labels for the data
+            # Use the fitted model to predict the cluster labels for the data
             birch.predict(X)
 
             # Calculate the Euclidean distances (straight-line distance between two points in a plane or space)
