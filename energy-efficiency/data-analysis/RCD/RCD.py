@@ -1,7 +1,7 @@
 import csv
 import os
 import pandas as pd
-from pyrca.analyzers.rcd import RCD
+from RCD.pyrca.analyzers.rcd import RCD
 # Import utils
 from utils import get_folder_path, unix_time_to_datetime
 

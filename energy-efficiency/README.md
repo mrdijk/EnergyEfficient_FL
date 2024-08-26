@@ -35,8 +35,8 @@ Running the scripts from this location is crucial, since the imports are assumin
 ## Running data analysis
 Navigate to the energy-efficiency/data-analysis folder and run the main python file:
 ```sh
-# Navigate to energy-efficiency/data-collection folder
-cd energy-efficiency/data-collection
+# Navigate to energy-efficiency/data-analysis folder
+cd energy-efficiency/data-analysis
 # Run specific scripts
 python main.py
 ```
