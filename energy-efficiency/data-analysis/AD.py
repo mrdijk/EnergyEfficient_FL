@@ -23,7 +23,7 @@ print(ENERGY_DATA_FOLDER, ALGORITHMS_DATA_FOLDER, CONVERTED_ENERGY_DATA_FILE)
 
 def main():
     """
-    Main function of the anomaly detection. 
+    Main function of the anomaly detection.
     """
     # Convert the CPU metrics to percentage
     cpu_to_percentage()
