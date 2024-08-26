@@ -32,7 +32,7 @@ python get_metrics.py
 Running the scripts from this location is crucial, since the imports are assuming the scripts are run from this location.
 
 
-## Running data analysis
+## Running data analysis (AD)
 Navigate to the energy-efficiency/data-analysis folder and run the main python file:
 ```sh
 # Navigate to energy-efficiency/data-analysis folder

@@ -1,5 +1,5 @@
 from AD import main as AD_main
-from RCD.RCD import main as RCD_main
+from RCD import main as RCD_main
 
 def main():
     """
@@ -7,7 +7,7 @@ def main():
     is done before running this file. This code assumes that a file for the energy data is present.
     """
     # Perform Anomaly Detection (AD)
-    AD_main()
+    # AD_main()
 
     # Perform Root Cause Analysis (RCA)
     RCD_main()

@@ -1,7 +1,7 @@
 import csv
 import os
 import pandas as pd
-from RCD.pyrca.analyzers.rcd import RCD
+from pyrca.analyzers.rcd import RCD
 # Import utils
 from utils import get_folder_path, unix_time_to_datetime
 
@@ -24,9 +24,9 @@ col_to_drop = "time"
 
 def main():
     """
-    Main function of the anomaly detection.
+    Main function for root cause analysis.
     """
-    # Execute BIRCH AD algorithm
+    # Execute algorithm
     run_rcd()
 
 
@@ -56,5 +56,3 @@ def print_results(results):
         writer = csv.writer(file)
         writer.writerow(['Root Cause'])
         writer.writerows([[node] for node in nodes_list])
-
-                            
