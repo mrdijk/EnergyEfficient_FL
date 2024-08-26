@@ -28,6 +28,7 @@ def main():
 
 
 def run_rcd():
+    print("Start executing RCD Root Cause Analysis algorithm...")
     # Define the column name that should be dropped from the dataset
     col_to_drop = "time" 
 
@@ -63,12 +64,14 @@ def run_rcd():
     print_results(results.to_dict())
 
 
-def print_results(results):   
+def print_results(results):
     # Extract the root cause nodes from the results dictionary
     nodes_list = [node[0] for node in results['root_cause_nodes']]
 
     # Define the filename for saving the results
     csv_filename = os.path.join(ALGORITHMS_DATA_FOLDER, 'RCD_RCA_results.csv')
+
+    print(f"Saving RCD results data to {csv_filename}...")
 
     # Open the file in write mode and write the root cause nodes to it
     with open(csv_filename, mode='w', newline='') as file:

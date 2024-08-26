@@ -12,5 +12,7 @@ def main():
     # Perform Root Cause Analysis (RCA)
     RCD_main()
 
+    print("Finished data analysis")
+
 if __name__ == '__main__':
     main()
