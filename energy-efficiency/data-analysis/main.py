@@ -7,7 +7,7 @@ def main():
     is done before running this file. This code assumes that a file for the energy data is present.
     """
     # Perform Anomaly Detection (AD)
-    # AD_main()
+    AD_main()
 
     # Perform Root Cause Analysis (RCA)
     RCD_main()
