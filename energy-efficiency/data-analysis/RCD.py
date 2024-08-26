@@ -50,7 +50,7 @@ def print_results(results):
     nodes_list = [node[0] for node in results['root_cause_nodes']]
 
     # Writing nodes_list to a CSV file
-    csv_filename = f'{ALGORITHMS_DATA_FOLDER}\RCD_RCA_results.csv'
+    csv_filename = f'{ALGORITHMS_DATA_FOLDER}/RCD_RCA_results.csv'
 
     with open(csv_filename, mode='w', newline='') as file:
         writer = csv.writer(file)
