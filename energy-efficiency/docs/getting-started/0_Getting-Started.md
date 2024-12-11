@@ -14,23 +14,11 @@ Keep in mind, it takes a while until all the different services are running, so 
 
 ## Table of Contents
 - [Prerequisites](./1_Prerequisites.md)
-- [Preparing Kubernetes Cluster](./2_PreparingKubernetesCluster.md)
-- [Preparing RabbitMQ](./3_PreparingRabbitMQ.md)
-- [Preparing Monitoring](./4_PreparingMonitoring.md)
-- [Deploying Other Components](./5_DeployingOtherComponents.md)
-- [Building DYNAMOS Components](./6_BuildingDYNAMOSComponents.md)
+TODO
 
 
 # After completing getting started steps
 These tutorials can be used after the getting started steps have been followed.
-
-# You can access the minikube VM using SSH:
-```sh
-# Make sure minikube is running (minikube start). In this project we use Docker for the containers/VMs
-
-# Open the SSH in minikube to access the minikube VM
-minikube ssh
-```
 
 ## Accessing Prometheus web UI
 ```sh
@@ -40,21 +28,65 @@ After running this command you can access it via:
 http://localhost:9090/
 
 ## Accessing Kubernetes Dashboard
-Local environment (this is the one currently used):
-```sh
-minikube dashboard
-```
-It may take a while before you can access the dashboard after creating the Kubernetes cluster using minikube. It may take a while for it to start up (it will automatically open a webbrowser tab for you).
+TODO: tutorial for setting up Kubernetes Dashboard.
 
-Production environments. Run these commands individually::
-```sh
-# Add kubernetes-dashboard repository
-helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
-helm repo update
-# Deploy a Helm Release named "kubernetes-dashboard" using the kubernetes-dashboard chart
-helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+## Setup monitoring
+TODO: add here how to setup monitoring
 
-# Enable access to the Kubernetes dashboard
-kubectl proxy
-# Will be available at: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+Run the script file to prepare the kubernetes cluster:
+```sh
+# Go to the scripts path
+cd cd energy-efficiency/scripts
+# Make the script executable (probably only needs to be done once)
+chmod +x <TODO.sh>
+# Execute the script:
+./<TODO.sh>
+
+# "running scripts is disabled on this system" error:
+# 1. Close VSC/ 2. Run VSC as administrator / 3. Open powershell terminal (outside wsl) / 4. Run:
+Set-ExecutionPolicy RemoteSigned
+# 5. Close VSC / 6. Open VSC how you normally do and rerun the script
 ```
+This might take a while, since it is installing a lot of different things, such as prometheus-stack.
+
+## Preparing the rest
+Wait for the resources above to be created. The final message of the file will be for example:
+```
+Release "prometheus" has been upgraded. Happy Helming!
+NAME: prometheus
+LAST DEPLOYED: Tue Jul  2 13:29:32 2024
+NAMESPACE: monitoring
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NOTES:
+kube-prometheus-stack has been installed. Check its status by running:
+  kubectl --namespace monitoring get pods -l "release=prometheus"
+```
+
+You can see that you can use the command to view the status:
+```sh
+# View status of prometheus release
+kubectl --namespace monitoring get pods -l "release=prometheus"
+
+# Example output:
+NAME                                                   READY   STATUS              RESTARTS   AGE
+prometheus-kube-prometheus-operator-6554f4464f-tf9k8   0/1     ContainerCreating   0          97s
+prometheus-kube-state-metrics-558db85bb5-f64sh         0/1     ContainerCreating   0          97s
+prometheus-prometheus-node-exporter-82mwd              0/1     ContainerCreating   0          97s
+# With this example output you know that you should wait, because it is still creating the containers
+```
+Alternatively, you could use minikube dashboard and view the monitoring namespace and wait until the pods are running. It may take a while before all the pods are running, sometimes even up to more than 10 minutes. 
+
+After the pods are running, you can execute the next script:
+```sh
+# Go to the scripts path
+cd cd energy-efficiency/scripts/prepare-monitoring
+# Make the script executable (probably only needs to be done once)
+chmod +x keplerAndMonitoringChart.sh
+
+# Execute the script with the charts path, such as:
+./keplerAndMonitoringChart.sh /mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts
+```
+
+TODO: add Grafana.

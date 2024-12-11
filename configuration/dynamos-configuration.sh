@@ -60,13 +60,6 @@ echo "Preparing PVC"
     ./fill-rabbit-pvc.sh
 }
 
-#Install prometheus
-# echo "Installing Prometheus..."
-# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-# helm repo update
-# helm upgrade -i -f "${core_chart}/prometheus-values.yaml" prometheus prometheus-community/prometheus
-# TODO: change above to work with kepler and other energy measurements
-
 echo "Installing NGINX..."
 helm install -f "${core_chart}/ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress -n ingress --version 0.18.0
 
