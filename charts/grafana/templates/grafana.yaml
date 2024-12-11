@@ -1,3 +1,4 @@
+# TODO: test and/or change if necessary to allow grafana
 ---
 apiVersion: apps/v1
 kind: Deployment

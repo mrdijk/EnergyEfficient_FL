@@ -12,22 +12,46 @@ You can run the steps explained in the different files (running the scripts). Or
 
 Keep in mind, it takes a while until all the different services are running, so you may want to take a small break in between each steps to wait until all the services are running before you go to the next step.
 
-## Table of Contents
+## Prerequisites
 - [Prerequisites](./1_Prerequisites.md)
-TODO
 
 
-# After completing getting started steps
-These tutorials can be used after the getting started steps have been followed.
-
-## Accessing Prometheus web UI
+## Follow the installation guide for DYNAMOS
+After installing the prerequisites, install Linkerd:
+https://github.com/Jorrit05/DYNAMOS?tab=readme-ov-file#6-linkerd
+This only includes these after installing:
 ```sh
-kubectl port-forward deploy/prometheus-server 9090:9090
-```
-After running this command you can access it via:
-http://localhost:9090/
+# Install Linkerd on cluster
+linkerd install --crds | kubectl apply -f -
+linkerd install --set proxyInit.runAsRoot=true | kubectl apply -f -
 
-## Accessing Kubernetes Dashboard
+linkerd check
+# This may take some time before everything is setup, wait until the check finishes
+
+# Install Jaeger onto the cluster for observability
+linkerd jaeger install | kubectl apply -f -
+
+# Optionally install for insight dashboard - not currently in use
+# linkerd wiz install | kubectl apply -f -
+```
+
+Then configure the system: https://github.com/Jorrit05/DYNAMOS?tab=readme-ov-file#system-configuration 
+In short, this encompasses setting the correct paths and running the start script from the root of DYNAMOS:
+```sh
+./configuration/dynamos-configuration.sh
+
+# When getting this error: Error: INSTALLATION FAILED: cannot re-use a name that is still in use
+# This is because you already installed nginx and are using the install instead of upgrade, as you can see by the previous lines: Installing NGINX...
+# Fix this by uninstalling the release nginx:
+helm uninstall nginx -n ingress
+# Then run the command again:
+./configuration/dynamos-configuration.sh
+```
+
+TODO: left off at: https://github.com/Jorrit05/DYNAMOS?tab=readme-ov-file#bashrc-shortcuts
+
+
+## Setup Kubernetes Dashboard
 To setup Kubernetes Dashboard, run the following:
 ```sh
 # Go to the scripts path
@@ -47,12 +71,13 @@ Then you can access Kubernetes Dashboard and get the token from the admin user i
 # Access Kubernetes Dashboard
 kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
 # Access it at: https://localhost:8443/
+# If it says something like net::ERR_CERT_AUTHORITY_INVALID, Your connection isn't private, you can select 
+# Advanced > Continue to localhost (unsafe). You can do this because you know it is Kubernetes and this is save to use
 
 # Get the token from the admin user that can be used to login in the Kubernetes Dashboard cluster
 kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"} | base64 -d
 # Add the token in the login window and you should be able to access Kubernetes Dashboard
 ```
-
 
 
 ## Setup monitoring
@@ -115,3 +140,31 @@ chmod +x keplerAndMonitoringChart.sh
 ```
 
 TODO: add Grafana.
+
+
+# After completing getting started steps
+These tutorials can be used after the getting started steps have been followed.
+
+## Accessing Prometheus web UI
+```sh
+kubectl port-forward deploy/prometheus-server 9090:9090
+```
+After running this command you can access it via:
+http://localhost:9090/
+
+## Accessing Kubernetes Dashboard
+You can access Kubernetes Dashboard and get the token from the admin user in the kubernetes-dashboard namespace like this:
+```sh
+# Access Kubernetes Dashboard
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+# Access it at: https://localhost:8443/
+# If it says something like net::ERR_CERT_AUTHORITY_INVALID, Your connection isn't private, you can select 
+# Advanced > Continue to localhost (unsafe). You can do this because you know it is Kubernetes and this is save to use
+
+# Get the token from the admin user that can be used to login in the Kubernetes Dashboard cluster
+kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"} | base64 -d
+# Add the token in the login window and you should be able to access Kubernetes Dashboard
+```
+
+
+

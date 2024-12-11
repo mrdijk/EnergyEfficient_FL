@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# TODO: change to new format:
+# # Change this to the path of the DYNAMOS repository on your disk
+# echo "Setting up paths..."
+# # Path to root of DYNAMOS project on local machine
+# DYNAMOS_ROOT="/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS"
+# # Charts
+# charts_path="${DYNAMOS_ROOT}/charts"
+# kubernetes_dashboard_chart="${charts_path}/kubernetes-dashboard"
+
 # Check if an argument was provided
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <chartsPath>"

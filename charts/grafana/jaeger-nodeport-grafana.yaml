@@ -1,0 +1,30 @@
+# Add authentication for grafana to jaeger nodeport (Jaegar nodeport service itself is in charts/core)
+apiVersion: policy.linkerd.io/v1beta1
+kind: ServerAuthorization
+metadata:
+  namespace: linkerd-jaeger
+  name: allow-grafana-to-jaeger
+spec:
+  server:
+    selector:
+      matchLabels:
+        component: jaeger
+  client:
+    unauthenticated: true # Or use 'authenticated' and provide a service account
+
+---
+
+
+apiVersion: policy.linkerd.io/v1beta1
+kind: ServerAuthorization
+metadata:
+  namespace: core
+  name: allow-jaeger-to-grafana
+spec:
+  server:
+    selector:
+      matchLabels:
+        app: grafana
+  client:
+    unauthenticated: true # Or use 'authenticated' and provide a service account
+
