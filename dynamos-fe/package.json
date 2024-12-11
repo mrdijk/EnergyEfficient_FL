@@ -14,6 +14,7 @@
     "@types/node": "^20.3.1",
     "axios": "^1.4.0",
     "element-plus": "^2.2.19",
+    "msal-vue-sample": "file:",
     "vue": "^3.2.41",
     "vue-router": "^4.1.5"
   },
