@@ -28,15 +28,40 @@ After running this command you can access it via:
 http://localhost:9090/
 
 ## Accessing Kubernetes Dashboard
-TODO: tutorial for setting up Kubernetes Dashboard.
+To setup Kubernetes Dashboard, run the following:
+```sh
+# Go to the scripts path
+cd energy-efficiency/scripts
+# Make the script executable (probably only needs to be done once)
+chmod +x kubernetes-dashboard.sh
+# Execute the script:
+./kubernetes-dashboard.sh
+
+# "running scripts is disabled on this system" error:
+# 1. Close VSC/ 2. Run VSC as administrator / 3. Open powershell terminal (outside wsl) / 4. Run:
+Set-ExecutionPolicy RemoteSigned
+# 5. Close VSC / 6. Open VSC how you normally do and rerun the script
+```
+Then you can access Kubernetes Dashboard and get the token from the admin user in the kubernetes-dashboard namespace like this:
+```sh
+# Access Kubernetes Dashboard
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+# Access it at: https://localhost:8443/
+
+# Get the token from the admin user that can be used to login in the Kubernetes Dashboard cluster
+kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"} | base64 -d
+# Add the token in the login window and you should be able to access Kubernetes Dashboard
+```
+
+
 
 ## Setup monitoring
 TODO: add here how to setup monitoring
 
-Run the script file to prepare the kubernetes cluster:
+Run the following:
 ```sh
 # Go to the scripts path
-cd cd energy-efficiency/scripts
+cd energy-efficiency/scripts
 # Make the script executable (probably only needs to be done once)
 chmod +x <TODO.sh>
 # Execute the script:
