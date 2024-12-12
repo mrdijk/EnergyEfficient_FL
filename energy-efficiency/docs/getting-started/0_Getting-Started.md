@@ -46,9 +46,29 @@ In short, this encompasses setting the correct paths and running the start scrip
 helm uninstall nginx -n ingress
 # Then run the command again:
 ./configuration/dynamos-configuration.sh
+
+# "running scripts is disabled on this system" error:
+# 1. Close VSC/ 2. Run VSC as administrator / 3. Open powershell terminal (outside wsl) / 4. Run:
+Set-ExecutionPolicy RemoteSigned
+# 5. Close VSC / 6. Open VSC how you normally do and rerun the script
 ```
 
-TODO: left off at: https://github.com/Jorrit05/DYNAMOS?tab=readme-ov-file#bashrc-shortcuts
+Now you can load the DYNAMOS configs shell file with some env vars and helper functions. You can add this code directly in your WSL ~/.bashrc file to not have to manually load it each time in the shell, however, for this setup we chose to not do this, since this configuration changes between different use cases (e.g. UNL and Prets) and therefore is easier to load manually each time in this case.
+To load the configuration file run the following:
+```sh
+# Go to the scripts path
+cd energy-efficiency/scripts
+# Make the script executable (needs to be done once)
+chmod +x dynamos-configs.sh
+# Load the script in the terminal
+source ./dynamos-configs.sh
+
+# Now you can run functions, such as
+deploy_core
+# You need to load the file in the shell each time you restart a shell or when making changing to the dynamos-configs.sh script
+```
+You can change this file whenever you want, such as adding or removing helpful functions. After changes you have to load it in the shell again each time. Also, for each terminal you have to load the file, so it is recommended to use one terminal to execute those functions when developing. 
+
 
 
 ## Setup Kubernetes Dashboard
@@ -56,15 +76,10 @@ To setup Kubernetes Dashboard, run the following:
 ```sh
 # Go to the scripts path
 cd energy-efficiency/scripts
-# Make the script executable (probably only needs to be done once)
+# Make the script executable (needs to be done once)
 chmod +x kubernetes-dashboard.sh
 # Execute the script:
 ./kubernetes-dashboard.sh
-
-# "running scripts is disabled on this system" error:
-# 1. Close VSC/ 2. Run VSC as administrator / 3. Open powershell terminal (outside wsl) / 4. Run:
-Set-ExecutionPolicy RemoteSigned
-# 5. Close VSC / 6. Open VSC how you normally do and rerun the script
 ```
 Then you can access Kubernetes Dashboard and get the token from the admin user in the kubernetes-dashboard namespace like this:
 ```sh
@@ -87,7 +102,7 @@ Run the following:
 ```sh
 # Go to the scripts path
 cd energy-efficiency/scripts
-# Make the script executable (probably only needs to be done once)
+# Make the script executable (needs to be done once)
 chmod +x <TODO.sh>
 # Execute the script:
 ./<TODO.sh>
@@ -132,7 +147,7 @@ After the pods are running, you can execute the next script:
 ```sh
 # Go to the scripts path
 cd cd energy-efficiency/scripts/prepare-monitoring
-# Make the script executable (probably only needs to be done once)
+# Make the script executable (needs to be done once)
 chmod +x keplerAndMonitoringChart.sh
 
 # Execute the script with the charts path, such as:
