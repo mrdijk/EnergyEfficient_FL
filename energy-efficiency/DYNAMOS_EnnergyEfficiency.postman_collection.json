@@ -1,0 +1,44 @@
+{
+	"info": {
+		"_postman_id": "d4e62414-d11b-434a-a613-af5030fcca6d",
+		"name": "DYNAMOS_EnnergyEfficiency",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14877361"
+	},
+	"item": [
+		{
+			"name": "SQL Data Request UNL",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"dataProviders\": [\"VU\",\"UVA\",\"RUG\"],\r\n    \"data_request\": {\r\n        \"type\": \"sqlDataRequest\",\r\n        \"query\" : \"SELECT * FROM Personen p JOIN Aanstellingen s LIMIT 1000\",\r\n        \"algorithm\" : \"average\",\r\n        \"options\" : {\r\n            \"graph\" : false,\r\n            \"aggregate\": false\r\n        },\r\n        \"requestMetadata\": {}\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://api-gateway.api-gateway.svc.cluster.local:80/api/v1/requestApproval",
+					"protocol": "http",
+					"host": [
+						"api-gateway",
+						"api-gateway",
+						"svc",
+						"cluster",
+						"local"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"v1",
+						"requestApproval"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
