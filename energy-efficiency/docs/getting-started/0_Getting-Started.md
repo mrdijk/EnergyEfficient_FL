@@ -124,6 +124,7 @@ To also enable Postman to work, you need to edit the host file in Windows as wel
 # Then open the hosts file and add this to the end of the line (including comment):
 # Expose DYNAMOS:
 127.0.0.1 api-gateway.api-gateway.svc.cluster.local
+# Save the changes
 
 # Then flush the DNS in a cmd (no admin rights necessary). This is harmless and can be freely used, only clears the DNS resolver cache
 # Then possibly you have to restart cmd and other applications if it is not working yet
