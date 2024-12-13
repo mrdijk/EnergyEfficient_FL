@@ -8,6 +8,8 @@ TODO: update or remove this entirely at the end when getting started documentati
 For the energy measurement Prometheus is used. This file shortly explains how you can run Prometheus to view the metrics.
 
 ## Configure minikube to use cgroup2 driver
+TODO: this still necessary???
+
 If you have not already done this:
 
 See this guide for detailed instructions: https://kubernetes.io/docs/concepts/architecture/cgroups/

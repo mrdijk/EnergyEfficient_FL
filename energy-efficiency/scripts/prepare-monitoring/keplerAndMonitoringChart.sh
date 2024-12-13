@@ -1,24 +1,13 @@
 #!/bin/bash
 
-# TODO: change to new format:
-# # Change this to the path of the DYNAMOS repository on your disk
-# echo "Setting up paths..."
-# # Path to root of DYNAMOS project on local machine
-# DYNAMOS_ROOT="/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS"
-# # Charts
-# charts_path="${DYNAMOS_ROOT}/charts"
-# kubernetes_dashboard_chart="${charts_path}/kubernetes-dashboard"
-
-# Check if an argument was provided
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <chartsPath>"
-    exit 1
-fi
-
-# First argument is the chartsPath (the path to core folder in DYNAMOS project)
-chartsPath="$1"
-monitoringChartsPath="$chartsPath/monitoring"
-monitoringValues="$monitoringChartsPath/values.yaml"
+# Change this to the path of the DYNAMOS repository on your disk
+echo "Setting up paths..."
+# Path to root of DYNAMOS project on local machine
+DYNAMOS_ROOT="/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS"
+# Charts
+charts_path="${DYNAMOS_ROOT}/charts"
+monitoring_chart="${charts_path}/monitoring"
+monitoring_values="$monitoring_chart/values.yaml"
 
 # Create the namespace in the Kubernetes cluster (if not exists)
 kubectl create namespace kepler
@@ -28,11 +17,12 @@ helm repo add kepler https://sustainable-computing-io.github.io/kepler-helm-char
 helm repo update
 # Install Kepler
 # This also creates a service monitor for the prometheus stack
-helm upgrade -i kepler kepler/kepler --namespace kepler --set serviceMonitor.enabled=true --set serviceMonitor.labels.release=prometheus 
+helm upgrade -i kepler kepler/kepler \
+    --namespace kepler \
+    --create-namespace \
+    --set serviceMonitor.enabled=true \
+    --set serviceMonitor.labels.release=prometheus \
 
-# After this final installation you should be able to view the Kepler namespace in minikube dashboard
-# See EnerConMeasInDYNAMOS.md file for how to run Prometheus and see the metrics.
-
-# Finally, apply/install the monitoring helm release (will use the monitoring charts,
+# # Finally, apply/install the monitoring helm release (will use the monitoring charts,
 # which includes the deamonset, service and sesrvicemonitor for cadvisor for example)
-helm upgrade -i -f "$monitoringValues" monitoring $monitoringChartsPath
+helm upgrade -i -f "$monitoring_values" monitoring $monitoring_chart

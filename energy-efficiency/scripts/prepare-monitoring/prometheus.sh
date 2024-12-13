@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# TODO: change to new format:
 # Change this to the path of the DYNAMOS repository on your disk
 echo "Setting up paths..."
 # Path to root of DYNAMOS project on local machine

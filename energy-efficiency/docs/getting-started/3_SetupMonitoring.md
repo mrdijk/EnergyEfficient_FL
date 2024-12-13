@@ -25,7 +25,11 @@ kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"
 ```
 
 ## Setup Energy Monitoring
-TODO: add here how to setup monitoring
+Used this guides as leading installations: 
+- https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+- https://sustainable-computing.io/installation/kepler-helm/
+
+Below is extra explanation on how to do this precisely.
 
 Run the following:
 ```sh
@@ -39,7 +43,9 @@ chmod +x prometheus.sh
 ```
 This might take a while, since it is installing a lot of different things, such as prometheus-stack.
 
-## Preparing the rest
+
+TODO: cAdvisor?
+
 Wait for the resources above to be created. The final message of the file will be for example:
 ```
 Release "prometheus" has been upgraded. Happy Helming!
@@ -66,8 +72,9 @@ prometheus-kube-state-metrics-558db85bb5-f64sh         0/1     ContainerCreating
 prometheus-prometheus-node-exporter-82mwd              0/1     ContainerCreating   0          97s
 # With this example output you know that you should wait, because it is still creating the containers
 ```
-Alternatively, you could use minikube dashboard and view the monitoring namespace and wait until the pods are running. It may take a while before all the pods are running, sometimes even up to more than 10 minutes. 
+Alternatively, you could use Kubernetes dashboard and view the monitoring namespace and wait until the pods are running. It may take a while before all the pods are running, sometimes even up to more than 10 minutes. 
 
+## Preparing Kepler (energy measurements)
 After the pods are running, you can execute the next script:
 ```sh
 # Go to the scripts path
@@ -75,8 +82,41 @@ cd cd energy-efficiency/scripts/prepare-monitoring
 # Make the script executable (needs to be done once)
 chmod +x keplerAndMonitoringChart.sh
 
-# Execute the script with the charts path, such as:
-./keplerAndMonitoringChart.sh /mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts
+# Execute the script:
+./keplerAndMonitoringChart.sh
 ```
 
-TODO: add Grafana.
+Then add Kepler Dashboard to Grafana and verify Grafana installation:
+```sh
+# Set a variable in WSL terminal for the Grafana POD
+GF_POD=$(
+    kubectl get pod \
+        -n monitoring \
+        -l app.kubernetes.io/name=grafana \
+        -o jsonpath="{.items[0].metadata.name}"
+)
+# Verify the variable
+echo $GF_POD
+
+# Download the kepler_dashboard.json file: https://github.com/sustainable-computing-io/kepler/blob/main/grafana-dashboards/Kepler-Exporter.json
+# Add it to your project (e.g. in VSC) so you can easily add it from WSL terminal.
+# Rename it to kepler_dashboard.json.
+# cd to the path where the kepler_dashboard.json file is located in the WSL terminal and run:
+kubectl cp kepler_dashboard.json monitoring/$GF_POD:/tmp/dashboards/kepler_dashboard.json
+
+# Port-forward Grafana in another WSL terminal
+kubectl port-forward -n monitoring service/prometheus-grafana 3000:80
+# Access it at http://localhost:3000/
+# Login with username admin
+# Get the password:
+kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+```
+
+TODO: add Grafana!? Or already present in prometheus stack?!
+```sh
+kubectl port-forward -n monitoring service/prometheus-grafana 3000:80
+
+# Username: admin
+# Get password with this:
+kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+```
