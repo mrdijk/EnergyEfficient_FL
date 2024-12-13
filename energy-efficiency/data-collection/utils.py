@@ -34,7 +34,8 @@ def save_energy_data_to_file(df: pd.DataFrame, filename: str):
     # Write the data to the output file
     df.to_csv(output_file, index=False)
 
-    print(f'Saved data to {output_file}')
+    # Output file location that is clickable for the user
+    print(f'Saved data to {os.path.join(os.getcwd(), output_file)}')
 
 
 def convert_float_time_to_string(float_time: float, format: str = "%Y-%m-%d %H:%M:%S") -> str:

@@ -15,16 +15,19 @@ This project contains of two parts:
 ## Prerequisites
 Install dependencies:
 ```sh
-# Navigate to the energy-efficiency folder
-cd energy-efficiency
-# Install requirements using pip
-pip install -r requirements.txt
-
 # Ensure usage of Python 3.10
 sudo apt install python3.10
 # Verify installation:
 python3.10 --version
+# Install pip 
+sudo apt install python3-pip
+# Verify installation:
+pip --version
 
+# Navigate to the energy-efficiency folder
+cd energy-efficiency
+# Install requirements using pip
+pip install -r requirements.txt
 ```
 
 ## Running data collection
