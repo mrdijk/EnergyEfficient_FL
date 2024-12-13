@@ -3,17 +3,6 @@ This file contains documentation about Kubernetes related topics that I found ve
 
 Do NOT add unnecessary extra information here, because that will only consume time, while it is available in the general documentation of Kubernetes for example. Only add information that you find very helpful and only when you have time, because this is just extra information!
 
-# Table of contents
-<!-- TOC -->
-- [Helm charts](#helm-charts)
-  - [Helm Chart Structure](#helm-chart-structure)
-  - [Example of Chart Structure](#example-of-chart-structure)
-  - [How Helm uses this](#how-helm-uses-this)
-- [Prometheus (using prometheus-stack over standalone prometheus)](#prometheus-using-prometheus-stack-over-standalone-prometheus)
-- [Configuring Prometheus stack](#configuring-prometheus-stack)
-- [Configuring config map in Prometheus (standalone, so NOT stack, this is an old guide and prometheus-stack is better to use, but may be useful sometime)](#configuring-config-map-in-prometheus-standalone-so-not-stack-this-is-an-old-guide-and-prometheus-stack-is-better-to-use-but-may-be-useful-sometime)
-- [Minimal cadvisor setup for Prometheus (standalone, so NOT stack, this is an old guide and prometheus-stack is better to use, but may be useful sometime)](#minimal-cadvisor-setup-for-prometheus-standalone-so-not-stack-this-is-an-old-guide-and-prometheus-stack-is-better-to-use-but-may-be-useful-sometime)
-<!-- /TOC -->
 
 
 # Helm charts
@@ -121,45 +110,7 @@ Of course, this is just an example and you should change this to your specific u
 
 
 # Configuring Prometheus stack
-You can configure everything using a .yaml file. For example, this file:
-```yaml
-# Keep this format for this part, because this works for adding additional scrape configs!
-prometheus:
-  prometheusSpec:
-    # Set global scrape interval and scrape timeout
-    # Set this to higher to avoid cadvisor sometimes timing out
-    scrapeInterval: "30s"
-    scrapeTimeout: "25s"
-    evaluationInterval: "1m"
-
-    # Additional scrape configs (on top of already present/default ones)
-    additionalScrapeConfigs:
-      # Job to gather metrics like CPU and memory using cadvisor daemonset
-      - job_name: 'cadvisor'
-        # Configures Kubernetes service discovery to find pods
-        kubernetes_sd_configs:
-          - role: pod
-        # Configures relabeling rules
-        relabel_configs:
-          # Keep only pods with the label app=cadvisor (otherwise all other metrics will be included, but you only want cadvisor metrics)
-          # Make sure that the name label is present in the pod (or in this case daemonset) you are creating! Otherwise, Prometheus cannot see it
-          - source_labels: [__meta_kubernetes_pod_label_name]
-            action: keep
-            regex: cadvisor
-          # Replace target with pod IP and port 8080 (where cadvisor runs)
-          - source_labels: [__meta_kubernetes_pod_ip]
-            action: replace
-            target_label: __address__
-            regex: (.+)
-            replacement: ${1}:8080
-          # No custom labels/replacements are set here (do NOT change this, because now it works!), so that the defaults of 
-          # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
-
-# Disable grafana from prometheus stack (not needed anyway)
-grafana:
-  enabled: false
-```
-This can be used to install and/or upgrade Prometheus stack by appending additional scrape configs and adding scrape intervals globally for example. You can upgrade Prometheus by following these steps:
+See getting started guide for how to setup Prometheus stack. Below is a guide on how you can change the configuration to apply changes to the Prometheus configuration.
 ```sh
 # Set variables for the paths (example with the monitoring chart path)
 monitoringChartsPath="/mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts/monitoring"
@@ -194,33 +145,4 @@ kubectl delete pod prometheus-server-<stringid> -n monitoring
 
 # Then port forward promtheus and see if it is working (assuming you are using standalone prometheus)
 kubectl port-forward svc/prometheus-server 9090:80 -n monitoring
-```
-## Minimal cadvisor setup for Prometheus (standalone, so NOT stack, this is an old guide and prometheus-stack is better to use, but may be useful sometime)
-```yaml
-global:
-  scrape_interval: 1m
-  evaluation_interval: 1m
-  # Avoids cadvisor to exceed the timeout range for example (increase when jobs are exceeding this time)
-  scrape_timeout: 25s
-
-scrape_configs:
-  # Job to gather metrics like CPU and memory using cadvisor daemonset
-  - job_name: 'cadvisor'
-    # Configures Kubernetes service discovery to find pods
-    kubernetes_sd_configs:
-      - role: pod
-    # Configures relabeling rules
-    relabel_configs:
-      # Keep only pods with the label app=cadvisor (otherwise all other metrics will be included, but you only want cadvisor metrics)
-      - source_labels: [__meta_kubernetes_pod_label_name]
-        action: keep
-        regex: cadvisor
-      # Replace target with pod IP and port 8080 (where cadvisor runs)
-      - source_labels: [__meta_kubernetes_pod_ip]
-        action: replace
-        target_label: __address__
-        regex: (.+)
-        replacement: ${1}:8080
-      # No custom labels/replacements are set here (do NOT change this, because now it works!), so that the defaults of 
-      # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
 ```

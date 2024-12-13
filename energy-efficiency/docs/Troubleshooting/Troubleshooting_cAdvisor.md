@@ -176,13 +176,13 @@ container_cpu_system_seconds_total{container_label_annotation_io_kubernetes_cont
 ```
 The final example shows the linkerd-proxy name as the name of the container (container_label_io_kubernetes_container_name="linkerd-proxy"). This is the name you want to see, because as you can see in the image below:
 
-![alt text](./assets/linkerd-proxyContainer.png)
+![alt text](../assets/linkerd-proxyContainer.png)
 
 The 'linkerd-proxy-injector-67945967d6-r9vg7' pod contains the container with name 'linkerd-proxy'. This can be seen by the following information in the last output:
 container_label_io_kubernetes_pod_name="linkerd-proxy-injector-67945967d6-r9vg7"
 
 This is also what it should be for grouping the results by name, then you can filter by containers for example:
 
-![alt text](./assets/cadvisorFilterByContainer.png)
+![alt text](../assets/cadvisorFilterByContainer.png)
 
 In this case you can see that we filter by 'container_label_io_kubernetes_container_name', which is equal to the container name that is provided by cadvisor in the used version. This is how you can filter these results by container.

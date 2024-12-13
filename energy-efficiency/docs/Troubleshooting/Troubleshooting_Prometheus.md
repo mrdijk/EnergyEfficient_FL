@@ -105,10 +105,10 @@ In the example output you can see that only the name label is present for cadvis
 # Prometheus query not returning any results, while you do expect results
 This can happen if you have a time included, such as a time interval of 1m:
 
-![alt text](./assets/PrometheusNoResultsQueryTimeinterval.png)
+![alt text](../assets/PrometheusNoResultsQueryTimeinterval.png)
 
 To fix this, you can try to increase the time to find data:
 
-![alt text](./assets/PrometheusNoResultsFix.png)
+![alt text](../assets/PrometheusNoResultsFix.png)
 
 Here you can see that there are results available (if not you can try to keep increasing the interval until you have data, such as 3m, 5m, 10m, etc.). This issue is related to the (global or job specific) configuration of prometheus. For example, if you have a scrape interval of 1m, then there is probably no data available at the time interval of 1m. 

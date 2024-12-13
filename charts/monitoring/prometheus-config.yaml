@@ -11,8 +11,6 @@ prometheus:
     additionalScrapeConfigs:
       # Job to gather metrics like CPU and memory using cadvisor daemonset
       - job_name: 'cadvisor'
-        # tls_config:
-        #   insecure_skip_verify: true
         # Configures Kubernetes service discovery to find pods
         kubernetes_sd_configs:
           - role: pod
@@ -33,9 +31,12 @@ prometheus:
           # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
 
 # Disable grafana from prometheus stack (not needed anyway)
-grafana:
-  enabled: false
+# grafana:
+#   enabled: false
+# TODO: fix above
 
+# Docker Desktop has a limitation that it will not compile node-exporter (Error response from daemon: path / is mounted on / but it is not a shared or slave mount)
+# Below is a workaround for that, see Troubleshooting documentation for explanation on this workaround
 prometheus-node-exporter:
   hostRootFsMount:
     enabled: false

@@ -16,16 +16,9 @@ kubectl create namespace monitoring
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
-# Install prometheus stack with the release name prometheus and wait for it to be done
-helm install prometheus prometheus-community/kube-prometheus-stack \
-    --namespace monitoring \
-    --wait
-
-
-# TODO: below was old, now trying again from scratch
-
-# Install prometheus stack (this may take a while before the pods are running (sometimes even up to more than 15 minutes))
-# Use the monitoring namcespace for prometheus (and use config file, excludes grafana for now for example, because it is not needed at the moment)
+# Install prometheus stack (this may take a while before the pods are running (sometimes even up to minutes))
+# -i flag allows helm to install it if it does not exist yet, otherwise upgrade it
+# Use the monitoring namcespace for prometheus (and use config file with the -f flag)
 # Using upgrade ensures that helm manages it correctly, this will upgrade or install if not exists
 # This names the release 'prometheus'. This is VERY IMPORTANT, because this release will be used by Kepler and others to create ServiceMonitors for example
-# helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoring_chart/prometheus-config.yaml"
+helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoring_chart/prometheus-config.yaml"
