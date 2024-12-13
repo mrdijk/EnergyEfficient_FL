@@ -93,7 +93,7 @@ spec:
 Make sure that you deploy it as a helm chart, such as in the monitoring helm chart located in this project.
 
 This is the .yaml file containing namespace.yaml, serviceaccount.yaml and daemonset.yaml from https://github.com/google/cadvisor/tree/master/deploy/kubernetes/base all in one, with the image changed to a newer one and including variables set in a helm chart:
-![alt text](./assets/GoogleCadvisorKubernetesDeploy.png)
+![alt text](../assets/GoogleCadvisorKubernetesDeploy.png)
 
 Then prometheus needs to be configured appropriately to scrape the metrics from cadvisor:
 ```sh
@@ -153,11 +153,11 @@ kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 909
 ```
 Go to the Prometheus UI and navigate to Status > Targets. Here you should see that cadvisor is in the targets:
 
-![alt text](./assets/cadvisorInPrometheusTargetsDown.png)
+![alt text](../assets/cadvisorInPrometheusTargetsDown.png)
 
 At first it will say down/unhealthy, because it is still initializing. (Except if there are errors shown). In a minute (you could try refreshing the page to see it faster) it should say up and when it says you can see something like this:
 
-![alt text](./assets/cadvisorInPrometheusTargetsUp.png)
+![alt text](../assets/cadvisorInPrometheusTargetsUp.png)
 
 Then you can see that the target is up and new metrics have been collected. Then you can go to /graph in the Prometheus UI to view the changes:
 

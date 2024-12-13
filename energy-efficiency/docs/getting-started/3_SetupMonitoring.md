@@ -31,6 +31,7 @@ Used this guides as leading installations:
 
 Below is extra explanation on how to do this precisely.
 
+# Setup Prometheus Stack (includes Grafana)
 Run the following:
 ```sh
 # Go to the scripts path (in WSL like with all other scripts)
@@ -71,6 +72,9 @@ prometheus-prometheus-node-exporter-82mwd              0/1     ContainerCreating
 ```
 Alternatively, you could use Kubernetes dashboard and view the monitoring namespace and wait until the pods are running. It may take a while before all the pods are running, sometimes even up to more than 10 minutes. 
 
+
+
+
 ## Preparing Kepler (energy measurements)
 After the pods are running, you can execute the next script:
 ```sh
@@ -108,7 +112,25 @@ kubectl port-forward -n monitoring service/prometheus-grafana 3000:80
 # Get the password:
 kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 ```
-Now you should be able see the dashboard in Grafana if you go to Dashboards > search for Kepler, such as Kepler Exporter Dashboard
+Now you should be able see the dashboard in Grafana if you go to Dashboards > search for Kepler, such as Kepler Exporter Dashboard.
 
 
-TODO: cAdvisor and Grafana documentation?
+Finally, you can verify Kepler and cAdvisor running by port-forwarding Prometheus:
+```sh
+# Port-forward Prometheus stack
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
+# Access it at http://localhost:9090/
+```
+
+Check the Prometheus Targets at the Prometheus instance > Status > Targets, you should see at least cAdvisor and Kepler with up status, some targets might not be up, but that is probably fine, as long as those two are up, you are good to go:
+![alt text](../assets/KeplerAndcAdvisorTargetsUp_Prometheus.png)
+
+Then you can execute a query in Prometheus to see energy metrics from Kepler to verify Kepler is running:
+```sh
+sum(kepler_container_joules_total) by (pod_name, container_name, container_namespace, node)
+```
+You should now see energy metrics per container. A lof of these values will be 0, but that is correct, since these do not use energy at the moment or Kepler could not measure them. However, as long as you can see some containers with data values, specifically the ones you want to measure, that is good.
+
+See this guide for detailed information about Kepler metrics: https://sustainable-computing.io/design/metrics/
+
+Now you are all set to monitor and measure energy consumption!

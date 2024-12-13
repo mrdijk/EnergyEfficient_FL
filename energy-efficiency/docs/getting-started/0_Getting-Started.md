@@ -26,10 +26,11 @@ TODO: here add some helpful commands, such as startup Kubernetes Dashboard, Prom
 
 ## Accessing Prometheus web UI
 ```sh
-kubectl port-forward deploy/prometheus-server 9090:9090
+# Port-forward Prometheus stack
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
+# Access it at http://localhost:9090/
 ```
-After running this command you can access it via:
-http://localhost:9090/
+
 
 ## Accessing Kubernetes Dashboard
 You can access Kubernetes Dashboard and get the token from the admin user in the kubernetes-dashboard namespace like this:
@@ -43,5 +44,16 @@ kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy
 # Get the token from the admin user that can be used to login in the Kubernetes Dashboard cluster
 kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"} | base64 -d
 # Add the token in the login window and you should be able to access Kubernetes Dashboard
+```
+
+
+## Accessing Grafana UI
+```sh
+# Port-forward Grafana in another WSL terminal
+kubectl port-forward -n monitoring service/prometheus-grafana 3000:80
+# Access it at http://localhost:3000/
+# Login with username admin
+# Get the password:
+kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 ```
 

@@ -4,6 +4,10 @@ It is recommended to use WSL (Linux OS). Install WSL and open the terminal, for 
 wsl
 ```
 
+Follow this guide to install prerequisites for DYNAMOS: https://github.com/Jorrit05/DYNAMOS?tab=readme-ov-file#prerequisite-software-tools
+
+Extra explanation for what to do from this guide precisely is below, follow closely. Other things are not necessary from the above installation guide.
+
 ## Install Go in WSL
 Follow instructions: https://go.dev/doc/install
 
@@ -19,17 +23,10 @@ sudo apt install make
 1. Make sure Docker is installed: https://docs.docker.com/desktop/
 (And the Docker Desktop is using WSL2 as backend: https://docs.docker.com/desktop/wsl/).
 
-2. Make sure Kubernetes is installed (kubectl and minikube for local development). 
+2. Make sure Kubernetes is installed (kubectl and Kubernetes enabled in Docker Desktop for local development). 
+Follow this guide on how to enable Kubernetes in Docker Desktop: https://docs.docker.com/desktop/features/kubernetes/
+Specifically, also use kubectl with it, and set the context to docker-desktop, like explained in the guide.
 
-Install minikube (local Kubernetes development): https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fbinary+download. Setup cgroupv2 driver (see Configure_cgroupv2.md file for a tutorial).
-
-Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
-
-3. Make sure Kubernetes is running (keep in mind again: use WSL):
-```sh
-minikube start --driver=docker
-```
-Make sure the Docker engine is running (open Docker Desktop).
 
 ## Install Helm (package manager for Kubernetes)
 Install the package manager for Kubernetes: https://helm.sh/docs/intro/install/#from-script
@@ -46,3 +43,9 @@ Then restart all terminals and verify the installation by running:
 ```sh
 linkerd version
 ```
+
+## Install Brew on WSL
+Use this guide: https://docs.brew.sh/Homebrew-on-Linux
+
+## Install k9s for WSL (optional)
+Use this guide: https://k9scli.io/topics/install/
