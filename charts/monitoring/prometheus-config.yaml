@@ -11,6 +11,8 @@ prometheus:
     additionalScrapeConfigs:
       # Job to gather metrics like CPU and memory using cadvisor daemonset
       - job_name: 'cadvisor'
+        # tls_config:
+        #   insecure_skip_verify: true
         # Configures Kubernetes service discovery to find pods
         kubernetes_sd_configs:
           - role: pod
@@ -33,3 +35,7 @@ prometheus:
 # Disable grafana from prometheus stack (not needed anyway)
 grafana:
   enabled: false
+
+prometheus-node-exporter:
+  hostRootFsMount:
+    enabled: false

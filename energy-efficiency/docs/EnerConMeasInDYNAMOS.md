@@ -1,5 +1,10 @@
 # Energy Consumption Measurements in DYNAMOS
 
+TODO: update or remove this entirely at the end when getting started documentation is done.
+
+
+
+
 For the energy measurement Prometheus is used. This file shortly explains how you can run Prometheus to view the metrics.
 
 ## Configure minikube to use cgroup2 driver

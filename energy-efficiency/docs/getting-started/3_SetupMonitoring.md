@@ -1,0 +1,82 @@
+# Setup Monitoring
+This guide provides explanation on how to setup monitoring in the Kubernetes environment, including energy monitoring.
+
+## Setup Kubernetes Dashboard
+Kubernetes Dashboard can be used to monitor and manage the Kubernetes environment. To setup Kubernetes Dashboard, run the following:
+```sh
+# Go to the scripts path
+cd energy-efficiency/scripts
+# Make the script executable (needs to be done once)
+chmod +x kubernetes-dashboard.sh
+# Execute the script:
+./kubernetes-dashboard.sh
+```
+Then you can access Kubernetes Dashboard and get the token from the admin user in the kubernetes-dashboard namespace like this:
+```sh
+# Access Kubernetes Dashboard
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+# Access it at: https://localhost:8443/
+# If it says something like net::ERR_CERT_AUTHORITY_INVALID, Your connection isn't private, you can select 
+# Advanced > Continue to localhost (unsafe). You can do this because you know it is Kubernetes and this is save to use
+
+# Get the token from the admin user that can be used to login in the Kubernetes Dashboard cluster
+kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"} | base64 -d
+# Add the token in the login window and you should be able to access Kubernetes Dashboard
+```
+
+## Setup Energy Monitoring
+TODO: add here how to setup monitoring
+
+Run the following:
+```sh
+# Go to the scripts path (in WSL like with all other scripts)
+cd energy-efficiency/scripts/prepare-monitoring
+# Make the script executable (needs to be done once)
+chmod +x prometheus.sh
+
+# Execute the script:
+./prometheus.sh
+```
+This might take a while, since it is installing a lot of different things, such as prometheus-stack.
+
+## Preparing the rest
+Wait for the resources above to be created. The final message of the file will be for example:
+```
+Release "prometheus" has been upgraded. Happy Helming!
+NAME: prometheus
+LAST DEPLOYED: Tue Jul  2 13:29:32 2024
+NAMESPACE: monitoring
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NOTES:
+kube-prometheus-stack has been installed. Check its status by running:
+  kubectl --namespace monitoring get pods -l "release=prometheus"
+```
+
+You can see that you can use the command to view the status:
+```sh
+# View status of prometheus release
+kubectl --namespace monitoring get pods -l "release=prometheus"
+
+# Example output:
+NAME                                                   READY   STATUS              RESTARTS   AGE
+prometheus-kube-prometheus-operator-6554f4464f-tf9k8   0/1     ContainerCreating   0          97s
+prometheus-kube-state-metrics-558db85bb5-f64sh         0/1     ContainerCreating   0          97s
+prometheus-prometheus-node-exporter-82mwd              0/1     ContainerCreating   0          97s
+# With this example output you know that you should wait, because it is still creating the containers
+```
+Alternatively, you could use minikube dashboard and view the monitoring namespace and wait until the pods are running. It may take a while before all the pods are running, sometimes even up to more than 10 minutes. 
+
+After the pods are running, you can execute the next script:
+```sh
+# Go to the scripts path
+cd cd energy-efficiency/scripts/prepare-monitoring
+# Make the script executable (needs to be done once)
+chmod +x keplerAndMonitoringChart.sh
+
+# Execute the script with the charts path, such as:
+./keplerAndMonitoringChart.sh /mnt/c/Users/cpoet/IdeaProjects/EnergyEfficiency_DYNAMOS/charts
+```
+
+TODO: add Grafana.
