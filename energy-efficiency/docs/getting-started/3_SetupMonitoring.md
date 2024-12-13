@@ -36,15 +36,12 @@ Run the following:
 # Go to the scripts path (in WSL like with all other scripts)
 cd energy-efficiency/scripts/prepare-monitoring
 # Make the script executable (needs to be done once)
-chmod +x prometheus.sh
+chmod +x prometheusAndGrafana.sh
 
 # Execute the script:
-./prometheus.sh
+./prometheusAndGrafana.sh
 ```
 This might take a while, since it is installing a lot of different things, such as prometheus-stack.
-
-
-TODO: cAdvisor?
 
 Wait for the resources above to be created. The final message of the file will be for example:
 ```
@@ -111,12 +108,7 @@ kubectl port-forward -n monitoring service/prometheus-grafana 3000:80
 # Get the password:
 kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 ```
+Now you should be able see the dashboard in Grafana if you go to Dashboards > search for Kepler, such as Kepler Exporter Dashboard
 
-TODO: add Grafana!? Or already present in prometheus stack?!
-```sh
-kubectl port-forward -n monitoring service/prometheus-grafana 3000:80
 
-# Username: admin
-# Get password with this:
-kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
-```
+TODO: cAdvisor and Grafana documentation?

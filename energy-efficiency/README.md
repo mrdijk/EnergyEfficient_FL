@@ -19,6 +19,12 @@ Install dependencies:
 cd energy-efficiency
 # Install requirements using pip
 pip install -r requirements.txt
+
+# Ensure usage of Python 3.10
+sudo apt install python3.10
+# Verify installation:
+python3.10 --version
+
 ```
 
 ## Running data collection
@@ -26,18 +32,18 @@ Navigate to the energy-efficiency/data-collection folder and run the main python
 ```sh
 # Navigate to energy-efficiency/data-collection folder
 cd energy-efficiency/data-collection
-# Run specific scripts
-python get_metrics.py
+# Run specific scripts (assuming Python is installed in WSL environment and the command is run in a WSL terminal)
+python3.10 get_metrics.py
 ```
 Running the scripts from this location is crucial, since the imports are assuming the scripts are run from this location.
 
 
-## Running data analysis (AD)
+## Running data analysis (AD and RCA)
 Navigate to the energy-efficiency/data-analysis folder and run the main python file:
 ```sh
 # Navigate to energy-efficiency/data-analysis folder
 cd energy-efficiency/data-analysis
-# Run specific scripts
-python main.py
+# Run specific scripts (assuming Python is installed in WSL environment and the command is run in a WSL terminal)
+python3.10 main.py
 ```
 Running the scripts from this location is crucial, since the imports are assuming the scripts are run from this location.

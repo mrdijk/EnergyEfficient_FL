@@ -30,11 +30,6 @@ prometheus:
           # No custom labels/replacements are set here (do NOT change this, because now it works!), so that the defaults of 
           # cadvisor are used! For example, you can group by name of the container with: container_label_io_kubernetes_container_name
 
-# Disable grafana from prometheus stack (not needed anyway)
-# grafana:
-#   enabled: false
-# TODO: fix above
-
 # Docker Desktop has a limitation that it will not compile node-exporter (Error response from daemon: path / is mounted on / but it is not a shared or slave mount)
 # Below is a workaround for that, see Troubleshooting documentation for explanation on this workaround
 prometheus-node-exporter:

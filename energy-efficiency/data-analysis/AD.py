@@ -18,7 +18,6 @@ ALGORITHMS_DATA_FOLDER = get_folder_path('data')
 # Path to the converted energy metrics file (after CPU conversion)
 CONVERTED_ENERGY_DATA_FILE = os.path.join(
     ALGORITHMS_DATA_FOLDER, 'converted_energy_metrics.csv')
-print(ENERGY_DATA_FOLDER, ALGORITHMS_DATA_FOLDER, CONVERTED_ENERGY_DATA_FILE)
 
 
 def main():
