@@ -1,4 +1,6 @@
 Root Cause
-etcd_energy
+linkerd-proxy_energy
+sidecar_energy
 rabbitmq_energy
 policy_energy
+etcd_energy

@@ -17,7 +17,7 @@ TRAINING_DATA_FILE = os.path.join(
     ALGORITHMS_DATA_FOLDER, 'normal_energy_metrics_training.csv')
 
 # Set the top-k parameter for the RCD model (number of root causes to identify)
-K = 4
+K = 5
 
 def main():
     """
