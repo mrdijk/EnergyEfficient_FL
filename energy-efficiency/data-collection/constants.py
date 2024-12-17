@@ -45,10 +45,11 @@ CONTAINERS = {
     # Policy container
     "policy",
     "policy-enforcer",
+    # Sidecar pattern container
+    "sidecar",
     # General Kubernetes containers
     "etcd",
     "rabbitmq",
-    "sidecar",
     "linkerd-proxy",
     "jaeger"
 }
