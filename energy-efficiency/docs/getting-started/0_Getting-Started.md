@@ -17,6 +17,15 @@ Keep in mind, it takes a while until all the different services are running, so 
 - [Configuring DYNAMOS](./2_ConfiguringDYNAMOS.md)
 - [Setup Monitoring](./3_SetupMonitoring.md)
 
+## Developing in DYNAMOS additional explanation
+Follow the Development guide: https://github.com/Jorrit05/DYNAMOS/tree/main/docs/development_guide
+
+Start with installing dependencies: https://github.com/Jorrit05/DYNAMOS/tree/main/docs/development_guide/Dependencies
+Specifically: https://pkg.go.dev/github.com/golang/protobuf/protoc-gen-go
+(do NOT use the manual protoc installation)
+TODO: finish this part
+
+
 
 # After completing getting started steps
 These tutorials can be used after the getting started steps have been followed.

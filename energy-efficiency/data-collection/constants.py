@@ -31,21 +31,23 @@ QUERIES = {
 }
 
 # Relevant containers to monitor the energy consumption 
-# (use scripts/describeContainers.sh to print containers in the Kubernetes cluster)
-# TODO: use containers used by DYNAMOS later (containers from orchestrator, vu, uva, etc.)
 CONTAINERS = {
+    # Use case specific containers
+    "vu",
+    "uva",
+    "surf",
+    "orchestratos",
+    "sql-query",
+    "sql-algorithm",
+    "sql-anonymize",
+    "sql-test",
+    # Policy container
+    "policy",
+    "policy-enforcer",
+    # General Kubernetes containers
     "etcd",
     "rabbitmq",
-    "nginx-ingress",
-    "policy",
+    "sidecar",
     "linkerd-proxy",
-    "kube-state-metrics",
-    "proxy-injector",
-    "node-exporter",
-    "identity",
-    "ot-collector",
-    "kube-proxy",
-    "destination",
-    "jaeger",
-    "prometheus-server"
+    "jaeger"
 }

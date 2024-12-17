@@ -1,0 +1,107 @@
+{
+	"info": {
+		"_postman_id": "7e78f87b-5912-44f1-b3e5-c09d4395cec1",
+		"name": "Prets API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40392997",
+		"_collection_link": "https://winter-eclipse-307316.postman.co/workspace/New-Team-Workspace~0094d701-2916-48ac-9158-50ea1cd6ce05/collection/6006455-7e78f87b-5912-44f1-b3e5-c09d4395cec1?action=share&source=collection_link&creator=40392997"
+	},
+	"item": [
+		{
+			"name": "test_root",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "xlmr2-pupdg-3atks-iaey6-qzdp3",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "SVC_TOP_BOT",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post_items_test",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Foo\",\r\n    \"description\": \"An optional description\",\r\n    \"price\": 45.2,\r\n    \"tax\": 3.5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/items",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "predict",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"features\" : [1.0, 2.0]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/predict",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"predict"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
