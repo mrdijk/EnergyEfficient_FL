@@ -25,6 +25,13 @@ Specifically: https://pkg.go.dev/github.com/golang/protobuf/protoc-gen-go
 (do NOT use the manual protoc installation)
 TODO: finish this part
 
+## Additional logging of traces can be viewed using Jaegar
+Optionally, you could view the traces after performing requests in Jaegar:
+```sh
+# Run Jaegar:
+kubectl port-forward -n linkerd-jaeger service/jaeger 16686:16686
+# Access at http://localhost:16686/
+```
 
 
 # After completing getting started steps
