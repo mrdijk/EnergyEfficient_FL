@@ -27,13 +27,13 @@ QUERIES = {
     # Energy metric, as stated by Kepler documentation (https://sustainable-computing.io/design/metrics/#exploring-node-exporter-metrics-through-the-prometheus-expression)
     # This query gets the energy consumption. The query stated in the 
     # documentation is suited to fit with the other queries (cpu, memory, ...) from the study by Ivano and colleagues 
-    # "energy": f"sum(rate(kepler_container_joules_total[{DURATION}])) by (pod_name, {KEPLER_CONTAINER_NAME_LABEL}, container_namespace, node)"
-    "energy": f"sum(rate(kepler_container_joules_total[{DURATION}])) by ({KEPLER_CONTAINER_NAME_LABEL})"
+    "energy": f"sum(increase(kepler_container_joules_total[{DURATION}])) by ({KEPLER_CONTAINER_NAME_LABEL})"
 }
 
 # Relevant containers to monitor the energy consumption 
 CONTAINERS = {
     # Use case specific containers
+    "api-gateway",
     "vu",
     "uva",
     "surf",
@@ -48,8 +48,9 @@ CONTAINERS = {
     # Sidecar pattern container
     "sidecar",
     # General Kubernetes containers
-    "etcd",
-    "rabbitmq",
-    "linkerd-proxy",
-    "jaeger"
+    # TODO: not used anymore because not specifically related to archetypes, but left here for reference
+    # "etcd",
+    # "rabbitmq",
+    # "linkerd-proxy",
+    # "jaeger"
 }
