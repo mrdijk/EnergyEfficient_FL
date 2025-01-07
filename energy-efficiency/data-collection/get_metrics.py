@@ -14,8 +14,8 @@ def main():
     Main function of the energy measurements gathering. 
     Run this file to gather the energy measurements that can be used for the algorithms.
     """
-    # Get the time interval from the last 45 minutes
-    start, end = get_time_range(45)
+    # Get the time interval from the last x minutes
+    start, end = get_time_range(15)
 
     # Get the data for all the queries
     df = pd.DataFrame(
