@@ -6,8 +6,8 @@ METRIC_STEP = 5
 # Maximum resolution of Prometheus (i.e. the maximum number of data points that can be returned in a single query)
 MAX_RESOLUTION = 11_000
 # How far back in time Prometheus should look to calculate the rate of change
-# Set to 5 minutes to get more data points for the rate calculation (1m sometimes gives no data)
-DURATION = "5m"
+# Set to multiple minutes to get more data points for the rate calculation
+DURATION = "2m"
 
 # Labels used to identify the container name in the Prometheus metrics
 KEPLER_CONTAINER_NAME_LABEL = "container_name"
@@ -37,20 +37,17 @@ CONTAINERS = {
     "vu",
     "uva",
     "surf",
-    "orchestrator",
     "sql-query",
     "sql-algorithm",
     "sql-anonymize",
     "sql-test",
-    # Policy container
+    # Policy containers
     "policy",
     "policy-enforcer",
+    "orchestrator",
     # Sidecar pattern container
     "sidecar",
-    # General Kubernetes containers
-    # TODO: not used anymore because not specifically related to archetypes, but left here for reference
-    # "etcd",
-    # "rabbitmq",
-    # "linkerd-proxy",
-    # "jaeger"
+    # General Kubernetes containers relevant to include
+    "system_processes",
+    "rabbitmq"
 }
