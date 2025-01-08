@@ -1,25 +1,34 @@
 #!/bin/bash
 
 # Define your personal and organizational account names
-PERSONAL_ACCOUNT="jorrit05"
-ORG_ACCOUNT="dynamos1"
+PERSONAL_ACCOUNT="dynamos1"
+ORG_ACCOUNT="poetoec"
 
 # Define a dictionary mapping old repository names to new repository names
 declare -A IMAGE_MAP=(
-    ["dynamos-aggregate:latest"]="sql-aggregate:latest"
-    ["dynamos-query:latest"]="sql-query:latest"
-    ["dynamos-algorithm:latest"]="sql-algorithm:latest"
-    ["dynamos-federated-learning:latest"]="fl-federated-learning:latest"
-    ["dynamos-model-service:latest"]="fl-model-service:latest"
-    ["dynamos-evaluate-service:latest"]="fl-evaluate-service:latest"
-    ["dynamos-fl-aggregate:latest"]="fl-aggregate:latest"
-    ["dynamos-agent:latest"]="agent:latest"
-    ["dynamos-anonymize:latest"]="sql-anonymize:latest"
-    ["dynamos-orchestrator:latest"]="orchestrator:latest"
-    ["dynamos-policy-enforcer:latest"]="policy-enforcer:latest"
-    ["dynamos-sidecar:latest"]="sidecar:latest"
-    ["dynamos-api-gateway:latest"]="api-gateway:latest"
-    ["dynamos-test:latest"]="test:latest"
+    # SQL Services
+    ["sql-aggregate:latest"]="sql-aggregate:latest"
+    ["sql-algorithm:latest"]="sql-algorithm:latest"
+    ["sql-anonymize:latest"]="sql-anonymize:latest"
+    ["sql-query:latest"]="sql-query:latest"
+    ["sql-test:latest"]="sql-test:latest"
+
+    # Federated Learning Services
+    # ["fl-aggregate:latest"]="fl-aggregate:latest"
+    # ["fl-evaluate-service:latest"]="fl-evaluate-service:latest"
+    # ["fl-federated-learning:latest"]="fl-federated-learning:latest"
+    # ["fl-model-service:latest"]="fl-model-service:latest"
+
+    # Core Services
+    ["agent:latest"]="agent:latest"
+    ["api-gateway:latest"]="api-gateway:latest"
+    ["orchestrator:latest"]="orchestrator:latest"
+    ["policy-enforcer:latest"]="policy-enforcer:latest"
+    ["sidecar:latest"]="sidecar:latest"
+
+    # Test Services
+    ["test:latest"]="test:latest"
+    ["new-service:latest"]="new-service:latest"
 )
 
 # Loop through each image in the dictionary
