@@ -19,6 +19,43 @@ wsl
 sudo apt install make
 ```
 
+## Installing Protoc (WSL) and libraries for Go and Python
+```sh
+# Open wsl
+wsl
+# Install protoc: https://grpc.io/docs/protoc-installation/
+# Example:
+sudo apt install -y protobuf-compiler
+# Verify installation:
+protoc --version
+
+# To compile the proto file for Go file we need the Protobuf Compiler(protoc) and also the protoc-gen-go plugin:
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+# We also need protoc-gen-go-grpc:
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+# This will install it in $GOPATH/bin. Verify installed file by running:
+which protoc-gen-go
+which protoc-gen-go-grpc
+# Or you can see them listed with ls
+echo $GOPATH
+cd $GOPATH/bin
+ls
+
+# Make sure you have GOPATH set in .bashrc:
+cd ~
+explorer.exe .
+# Select .bashrc and open it (click Allow when asked). Make sure the following lines for Go are present:
+export PATH=$PATH:/usr/local/go/bin
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+# Reload file contents source ~/.bashrc
+
+# For Python you can use pip to install the required library
+pip install grpcio grpcio-tools
+# Verify installation:
+python3 -m grpc_tools.protoc --version
+```
+
 ## Installing and running Kubernetes
 1. Make sure Docker is installed: https://docs.docker.com/desktop/
 (And the Docker Desktop is using WSL2 as backend: https://docs.docker.com/desktop/wsl/).
