@@ -9,7 +9,7 @@ import (
 	pb "github.com/Jorrit05/DYNAMOS/pkg/proto"
 )
 
-func ChainConsumeWithRetry(serviceName string, c pb.SideCarClient, queueName string, handler MessageHandlerFunc, maxRetries int, waitTime time.Duration, receiveMutex *sync.Mutex) {
+func ChainConsumeWithRetry(serviceName string, c pb.RabbitMQClient, queueName string, handler MessageHandlerFunc, maxRetries int, waitTime time.Duration, receiveMutex *sync.Mutex) {
 	for i := 0; i < maxRetries; i++ {
 		err := chainConsume(serviceName, c, queueName, handler, receiveMutex)
 		if err == nil {
@@ -24,7 +24,7 @@ func ChainConsumeWithRetry(serviceName string, c pb.SideCarClient, queueName str
 }
 
 // Specific handler for microservices in the microservice chain
-func chainConsume(serviceName string, c pb.SideCarClient, from string, handler MessageHandlerFunc, receiveMutex *sync.Mutex) error {
+func chainConsume(serviceName string, c pb.RabbitMQClient, from string, handler MessageHandlerFunc, receiveMutex *sync.Mutex) error {
 	logger.Sugar().Debugf("Starting %s/chainConsume", serviceName)
 	ctx := context.Background()
 	stream, err := c.ChainConsume(ctx, &pb.ConsumeRequest{QueueName: from, AutoAck: true})
