@@ -72,6 +72,8 @@ prometheus-prometheus-node-exporter-82mwd              0/1     ContainerCreating
 ```
 Alternatively, you could use Kubernetes dashboard and view the monitoring namespace and wait until the pods are running. It may take a while before all the pods are running, sometimes even up to more than 10 minutes. 
 
+## Setup Grafana with loki and promtail
+The above script also deployed grafana, loki and promtail.
 
 
 
@@ -89,30 +91,19 @@ chmod +x keplerAndMonitoringChart.sh
 
 Then add Kepler Dashboard to Grafana and verify Grafana installation:
 ```sh
-# Set a variable in WSL terminal for the Grafana POD
-GF_POD=$(
-    kubectl get pod \
-        -n monitoring \
-        -l app.kubernetes.io/name=grafana \
-        -o jsonpath="{.items[0].metadata.name}"
-)
-# Verify the variable
-echo $GF_POD
-
-# Download the kepler_dashboard.json file: https://github.com/sustainable-computing-io/kepler/blob/main/grafana-dashboards/Kepler-Exporter.json
-# Add it to your project (e.g. in VSC) so you can easily add it from WSL terminal.
-# Rename it to kepler_dashboard.json.
-# cd to the path where the kepler_dashboard.json file is located in the WSL terminal and run:
-kubectl cp kepler_dashboard.json monitoring/$GF_POD:/tmp/dashboards/kepler_dashboard.json
-
 # Port-forward Grafana in another WSL terminal
 kubectl port-forward -n monitoring service/prometheus-grafana 3000:80
 # Access it at http://localhost:3000/
-# Login with username admin
+# Login with username: admin
 # Get the password:
 kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+# Download the kepler_dashboard.json file: https://github.com/sustainable-computing-io/kepler/blob/main/grafana-dashboards/Kepler-Exporter.json
+# Then go to Dashboards > New > Import > Add the JSON file just downloaded
 ```
 Now you should be able see the dashboard in Grafana if you go to Dashboards > search for Kepler, such as Kepler Exporter Dashboard.
+
+If it does not load, you can delete the grafana pod and then port-forward again and see if you can login, this fixes the issue most of the times in Kubernetes.
 
 
 Finally, you can verify Kepler and cAdvisor running by port-forwarding Prometheus:
@@ -130,6 +121,7 @@ Then you can execute a query in Prometheus to see energy metrics from Kepler to 
 sum(kepler_container_joules_total) by (pod_name, container_name, container_namespace, node)
 ```
 You should now see energy metrics per container. A lof of these values will be 0, but that is correct, since these do not use energy at the moment or Kepler could not measure them. However, as long as you can see some containers with data values, specifically the ones you want to measure, that is good.
+It also takes a while before measurements are in, such as in the system_processes container.
 
 See this guide for detailed information about Kepler metrics: https://sustainable-computing.io/design/metrics/
 

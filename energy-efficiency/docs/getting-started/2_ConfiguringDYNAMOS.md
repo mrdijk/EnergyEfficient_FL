@@ -178,13 +178,25 @@ You can change this file whenever you want, such as adding or removing helpful f
 Now test DYNAMOS, such as using curl:
 ```sh
 # In a WSL terminal run curl with the specified command in the DYNAMOS main README.md or use the Postman request.
-
+# Example:
+curl --location 'http://api-gateway.api-gateway.svc.cluster.local:80/api/v1/requestApproval' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "type": "sqlDataRequest",
+    "user": {
+        "id": "12324",
+        "userName": "jorrit.stutterheim@cloudnation.nl"
+    },
+    "dataProviders": ["VU","UVA","RUG"]
+}'
 # This will eventually return something like this after the request:
 {
-    "jobId": "jorrit-stutterheim-38e408e4",
-    "responses": [
-        "{\"avg_salary_scale_women\":\"10.626\"}",
-        "{\"avg_salary_scale_women\":\"11.115\"}"
-    ]
+    "authorized_providers": {
+        "UVA": "uva.uva.svc.cluster.local",
+        "VU": "vu.vu.svc.cluster.local"
+    },
+    "jobId": "jorrit-stutterheim-c7bd19b2"
 }
 ```
+
+Now DYNAMOS is running and you can set up monitoring.
