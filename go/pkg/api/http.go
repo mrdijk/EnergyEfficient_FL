@@ -46,15 +46,17 @@ type RequestApproval struct {
 	Type          string   `json:"type"`
 	User          User     `json:"user"`
 	DataProviders []string `json:"dataProviders"`
+	// OLD: was part of doing /sqlDataRequest after /requestApproval, now only requests approval
 	// DataRequest   DataRequest `json:"dataRequest"`
-	DataRequest json.RawMessage `json:"data_request"`
+	// DataRequest json.RawMessage `json:"data_request"`
 }
 
-type DataRequestOptions struct {
-	Options map[string]bool `json:"options"`
-	// Algorithm string          `json:"algorithm"`
-	// Query     string          `json:"query"`
-}
+// OLD: was part of doing /sqlDataRequest after /requestApproval, now only requests approval
+// type DataRequestOptions struct {
+// 	Options map[string]bool `json:"options"`
+// 	// Algorithm string          `json:"algorithm"`
+// 	// Query     string          `json:"query"`
+// }
 
 type Options struct {
 	Aggregate bool `json:"aggregate"`

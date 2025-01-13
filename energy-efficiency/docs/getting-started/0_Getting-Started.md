@@ -51,7 +51,7 @@ Steps to run automatically using the makefile:
 cd go
 # Run make with the specified choices to deploy, such as a specific service, a group or all
 # Specific service example:
-make sql-algorithm
+make api-gateway
 
 # Python services: Go to the python folder
 cd python
