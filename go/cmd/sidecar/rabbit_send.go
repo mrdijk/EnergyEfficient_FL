@@ -103,6 +103,7 @@ func send(ctx context.Context, message amqp.Publishing, target string, s *server
 			logger.Sugar().Debugf("In error chan: %v", err)
 			return err
 		}
+
 		select {
 		case r := <-returns:
 			if r.ReplyText == "NO_ROUTE" {
