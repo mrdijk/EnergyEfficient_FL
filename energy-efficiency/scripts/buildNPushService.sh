@@ -40,7 +40,7 @@ if [ -z "$SERVICE_NAME" ] || [ -z "$SERVICE_PATH_FROM_ROOT" ]; then
 fi
 
 # Set the path from DYNAMOS root
-SERVICE_PATH="${DYNAMOS_ROOT}/${SERVICE_PATH_FROM_ROOT}"
+SERVICE_PATH="${DYNAMOS_ROOT}${SERVICE_PATH_FROM_ROOT}"
 
 # Ensure the provided path exists
 if [ ! -d "$SERVICE_PATH" ]; then

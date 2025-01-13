@@ -59,8 +59,12 @@ TODO: make script for deploying services.
 ```sh
 # Copy required files in service folder, see docs\development_guide\Building\Makefiles.md
 # For Go this is the Dockerfile, go.mod, go.sum and pkg folder for example
-# TODO: more steps? Go is run go mod tidy
+# For Go services, navigate to the service and run:
+go mod tidy
+# TODO: more steps for Python? Go is run go mod tidy
 
+# In a new WSL terminal navigate to the scripts folder
+cd energy-efficiency/scripts
 # Build the service, such as the api-gateway go service:
 ./buildNPushService.sh -s api-gateway -p /go/cmd/api-gateway
 # TODO: example for python
@@ -71,7 +75,7 @@ TODO: make script for deploying services.
 helm uninstall api-gateway
 # Deploy (using DYNAMOS config helper functions):
 deploy_api_gateway
-# Verify in Kubernetes Dashboard that pods are running
+# Verify in Kubernetes Dashboard that pods are running (and possibly old pods with old containers are removed/terminated now)
 ```
 
 
