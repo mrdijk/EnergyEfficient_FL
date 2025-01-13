@@ -56,18 +56,44 @@ You can change this file whenever you want, such as adding or removing helpful f
 
 ## Deploying services
 TODO: make script for deploying services.
+Steps to run automatically using the makefile:
+```sh
+# See docs\development_guide\Building\Makefiles.md
+# (Make sure you have run "make proto" in both /go and /python when changing the .proto files)
+
+# Go services: Go to the Go folder
+cd go
+# Run make with the specified choices to deploy, such as a specific service, a group or all
+# Specific service example:
+make sql-algorithm
+
+# Python services: Go to the python folder
+cd python
+# Run make, such as with all
+make all
+
+# Then deploy services to Kubernetes:
+# First uninstall, such as:
+helm uninstall api-gateway
+# Deploy (using DYNAMOS config helper functions):
+deploy_api_gateway
+# Verify in Kubernetes Dashboard that pods are running (and possibly old pods with old containers are removed/terminated now)
+```
+
+Below steps are used to manually do everything (useful when you want to understand the process for example):
 ```sh
 # Copy required files in service folder, see docs\development_guide\Building\Makefiles.md
+# This guide uses Go services as an example.
+
 # For Go this is the Dockerfile, go.mod, go.sum and pkg folder for example
 # For Go services, navigate to the service and run:
 go mod tidy
-# TODO: more steps for Python? Go is run go mod tidy
+go mod download
 
 # In a new WSL terminal navigate to the scripts folder
 cd energy-efficiency/scripts
 # Build the service, such as the api-gateway go service:
 ./buildNPushService.sh -s api-gateway -p /go/cmd/api-gateway
-# TODO: example for python
 # Then verify in Docker Desktop > Images > Hub repositories > check last pushed is few seconds ago
 
 # Then deploy services to Kubernetes:

@@ -51,7 +51,9 @@ export PATH=$PATH:$GOPATH/bin
 # Reload file contents source ~/.bashrc
 
 # For Python you can use pip to install the required library
-pip install grpcio grpcio-tools
+# It is important to install these versions specifically, as they are used for DYNAMOS later.
+pip install grpcio==1.59.3
+pip install grpcio-tools==1.59.3
 # Verify installation:
 python3 -m grpc_tools.protoc --version
 ```

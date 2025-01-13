@@ -30,10 +30,8 @@ require (
 replace github.com/docker/distribution => github.com/docker/distribution v2.7.1+incompatible
 
 require (
-	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
-	github.com/docker/distribution v2.8.3+incompatible // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
@@ -54,13 +52,9 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
-	github.com/moby/term v0.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.1.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rs/dnscache v0.0.0-20230804202142-fc85eb664529 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
