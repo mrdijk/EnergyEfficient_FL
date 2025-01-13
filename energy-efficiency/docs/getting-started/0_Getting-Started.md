@@ -20,24 +20,11 @@ Keep in mind, it takes a while until all the different services are running, so 
 ## Developing in DYNAMOS additional explanation
 Follow the Development guide: https://github.com/Jorrit05/DYNAMOS/tree/main/docs/development_guide
 
-Start with installing dependencies: https://github.com/Jorrit05/DYNAMOS/tree/main/docs/development_guide/Dependencies
-Specifically: https://pkg.go.dev/github.com/golang/protobuf/protoc-gen-go
-(do NOT use the manual protoc installation)
-TODO: finish this part
-
-## Additional logging of traces can be viewed using Jaegar
-Optionally, you could view the traces after performing requests in Jaegar:
-```sh
-# Run Jaegar:
-kubectl port-forward -n linkerd-jaeger service/jaeger 16686:16686
-# Access at http://localhost:16686/
-```
-
 
 # After completing getting started steps
 These tutorials can be used after the getting started steps have been followed.
 
-TODO: here add some helpful commands, such as startup Kubernetes Dashboard, Prometheus, etc.
+TODO: here add some helpful commands that I find while developing, such as startup Kubernetes Dashboard, Prometheus, etc.
 
 
 ## Using DYNAMOS config helper functions
@@ -55,7 +42,6 @@ You can change this file whenever you want, such as adding or removing helpful f
 
 
 ## Deploying services
-TODO: make script for deploying services.
 Steps to run automatically using the makefile:
 ```sh
 # See docs\development_guide\Building\Makefiles.md
@@ -138,3 +124,10 @@ kubectl port-forward -n monitoring service/prometheus-grafana 3000:80
 kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 ```
 
+## Additional logging of traces can be viewed using Jaegar
+Optionally, you could view the traces after performing requests in Jaegar:
+```sh
+# Run Jaegar:
+kubectl port-forward -n linkerd-jaeger service/jaeger 16686:16686
+# Access at http://localhost:16686/
+```
