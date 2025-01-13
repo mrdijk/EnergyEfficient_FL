@@ -40,6 +40,41 @@ These tutorials can be used after the getting started steps have been followed.
 TODO: here add some helpful commands, such as startup Kubernetes Dashboard, Prometheus, etc.
 
 
+## Using DYNAMOS config helper functions
+```sh
+# Go to the scripts path
+cd energy-efficiency/scripts
+# Load the script in the terminal
+source ./dynamos-configs.sh
+
+# Now you can run functions, such as
+deploy_core
+# You need to load the file in the shell each time you restart a shell or when making changing to the dynamos-configs.sh script
+```
+You can change this file whenever you want, such as adding or removing helpful functions. After changes you have to load it in the shell again each time. Also, for each terminal you have to load the file, so it is recommended to use one terminal to execute those functions when developing. 
+
+
+## Deploying services
+TODO: make script for deploying services.
+```sh
+# Copy required files in service folder, see docs\development_guide\Building\Makefiles.md
+# For Go this is the Dockerfile, go.mod, go.sum and pkg folder for example
+# TODO: more steps? Go is run go mod tidy
+
+# Build the service, such as the api-gateway go service:
+./buildNPushService.sh -s api-gateway -p /go/cmd/api-gateway
+# TODO: example for python
+# Then verify in Docker Desktop > Images > Hub repositories > check last pushed is few seconds ago
+
+# Then deploy services to Kubernetes:
+# First uninstall, such as:
+helm uninstall api-gateway
+# Deploy (using DYNAMOS config helper functions):
+deploy_api_gateway
+# Verify in Kubernetes Dashboard that pods are running
+```
+
+
 ## Accessing Prometheus web UI
 ```sh
 # Port-forward Prometheus stack
