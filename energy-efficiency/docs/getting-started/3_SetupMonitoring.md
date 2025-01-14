@@ -118,9 +118,11 @@ Check the Prometheus Targets at the Prometheus instance > Status > Targets, you 
 Then you can execute a query in Prometheus to see energy metrics from Kepler to verify Kepler is running:
 ```sh
 sum(kepler_container_joules_total) by (pod_name, container_name, container_namespace, node)
+
+# Or:
+sum(kepler_container_joules_total) by (container_name)
 ```
-You should now see energy metrics per container. A lof of these values will be 0, but that is correct, since these do not use energy at the moment or Kepler could not measure them. However, as long as you can see some containers with data values, specifically the ones you want to measure, that is good.
-It also takes a while before measurements are in, such as in the system_processes container.
+You should now see energy metrics per container. A lof of these values will be 0, but that is correct, since these do not use energy at the moment or Kepler could not measure them. However, the system_processes container should report data pretty quickly. Doing other operations in other containers, such as /sqlDataRequest can take a while before Kepler has added those values. It can take even longer than 10 minutes. Also what you could try is restarting the Kubernetes cluster (in Docker Desktop: three dots > Quit Docker Desktop > Wait for a few seconds and start Docker Desktop again > Then wait a while again and perform some operations in your software application and see if the values are now present after some time again.).
 
 See this guide for detailed information about Kepler metrics: https://sustainable-computing.io/design/metrics/
 

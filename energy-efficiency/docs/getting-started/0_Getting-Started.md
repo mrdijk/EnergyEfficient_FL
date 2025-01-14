@@ -123,6 +123,9 @@ kubectl port-forward -n monitoring service/prometheus-grafana 3000:80
 # Login with username admin
 # Get the password:
 kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+# Query for Loki to see all logs:
+{job=~".+"}
 ```
 
 ## Additional logging of traces can be viewed using Jaegar
