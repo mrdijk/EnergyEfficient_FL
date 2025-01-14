@@ -26,3 +26,4 @@ helm upgrade -i kepler kepler/kepler \
 # # Finally, apply/install the monitoring helm release (will use the monitoring charts,
 # which includes the deamonset, service and sesrvicemonitor for cadvisor for example)
 helm upgrade -i -f "$monitoring_values" monitoring $monitoring_chart
+# Uninstall the release using helm to rollback changes: helm uninstall kepler --namespace kepler

@@ -21,6 +21,7 @@ helm repo update
 # Using upgrade ensures that helm manages it correctly, this will upgrade or install if not exists
 # This names the release 'prometheus'. This is VERY IMPORTANT, because this release will be used by Kepler and others to create ServiceMonitors for example
 helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoring_chart/prometheus-config.yaml"
+# Uninstall the release using helm to rollback changes: helm uninstall prometheus --namespace monitoring
 
 # Grafana setup with loki and promtail (with release name "grafana")
 # Prometheus stack already includes grafana itself with a default setup (saves time to set it up yourself)
@@ -29,7 +30,11 @@ helm repo update
 # Create namespace (if not exists)
 kubectl create namespace loki
 # Install loki and promtail (or upgrade)
-helm upgrade -i grafana grafana/loki --namespace loki --values "$monitoring_chart/loki-values.yaml"
-helm upgrade -i grafana grafana/promtail --namespace loki
+helm upgrade -i loki grafana/loki --namespace loki --values "$monitoring_chart/loki-values.yaml"
+helm upgrade -i promtail grafana/promtail --namespace loki
+# Uninstall the release using helm to rollback changes: 
+# helm uninstall loki --namespace loki
+# helm uninstall promtail --namespace loki
+
 # TODO: this is not further set up for loki and promtail (now includes only installation, but not further setup), 
 # but this could be something in the future. However, for now I focus on priority things, such as implement energy optimizations

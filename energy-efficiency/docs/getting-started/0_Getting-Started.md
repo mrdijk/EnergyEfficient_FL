@@ -16,6 +16,7 @@ Keep in mind, it takes a while until all the different services are running, so 
 - [Prerequisites](./1_Prerequisites.md)
 - [Configuring DYNAMOS](./2_ConfiguringDYNAMOS.md)
 - [Setup Monitoring](./3_SetupMonitoring.md)
+- [Setup Caching](./4_Caching.md)
 
 ## Developing in DYNAMOS additional explanation
 Follow the Development guide: https://github.com/Jorrit05/DYNAMOS/tree/main/docs/development_guide
