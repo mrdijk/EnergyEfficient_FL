@@ -127,21 +127,24 @@ See this guide for detailed information about Kepler metrics: https://sustainabl
 Now you are all set to monitor and measure energy consumption!
 
 
-### Setup Grafana loki and promtail
+#### Setup Grafana loki and promtail
 Grafana itself is already deployed when using Prometheus stack, see Prometheus setup section.
 
 Grafana loki and promtail allow centralized log management for distributed systems. Grafana Loki is a log aggregation system designed to work seamlessly with Grafana. Promtail is an agent that collects logs from your systems and forwards them to Loki.
 
-The following steps can be done to install Loki and Promtail:
+When running the above script, loki and promtail should be deployed from the monitoring chart with helm. 
+Now, do the following steps to verify Loki is working:
+1. Follow the steps to port-forward Grafana like above with Kepler.
+
+2. Navigate to Grafana UI > Connections > Data sources > Verify Loki is present and opening it and clicking Test works (if pods are running in Kubernetes ofcourse).
+
+3. Select Explore with the Loki data source and run the query: {job=~".+"}
+
+4. You should now see logs present from the application, as this query lists all logs that have a job label with at least one character.
+
+Additional information:
 ```sh
-# Go to the scripts path
-cd cd energy-efficiency/scripts/prepare-monitoring
-# Make the script executable (needs to be done once)
-chmod +x lokiAndPromtail.sh
-
-# Execute the script:
-./lokiAndPromtail.sh
-
-# Then go to the Grafana UI similar to the steps used for adding the Kepler dashboard.
-# Then go to Dashboards
+# You can port-forward loki with this command:
+kubectl port-forward svc/loki 3100:3100 -n monitoring
+# However, this is probably not required as you can collect logs without it as well, but if you ever need it you can use that command.
 ```

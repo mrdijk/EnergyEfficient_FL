@@ -9,9 +9,6 @@ charts_path="${DYNAMOS_ROOT}/charts"
 monitoring_chart="${charts_path}/monitoring"
 monitoring_values="$monitoring_chart/values.yaml"
 
-# Create the namespace in the Kubernetes cluster (if not exists)
-kubectl create namespace kepler
-
 # More information on Kepler installation: https://sustainable-computing.io/installation/kepler-helm/
 # Installing Prometheus (and Grafana) can be skipped, this is already done earlier 
 
@@ -22,13 +19,14 @@ helm repo update
 # This also creates a service monitor for the prometheus stack
 # Use specific version to ensure compatability (this version has worked in previous setups)
 helm upgrade -i kepler kepler/kepler \
-    --namespace kepler \
+    --namespace monitoring \
     --version 0.5.12 \
-    --create-namespace \
     --set serviceMonitor.enabled=true \
     --set serviceMonitor.labels.release=prometheus \
-
-# # Finally, apply/install the monitoring helm release (will use the monitoring charts,
-# which includes the deamonset, service and sesrvicemonitor for cadvisor for example)
-helm upgrade -i -f "$monitoring_values" monitoring $monitoring_chart
 # Uninstall the release using helm to rollback changes: helm uninstall kepler --namespace kepler
+
+# Apply/install the monitoring helm release (will use the monitoring charts,
+# which includes the deamonset, service and sesrvicemonitor for cadvisor for example)
+# Optional: enable debug flag to output logs for potential errors (add --debug to the end of the next line)
+helm upgrade -i monitoring $monitoring_chart --namespace monitoring -f "$monitoring_values"
+# Uninstall the release using helm to rollback changes: helm uninstall monitoring --namespace monitoring

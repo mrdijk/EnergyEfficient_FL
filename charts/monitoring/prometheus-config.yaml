@@ -45,7 +45,9 @@ grafana:
     datasources:
       enabled: true
   
+  # Additional data sources
   additionalDataSources:
+    # Loki datasource
     - name: Loki
       type: loki
       access: proxy

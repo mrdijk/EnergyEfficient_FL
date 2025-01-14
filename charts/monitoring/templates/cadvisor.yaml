@@ -1,22 +1,16 @@
-# cadvisor (namespace, serviceaccount and daemonset)
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: cadvisor
----
-
+# cadvisor (serviceaccount and daemonset)
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: cadvisor
-  namespace: cadvisor
+  namespace: monitoring
 ---
 
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: cadvisor
-  namespace: cadvisor
+  namespace: monitoring
   labels:
     name: cadvisor
 spec:
