@@ -12,13 +12,18 @@ monitoring_values="$monitoring_chart/values.yaml"
 # Create the namespace in the Kubernetes cluster (if not exists)
 kubectl create namespace kepler
 
+# More information on Kepler installation: https://sustainable-computing.io/installation/kepler-helm/
+# Installing Prometheus (and Grafana) can be skipped, this is already done earlier 
+
 # Install and add Kepler
 helm repo add kepler https://sustainable-computing-io.github.io/kepler-helm-chart
 helm repo update
 # Install Kepler
 # This also creates a service monitor for the prometheus stack
+# Use specific version to ensure compatability (this version has worked in previous setups)
 helm upgrade -i kepler kepler/kepler \
     --namespace kepler \
+    --version 0.5.12 \
     --create-namespace \
     --set serviceMonitor.enabled=true \
     --set serviceMonitor.labels.release=prometheus \

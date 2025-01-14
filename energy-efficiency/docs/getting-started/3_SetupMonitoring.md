@@ -23,6 +23,8 @@ kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy
 kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"} | base64 -d
 # Add the token in the login window and you should be able to access Kubernetes Dashboard
 ```
+Alternatively, you could also use k9s (https://k9scli.io/), as they both are used for the same purposes. K9s is CLI based and Kubernetes Dashboard is GUI based, but you can use which one you prefer or even use both.
+
 
 ## Setup Energy Monitoring
 Used this guides as leading installations: 
@@ -31,7 +33,7 @@ Used this guides as leading installations:
 
 Below is extra explanation on how to do this precisely.
 
-# Setup Prometheus Stack (includes Grafana)
+### Setup Prometheus Stack (includes Grafana with initial setup (e.g. Prometheus as Data source in Grafana, etc.))
 Run the following:
 ```sh
 # Go to the scripts path (in WSL like with all other scripts)
@@ -72,12 +74,9 @@ prometheus-prometheus-node-exporter-82mwd              0/1     ContainerCreating
 ```
 Alternatively, you could use Kubernetes dashboard and view the monitoring namespace and wait until the pods are running. It may take a while before all the pods are running, sometimes even up to more than 10 minutes. 
 
-## Setup Grafana with loki and promtail
-The above script also deployed grafana, loki and promtail.
 
 
-
-## Preparing Kepler (energy measurements)
+### Preparing Kepler (energy measurements)
 After the pods are running, you can execute the next script:
 ```sh
 # Go to the scripts path
@@ -126,3 +125,23 @@ It also takes a while before measurements are in, such as in the system_processe
 See this guide for detailed information about Kepler metrics: https://sustainable-computing.io/design/metrics/
 
 Now you are all set to monitor and measure energy consumption!
+
+
+### Setup Grafana loki and promtail
+Grafana itself is already deployed when using Prometheus stack, see Prometheus setup section.
+
+Grafana loki and promtail allow centralized log management for distributed systems. Grafana Loki is a log aggregation system designed to work seamlessly with Grafana. Promtail is an agent that collects logs from your systems and forwards them to Loki.
+
+The following steps can be done to install Loki and Promtail:
+```sh
+# Go to the scripts path
+cd cd energy-efficiency/scripts/prepare-monitoring
+# Make the script executable (needs to be done once)
+chmod +x lokiAndPromtail.sh
+
+# Execute the script:
+./lokiAndPromtail.sh
+
+# Then go to the Grafana UI similar to the steps used for adding the Kepler dashboard.
+# Then go to Dashboards
+```

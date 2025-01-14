@@ -1,4 +1,5 @@
 # Keep this format for this part, because this works for adding additional scrape configs!
+# See the helm chart > Default values for examples: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
 prometheus:
   prometheusSpec:
     # Set global scrape interval and scrape timeout
@@ -35,3 +36,23 @@ prometheus:
 prometheus-node-exporter:
   hostRootFsMount:
     enabled: false
+
+# Enable grafana and add loki data source
+grafana:
+  enabled: true
+
+  sidecar:
+    datasources:
+      enabled: true
+  
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      access: proxy
+      orgId: 1
+      url: http://loki.monitoring.svc.cluster.local:3100
+      basicAuth: false
+      # Set default to false (prometheus-stack uses prometheus itself as default probably)
+      isDefault: false
+      version: 1
+      editable: false

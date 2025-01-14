@@ -15,26 +15,18 @@ kubectl create namespace monitoring
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
+# Additional information to helm chart used: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+# It is a widely used chart and maintained extensively (at least this was at the time of creating: 2025). Formerly named: prometheus-operator
+
 # Install prometheus stack (this may take a while before the pods are running (sometimes even up to minutes))
 # -i flag allows helm to install it if it does not exist yet, otherwise upgrade it
 # Use the monitoring namcespace for prometheus (and use config file with the -f flag)
 # Using upgrade ensures that helm manages it correctly, this will upgrade or install if not exists
 # This names the release 'prometheus'. This is VERY IMPORTANT, because this release will be used by Kepler and others to create ServiceMonitors for example
-helm upgrade -i prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f "$monitoring_chart/prometheus-config.yaml"
-# Uninstall the release using helm to rollback changes: helm uninstall prometheus --namespace monitoring
-
-# Grafana setup with loki and promtail (with release name "grafana")
+# Use specific version to ensure compatability (this version has worked in previous setups)
+helm upgrade -i prometheus prometheus-community/kube-prometheus-stack \
+    --namespace monitoring \
+    --version 68.1.0 \
+    -f "$monitoring_chart/prometheus-config.yaml"
 # Prometheus stack already includes grafana itself with a default setup (saves time to set it up yourself)
-helm repo add grafana https://grafana.github.io/helm-charts
-helm repo update 
-# Create namespace (if not exists)
-kubectl create namespace loki
-# Install loki and promtail (or upgrade)
-helm upgrade -i loki grafana/loki --namespace loki --values "$monitoring_chart/loki-values.yaml"
-helm upgrade -i promtail grafana/promtail --namespace loki
-# Uninstall the release using helm to rollback changes: 
-# helm uninstall loki --namespace loki
-# helm uninstall promtail --namespace loki
-
-# TODO: this is not further set up for loki and promtail (now includes only installation, but not further setup), 
-# but this could be something in the future. However, for now I focus on priority things, such as implement energy optimizations
+# Uninstall the release using helm to rollback changes: helm uninstall prometheus --namespace monitoring
