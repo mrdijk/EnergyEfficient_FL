@@ -26,6 +26,8 @@ In short, this encompasses setting the correct paths and running the start scrip
 ```sh
 ./configuration/dynamos-configuration.sh
 
+# Possible problems:
+
 # When getting this error: Error: INSTALLATION FAILED: cannot re-use a name that is still in use
 # This is because you already installed nginx and are using the install instead of upgrade, as you can see by the previous lines: Installing NGINX...
 # Fix this by uninstalling the release nginx:
@@ -46,7 +48,7 @@ dos2unix ./configuration/dynamos-configuration.sh
 ```
 
 
-## Expose DYNAMOS with etc (edit host file)
+## Expose DYNAMOS with etc (edit host file), only needs to be done once on your computer
 To expose DYNAMOS and be able to send requests using Postman or curl for example, edit the configuration file:
 ```sh
 # Install etcd on WSL (not sure if this step is necessary, may be possible without installing etcd)
@@ -134,7 +136,7 @@ Reply from 127.0.0.1: bytes=32 time<1ms TTL=128
 # Now you should be able to use Postman to send requests
 ```
 
-### Adding additional hosts (required for developing in DYNAMOS)
+### Adding additional hosts (required for developing in DYNAMOS), only needs to be done once on your computer
 Firstly, to understand the endpoints available, you can go to Service > Ingresses (with all namespaces selected) in the Kubernetes Dashboard to view all ingresses available, showing all the possible hosts:
 
 ![alt text](../assets/AllIngresses_KubernetesDashboard.png)
@@ -167,7 +169,7 @@ chmod +x dynamos-configs.sh
 # Load the script in the terminal
 source ./dynamos-configs.sh
 
-# Now you can run functions, such as
+# Now you can run functions, such as:
 deploy_core
 # You need to load the file in the shell each time you restart a shell or when making changing to the dynamos-configs.sh script
 ```

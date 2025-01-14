@@ -138,7 +138,8 @@ Now, do the following steps to verify Loki is working:
 
 2. Navigate to Grafana UI > Connections > Data sources > Verify Loki is present and opening it and clicking Test works (if pods are running in Kubernetes ofcourse).
 
-3. Select Explore with the Loki data source and run the query: {job=~".+"}
+3. Select Explore with the Loki data source and run the query: 
+{job=~".+"}
 
 4. You should now see logs present from the application, as this query lists all logs that have a job label with at least one character.
 
