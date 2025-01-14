@@ -1,15 +1,3 @@
-# # Redis values used for below: https://github.com/bitnami/charts/tree/main/bitnami/redis#parameters
-
-# # Disable authentication
-# auth:
-#   enabled: false
-
-# # Enable persistence and set size
-# master:
-#   persistence:
-#     enabled: true
-#     size: 8Gi
- 
 redis:
   # See for full versions of images: https://hub.docker.com/_/redis
   image: 7.4.2
