@@ -124,6 +124,67 @@ sum(kepler_container_joules_total) by (container_name)
 ```
 You should now see energy metrics per container. A lof of these values will be 0, but that is correct, since these do not use energy at the moment or Kepler could not measure them. However, the system_processes container should report data pretty quickly. Doing other operations in other containers, such as /sqlDataRequest can take a while before Kepler has added those values. It can take even longer than 10 minutes. Also what you could try is restarting the Kubernetes cluster (in Docker Desktop: three dots > Quit Docker Desktop > Wait for a few seconds and start Docker Desktop again > Then wait a while again and perform some operations in your software application and see if the values are now present after some time again.). It may even take longer even after the restart, but be patient, and if after 4 hours you still have nothing you can debug further, but it took 4 hours for me one time until Kepler produced energy consumed for other containers then system_processes.
 
+You should see logs similar to this in the kepler-<string> pod:
+```sh
+2025-01-14T16:04:32.012Z | WARNING: failed to read int from file: open /sys/devices/system/cpu/cpu0/online: no such file or directory
+2025-01-14T16:04:32.024Z | I0114 16:04:32.024529       1 exporter.go:103] Kepler running on version: v0.7.12-dirty
+2025-01-14T16:04:32.024Z | I0114 16:04:32.024713       1 config.go:293] using gCgroup ID in the BPF program: true
+2025-01-14T16:04:32.024Z | I0114 16:04:32.024734       1 config.go:295] kernel version: 5.15
+2025-01-14T16:04:32.024Z | I0114 16:04:32.024768       1 rapl_msr_util.go:129] failed to open path /dev/cpu/0/msr: no such file or directory
+2025-01-14T16:04:32.024Z | I0114 16:04:32.024796       1 power.go:78] Unable to obtain power, use estimate method
+2025-01-14T16:04:32.024Z | I0114 16:04:32.024804       1 redfish.go:169] failed to get redfish credential file path
+2025-01-14T16:04:32.032Z | I0114 16:04:32.031718       1 acpi.go:71] Could not find any ACPI power meter path. Is it a VM?
+2025-01-14T16:04:32.032Z | I0114 16:04:32.031769       1 power.go:79] using none to obtain power
+2025-01-14T16:04:32.032Z | E0114 16:04:32.031780       1 accelerator.go:154] [DUMMY] doesn't contain GPU
+2025-01-14T16:04:32.032Z | E0114 16:04:32.031816       1 exporter.go:154] failed to init GPU accelerators: no devices found
+2025-01-14T16:04:32.033Z | WARNING: failed to read int from file: open /sys/devices/system/cpu/cpu0/online: no such file or directory
+2025-01-14T16:04:32.033Z | I0114 16:04:32.033842       1 exporter.go:84] Number of CPUs: 14
+2025-01-14T16:04:32.218Z | W0114 16:04:32.218256       1 exporter.go:135] failed to attach tp/writeback/writeback_dirty_page: neither debugfs nor tracefs are mounted. Kepler will not collect page cache write events. This will affect the DRAM power model estimation on VMs.
+2025-01-14T16:04:32.299Z | W0114 16:04:32.299338       1 exporter.go:299] Failed to open perf event for CPU cycles: failed to open bpf perf event on cpu 0: no such file or directory
+2025-01-14T16:04:32.301Z | E0114 16:04:32.300893       1 node.go:145] grep cpuid command output failure: exit status 1
+2025-01-14T16:04:32.301Z | E0114 16:04:32.301571       1 node.go:123] getCPUArch failure: open /sys/devices/cpu/caps/pmu_name: no such file or directory
+2025-01-14T16:04:32.302Z | I0114 16:04:32.302000       1 watcher.go:83] Using in cluster k8s config
+2025-01-14T16:04:32.403Z | I0114 16:04:32.403312       1 watcher.go:229] k8s APIserver watcher was started
+2025-01-14T16:04:32.405Z | E0114 16:04:32.404930       1 node.go:145] grep cpuid command output failure: exit status 1
+2025-01-14T16:04:32.406Z | E0114 16:04:32.406575       1 node.go:123] getCPUArch failure: open /sys/devices/cpu/caps/pmu_name: no such file or directory
+2025-01-14T16:04:32.406Z | I0114 16:04:32.406661       1 process_energy.go:129] Using the Ratio Power Model to estimate PROCESS_TOTAL Power
+2025-01-14T16:04:32.406Z | I0114 16:04:32.406688       1 process_energy.go:130] Feature names: [bpf_cpu_time_ms]
+2025-01-14T16:04:32.408Z | E0114 16:04:32.408215       1 node.go:145] grep cpuid command output failure: exit status 1
+2025-01-14T16:04:32.408Z | E0114 16:04:32.408571       1 node.go:123] getCPUArch failure: open /sys/devices/cpu/caps/pmu_name: no such file or directory
+2025-01-14T16:04:32.408Z | I0114 16:04:32.408619       1 process_energy.go:129] Using the Ratio Power Model to estimate PROCESS_COMPONENTS Power
+2025-01-14T16:04:32.408Z | I0114 16:04:32.408628       1 process_energy.go:130] Feature names: [bpf_cpu_time_ms bpf_cpu_time_ms bpf_cpu_time_ms   gpu_compute_util]
+2025-01-14T16:04:32.409Z | E0114 16:04:32.409801       1 node.go:145] grep cpuid command output failure: exit status 1
+2025-01-14T16:04:32.410Z | E0114 16:04:32.410012       1 node.go:123] getCPUArch failure: open /sys/devices/cpu/caps/pmu_name: no such file or directory
+2025-01-14T16:04:32.411Z | I0114 16:04:32.411706       1 regressor.go:276] Created predictor linear for trainer: "SGDRegressorTrainer"
+2025-01-14T16:04:32.411Z | I0114 16:04:32.411726       1 model.go:125] Requesting for Machine Spec: &{genuineintel intel_core_ultra_7_155u 14 1 15 2700 2}
+2025-01-14T16:04:32.411Z | I0114 16:04:32.411735       1 node_platform_energy.go:53] Using the Regressor/AbsPower Power Model to estimate Node Platform Power
+2025-01-14T16:04:32.412Z | E0114 16:04:32.412799       1 node.go:145] grep cpuid command output failure: exit status 1
+2025-01-14T16:04:32.413Z | E0114 16:04:32.412975       1 node.go:123] getCPUArch failure: open /sys/devices/cpu/caps/pmu_name: no such file or directory
+2025-01-14T16:04:32.414Z | I0114 16:04:32.414428       1 regressor.go:276] Created predictor linear for trainer: "SGDRegressorTrainer"
+2025-01-14T16:04:32.414Z | I0114 16:04:32.414444       1 regressor.go:276] Created predictor linear for trainer: "SGDRegressorTrainer"
+2025-01-14T16:04:32.414Z | I0114 16:04:32.414446       1 regressor.go:276] Created predictor linear for trainer: "SGDRegressorTrainer"
+2025-01-14T16:04:32.414Z | I0114 16:04:32.414448       1 regressor.go:276] Created predictor linear for trainer: "SGDRegressorTrainer"
+2025-01-14T16:04:32.414Z | I0114 16:04:32.414451       1 model.go:125] Requesting for Machine Spec: &{genuineintel intel_core_ultra_7_155u 14 1 15 2700 2}
+2025-01-14T16:04:32.414Z | I0114 16:04:32.414458       1 node_component_energy.go:57] Using the Regressor/AbsPower Power Model to estimate Node Component Power
+2025-01-14T16:04:32.414Z | I0114 16:04:32.414494       1 prometheus_collector.go:95] Registered Container Prometheus metrics
+2025-01-14T16:04:32.414Z | I0114 16:04:32.414508       1 prometheus_collector.go:100] Registered VM Prometheus metrics
+2025-01-14T16:04:32.414Z | I0114 16:04:32.414514       1 prometheus_collector.go:104] Registered Node Prometheus metrics
+2025-01-14T16:04:32.417Z | I0114 16:04:32.417076       1 exporter.go:194] starting to listen on 0.0.0.0:9102
+2025-01-14T16:04:32.417Z | I0114 16:04:32.417357       1 exporter.go:208] Started Kepler in 392.947565ms
+```
+Particularly the Started Kepler in ... part. If you do not see that, you can try:
+```sh
+# Uninstall kepler release
+helm uninstall kepler -n monitoring
+# Run script again after a few seconds:
+./keplerAndMonitoringChart.sh
+
+# You can try this a few times (it sometimes took me more than 2 times before it worked).
+# You can also try to delete the kepler-<string> pod (it will automatically create it again)
+```
+Then you again need to wait a while before it works, trying to restart Docker Desktop again maybe and even your computer again to see if that works.
+Previous situation: in a previous situation I had to uninstall with helm a couple of times and then redeploy. Then I restarted Docker Desktop and tried again, with it not working yet. Then I tried to close everything on my computer and restart my computer. Then I started Docker Desktop again, but the first time it did not start, so I restarted Docker Desktop again and then when Kubernetes was running I performed several actions and then Kepler reported energy consumed for other containers (in this case only orchestrator and another time it was mostly sidecar) after a couple minutes. So, it seems that a restart of your computer works best for this if you know Kepler started and is running, since this worked for me on several occasions. This is maybe because it then restarts and reads the CPU or other metrics differently but I am not sure, but it works!  
+
 See this guide for detailed information about Kepler metrics: https://sustainable-computing.io/design/metrics/
 
 Now you are all set to monitor and measure energy consumption!
