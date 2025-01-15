@@ -62,6 +62,17 @@ deploy_surf() {
   helm upgrade -i -f "${surfChart}" surf ${DYNAMOS_ROOT}/charts/thirdparty
 }
 
+# Deploy agents (agents and third party: surf)
+deploy_agents() {
+  deploy_agent
+  deploy_surf
+}
+# Uninstall agents (agents and third party: surf)
+uninstall_agents(){
+  helm uninstall surf
+  helm uninstall agents
+}
+
 ##############################
 ## Bulk deployment commands ##
 ##############################
