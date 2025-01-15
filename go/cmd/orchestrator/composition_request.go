@@ -115,6 +115,8 @@ func pickArchetypeBasedOnWeight() (*api.Archetype, error) {
 		return nil, fmt.Errorf("no archetypes available")
 	}
 
+	logger.Sugar().Infof("Possible archetypes: %v", archeTypes)
+
 	lightest := archeTypes[0]
 
 	// Iterate to find the one with the lowest weight
@@ -123,6 +125,8 @@ func pickArchetypeBasedOnWeight() (*api.Archetype, error) {
 			lightest = archeType
 		}
 	}
+
+	logger.Sugar().Infof("Chosen archetype: %s", lightest)
 
 	return lightest, nil
 }

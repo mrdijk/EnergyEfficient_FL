@@ -33,9 +33,12 @@ func checkRequestApproval(ctx context.Context, requestApproval *pb.RequestApprov
 		Options:         make(map[string]bool),
 	}
 
-	if requestApproval.Options != nil && len(requestApproval.Options) > 0 {
-		protoRequest.Options = requestApproval.Options
-	}
+	// OLD: was part of doing /sqlDataRequest after /requestApproval, now only requests approval
+	// This part is removed since request approval has no options anymore, but the Options are still required for ValidationResponse, 
+	// which is why in the protoRequest it is still set, but removed this if statement (requestApproval.Options is removed)
+	// if requestApproval.Options != nil && len(requestApproval.Options) > 0 {
+	// 	protoRequest.Options = requestApproval.Options
+	// }
 
 	getValidAgreements(requestApproval.DataProviders, requestApproval.User, &agreements, protoRequest)
 	if len(agreements) == 0 || len(protoRequest.ValidDataproviders) == 0 {
