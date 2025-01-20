@@ -27,31 +27,6 @@ These tutorials can be used after the getting started steps have been followed.
 TODO: here add some helpful commands that I find while developing, such as startup Kubernetes Dashboard, Prometheus, etc.
 
 
-## Changing etcd PVC (e.g. to change archetypes)
-To edit the etcd PVC:
-```sh
-# Apply inspect etcd-pvc yaml file (adds a temp pod to view the contents of etcd-pvc (PVC located in orchestrator namespace))
-kubectl apply -f /mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/energy-efficiency/inspect-etcd-pvc.yaml
-# Execute temp pod to view etcd-pvc
-kubectl exec -it pvc-viewer -n orchestrator -- sh
-# Run these commands:
-cd /mnt
-ls -al
-# View archetype.json
-cat archetype.json
-# Edit the file:
-vi archetype.json
-# Press i to enter insert mode
-# Change the weight of the compute to data archetype (e.g. 300 to set data through ttp, or 100 to set compute to data as main archetype) 
-# Press Esc to exit insert mode
-# Type :wq and press Enter to save and exit
-# Verify changes in archetype.json
-cat archetype.json
-# Type exit and press Enter to quit terminal
-
-# Delete the pod afterwards, such as in k9s
-```
-
 ## Using DYNAMOS config helper functions
 ```sh
 # Go to the scripts path
