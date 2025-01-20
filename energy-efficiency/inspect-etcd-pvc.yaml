@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pvc-viewer
+  namespace: orchestrator
+  annotations:
+    "linkerd.io/inject" : disabled
+spec:
+  containers:
+  - name: pvc-viewer
+    image: busybox
+    command: [ "sleep", "3600" ]
+    volumeMounts:
+    - mountPath: /mnt
+      name: pvc-storage
+  volumes:
+  - name: pvc-storage
+    persistentVolumeClaim:
+      claimName: etcd-pvc
