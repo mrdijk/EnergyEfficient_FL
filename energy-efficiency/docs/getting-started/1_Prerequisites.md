@@ -88,3 +88,18 @@ Use this guide: https://docs.brew.sh/Homebrew-on-Linux
 
 ## Install k9s for WSL (optional)
 Use this guide: https://k9scli.io/topics/install/
+In short:
+```sh
+# Use brew on Linux for this:
+brew install derailed/k9s/k9s
+```
+HINT: When running k9s, it will initially load the default namespaces, press 0 to show all namespaces, which your containers are likely going to show up in.
+
+
+## Install etcdctl for WSL (optional)
+Use this guide: https://etcd.io/docs/v3.5/install/
+In short:
+```sh
+# Use brew on Linux for this:
+brew install etcd
+```

@@ -134,3 +134,6 @@ Optionally, you could view the traces after performing requests in Jaegar:
 kubectl port-forward -n linkerd-jaeger service/jaeger 16686:16686
 # Access at http://localhost:16686/
 ```
+
+
+## Reading from etcdctl
