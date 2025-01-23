@@ -7,195 +7,556 @@
 	},
 	"item": [
 		{
-			"name": "Request Approval (old: including approval AND data requests)",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"dataProviders\": [\"VU\",\"UVA\",\"RUG\"],\r\n    \"data_request\": {\r\n        \"type\": \"sqlDataRequest\",\r\n        \"query\" : \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n        \"algorithm\" : \"\",\r\n        \"options\" : {\r\n            \"graph\" : false,\r\n            \"aggregate\": false\r\n        }\r\n    }\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "requestApproval",
+			"item": [
+				{
+					"name": "Request Approval (old: including approval AND data requests)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"dataProviders\": [\"VU\",\"UVA\",\"RUG\"],\r\n    \"data_request\": {\r\n        \"type\": \"sqlDataRequest\",\r\n        \"query\" : \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n        \"algorithm\" : \"\",\r\n        \"options\" : {\r\n            \"graph\" : false,\r\n            \"aggregate\": false\r\n        }\r\n    }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://api-gateway.api-gateway.svc.cluster.local:80/api/v1/requestApproval",
+							"protocol": "http",
+							"host": [
+								"api-gateway",
+								"api-gateway",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"api",
+								"v1",
+								"requestApproval"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://api-gateway.api-gateway.svc.cluster.local:80/api/v1/requestApproval",
-					"protocol": "http",
-					"host": [
-						"api-gateway",
-						"api-gateway",
-						"svc",
-						"cluster",
-						"local"
-					],
-					"port": "80",
-					"path": [
-						"api",
-						"v1",
-						"requestApproval"
-					]
+				{
+					"name": "Request Approval",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"dataProviders\": [\"UVA\"]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://api-gateway.api-gateway.svc.cluster.local:80/api/v1/requestApproval",
+							"protocol": "http",
+							"host": [
+								"api-gateway",
+								"api-gateway",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"api",
+								"v1",
+								"requestApproval"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Request Approval (new: only approval)",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"dataProviders\": [\"VU\",\"UVA\",\"RUG\"]\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "requestData",
+			"item": [
+				{
+					"name": "sqlDataRequest uva query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer 1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n    \"algorithm\": \"\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-ac1327a8\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://uva.uva.svc.cluster.local:80/agent/v1/sqlDataRequest/uva",
+							"protocol": "http",
+							"host": [
+								"uva",
+								"uva",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"agent",
+								"v1",
+								"sqlDataRequest",
+								"uva"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://api-gateway.api-gateway.svc.cluster.local:80/api/v1/requestApproval",
-					"protocol": "http",
-					"host": [
-						"api-gateway",
-						"api-gateway",
-						"svc",
-						"cluster",
-						"local"
-					],
-					"port": "80",
-					"path": [
-						"api",
-						"v1",
-						"requestApproval"
-					]
+				{
+					"name": "sqlDataRequest surf query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer 1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n    \"algorithm\": \"\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-6a309e04\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://surf.surf.svc.cluster.local:80/agent/v1/sqlDataRequest/surf",
+							"protocol": "http",
+							"host": [
+								"surf",
+								"surf",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"agent",
+								"v1",
+								"sqlDataRequest",
+								"surf"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "sqlDataRequest uva UNL",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "bearer 1234",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n    \"algorithm\": \"\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-2d788089\"\r\n    }\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "switchArchetypes",
+			"item": [
+				{
+					"name": "Get archetypes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://orchestrator.orchestrator.svc.cluster.local:80/api/v1/archetypes",
+							"protocol": "http",
+							"host": [
+								"orchestrator",
+								"orchestrator",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"api",
+								"v1",
+								"archetypes"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://uva.uva.svc.cluster.local:80/agent/v1/sqlDataRequest/uva",
-					"protocol": "http",
-					"host": [
-						"uva",
-						"uva",
-						"svc",
-						"cluster",
-						"local"
-					],
-					"port": "80",
-					"path": [
-						"agent",
-						"v1",
-						"sqlDataRequest",
-						"uva"
-					]
+				{
+					"name": "Update archetypes (set compute to data)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"computeToData\",\r\n    \"computeProvider\": \"dataProvider\",\r\n    \"resultRecipient\": \"requestor\",\r\n    \"weight\": 100\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://orchestrator.orchestrator.svc.cluster.local:80/api/v1/archetypes/agreements",
+							"protocol": "http",
+							"host": [
+								"orchestrator",
+								"orchestrator",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"api",
+								"v1",
+								"archetypes",
+								"agreements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update archetypes (set data through ttp)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"computeToData\",\r\n    \"computeProvider\": \"dataProvider\",\r\n    \"resultRecipient\": \"requestor\",\r\n    \"weight\": 300\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://orchestrator.orchestrator.svc.cluster.local:80/api/v1/archetypes/agreements",
+							"protocol": "http",
+							"host": [
+								"orchestrator",
+								"orchestrator",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"api",
+								"v1",
+								"archetypes",
+								"agreements"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "sqlDataRequest vu UNL",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "bearer 1234",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\" : \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n    \"algorithm\" : \"\",\r\n    \"options\" : {\r\n        \"graph\" : false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\", \r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-5f4ccec7\"\r\n    }\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "OtherDataRequests",
+			"item": [
+				{
+					"name": "sqlDataRequest uva query 2",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer 1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT * FROM Personen p JOIN Aanstellingen s LIMIT 30000\",\r\n    \"algorithm\": \"average\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": true\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-e0e10ed7\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://uva.uva.svc.cluster.local:80/agent/v1/sqlDataRequest/uva",
+							"protocol": "http",
+							"host": [
+								"uva",
+								"uva",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"agent",
+								"v1",
+								"sqlDataRequest",
+								"uva"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://vu.vu.svc.cluster.local:80/agent/v1/sqlDataRequest/vu",
-					"protocol": "http",
-					"host": [
-						"vu",
-						"vu",
-						"svc",
-						"cluster",
-						"local"
-					],
-					"port": "80",
-					"path": [
-						"agent",
-						"v1",
-						"sqlDataRequest",
-						"vu"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "sqlDataRequest surf UNL",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "bearer 1234",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\" : \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n    \"algorithm\" : \"\",\r\n    \"options\" : {\r\n        \"graph\" : false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\", \r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-5f4ccec7\"\r\n    }\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "sqlDataRequest surf query 2",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer 1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT * FROM Personen p JOIN Aanstellingen s LIMIT 30000\",\r\n    \"algorithm\": \"average\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": true\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-b47c0dc4\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://surf.surf.svc.cluster.local:80/agent/v1/sqlDataRequest/surf",
+							"protocol": "http",
+							"host": [
+								"surf",
+								"surf",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"agent",
+								"v1",
+								"sqlDataRequest",
+								"surf"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://surf.surf.svc.cluster.local:80/agent/v1/sqlDataRequest/surf",
-					"protocol": "http",
-					"host": [
-						"surf",
-						"surf",
-						"svc",
-						"cluster",
-						"local"
-					],
-					"port": "80",
-					"path": [
-						"agent",
-						"v1",
-						"sqlDataRequest",
-						"surf"
-					]
+				{
+					"name": "sqlDataRequest simple 1 uva query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer 1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 10\",\r\n    \"algorithm\": \"\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-ba0885f0\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://uva.uva.svc.cluster.local:80/agent/v1/sqlDataRequest/uva",
+							"protocol": "http",
+							"host": [
+								"uva",
+								"uva",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"agent",
+								"v1",
+								"sqlDataRequest",
+								"uva"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "sqlDataRequest simple 2 uva query Copy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer 1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT * FROM Personen p JOIN Aanstellingen s LIMIT 10\",\r\n    \"algorithm\": \"average\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": true\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-ba0885f0\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://uva.uva.svc.cluster.local:80/agent/v1/sqlDataRequest/uva",
+							"protocol": "http",
+							"host": [
+								"uva",
+								"uva",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"agent",
+								"v1",
+								"sqlDataRequest",
+								"uva"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "sqlDataRequest simple 1 SURF query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer 1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 10\",\r\n    \"algorithm\": \"\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-fbfa11b4\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://surf.surf.svc.cluster.local:80/agent/v1/sqlDataRequest/surf",
+							"protocol": "http",
+							"host": [
+								"surf",
+								"surf",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"agent",
+								"v1",
+								"sqlDataRequest",
+								"surf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "sqlDataRequest simple 2 SURF query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer 1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT * FROM Personen p JOIN Aanstellingen s LIMIT 10\",\r\n    \"algorithm\": \"average\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": true\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-405b4f44\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://surf.surf.svc.cluster.local:80/agent/v1/sqlDataRequest/surf",
+							"protocol": "http",
+							"host": [
+								"surf",
+								"surf",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"agent",
+								"v1",
+								"sqlDataRequest",
+								"surf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "sqlDataRequest vu UNL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer 1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\" : \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n    \"algorithm\" : \"\",\r\n    \"options\" : {\r\n        \"graph\" : false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\", \r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-42249df1\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://vu.vu.svc.cluster.local:80/agent/v1/sqlDataRequest/vu",
+							"protocol": "http",
+							"host": [
+								"vu",
+								"vu",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"agent",
+								"v1",
+								"sqlDataRequest",
+								"vu"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
 			"name": "Get agreements",
@@ -217,6 +578,41 @@
 						"api",
 						"v1",
 						"policyEnforcer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update agreements UvA",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"UVA\",\r\n    \"relations\": {\r\n        \"jorrit.stutterheim@cloudnation.nl\": {\r\n            \"ID\": \"GUID\",\r\n            \"requestTypes\": [\"sqlDataRequest\",\"genericRequest\"],\r\n            \"dataSets\": [\"wageGap\"],\r\n            \"allowedArchetypes\": [\"computeToData\"],\r\n            \"allowedComputeProviders\": [\"SURF\"]\r\n        }\r\n    },\r\n    \"computeProviders\": [\"SURF\",\"otherCompany\"],\r\n    \"archetypes\": [\"computeToData\",\"dataThroughTtp\",\"reproducableScience\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://orchestrator.orchestrator.svc.cluster.local:80/api/v1/policyEnforcer/agreements",
+					"protocol": "http",
+					"host": [
+						"orchestrator",
+						"orchestrator",
+						"svc",
+						"cluster",
+						"local"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"v1",
+						"policyEnforcer",
+						"agreements"
 					]
 				}
 			},
