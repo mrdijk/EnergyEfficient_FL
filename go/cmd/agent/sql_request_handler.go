@@ -86,9 +86,6 @@ func sqlDataRequestHandler() http.HandlerFunc {
 			return
 		}
 
-		// TODO: remove later
-		logger.Sugar().Debug("*************Getting to after the handle sql functions")
-
 		// Create a channel to receive the response
 		responseChan := make(chan dataResponse)
 
@@ -184,13 +181,7 @@ func handleSqlComputeProvider(ctx context.Context, jobName string, compositionRe
 	}
 
 	for _, dataProvider := range compositionRequest.DataProviders {
-			// TODO: the issue is definitely in this part with the storage from etcd probably
-
 		dataProviderRoutingKey := fmt.Sprintf("/agents/online/%s", dataProvider)
-		// TODO: remove later
-		logger.Sugar().Debug("*************Getting to after the handle sql functions")
-		logger.Sugar().Debugf("*************Routing key: %s", dataProviderRoutingKey)
-
 		var agentData lib.AgentDetails
 		_, err := etcd.GetAndUnmarshalJSON(etcdClient, dataProviderRoutingKey, &agentData)
 		if err != nil {
@@ -213,16 +204,10 @@ func handleSqlComputeProvider(ctx context.Context, jobName string, compositionRe
 			logger.Sugar().Errorf("Error PutEtcdWithGrant: %v", err)
 		}
 
-		// TODO: remove later
-		logger.Sugar().Debug("*************Getting to before doing sql data request")
-
 		_, err = c.SendSqlDataRequest(ctx, sqlDataRequest)
 		if err != nil {
 			logger.Sugar().Errorf("Error c.SendSqlDataRequest: %v", err)
 		}
-
-		// TODO: remove later
-		logger.Sugar().Debug("*************Getting to after doing sql data request")
 	}
 
 	// TODO: Parse SQL request for extra compute services
@@ -236,9 +221,6 @@ func handleSqlComputeProvider(ctx context.Context, jobName string, compositionRe
 	waitingJobMap[sqlDataRequest.RequestMetadata.CorrelationId] = &waitingJob{job: createdJob, nrOfDataStewards: len(compositionRequest.DataProviders)}
 	waitingJobMutex.Unlock()
 	logger.Sugar().Debugf("Created job nr of stewards: %d", waitingJobMap[sqlDataRequest.RequestMetadata.CorrelationId].nrOfDataStewards)
-
-	// TODO: remove later
-	logger.Sugar().Debug("*************Getting to end of handleSqlComputeProvider func")
 
 	return ctx, nil
 }

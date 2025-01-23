@@ -126,6 +126,14 @@ delete_jobs() {
   etcdctl --endpoints=http://localhost:30005 del /agents/jobs/VU/queueInfo/jorrit-stutterheim- --prefix
 }
 
+# Delete jobs that may not be automatically deleted
+delete_jobs_other() {
+  kubectl get pods -A | grep 'jorrit-stutterheim' | awk '{split($2,a,"-"); print $1" "a[1]"-"a[2]"-"a[3]}' | xargs -n2 bash -c 'kubectl delete job $1 -n $0'
+  etcdctl --endpoints=http://localhost:30005 del /agents/jobs/UVA/jorrit.stutterheim --prefix
+  etcdctl --endpoints=http://localhost:30005 del /agents/jobs/SURF/jorrit.stutterheim --prefix
+  etcdctl --endpoints=http://localhost:30005 del /agents/jobs/VU/jorrit.stutterheim --prefix
+}
+
 # Provides an overview of all running pods
 #   Decent but basic alternative to using k9s
 watch_pods(){

@@ -137,3 +137,24 @@ kubectl port-forward -n linkerd-jaeger service/jaeger 16686:16686
 
 
 ## Reading from etcdctl
+Examples of useful commands (replace endpoints when necessary)
+```sh
+# Get all keys
+etcdctl --endpoints=http://localhost:30005 get --prefix "" --keys-only
+
+# Delete jobs with a prefix, such as:
+etcdctl --endpoints=http://localhost:30005 del /agents/jobs/SURF/jorrit.stutterheim --prefix
+
+# Get a specific value based on a key (based on a prefix)
+etcdctl --endpoints=http://localhost:30005 get --prefix "/agents/jobs/SURF"
+```
+
+## See RabbitMQ information
+Go to http://localhost:30000/ and login with "guest" as username and password. Here you can view queues and other things.
+
+
+## Useful additional k9s info
+```sh
+# Within the logs of k9s you can type / to go into filter mode and then you can find logs based on the typing. 
+# Exit with Esc.
+```
