@@ -154,15 +154,15 @@ redeploy_structurally() {
   echo "Waiting for 1 minute..."
   sleep 60
 
-  # Deploy core and wait for 10 seconds so orchestrator is running after core is done
+  # Deploy core and wait for 15 seconds so orchestrator is running after core is done
   deploy_core
-  echo "Waiting for 10 seconds..."
-  sleep 10
+  echo "Waiting for 15 seconds..."
+  sleep 15
 
   # Deploy orchestrator and wait a short time before deploying the rest
   deploy_orchestrator
-  echo "Waiting for 5 seconds..."
-  sleep 5
+  echo "Waiting for 10 seconds..."
+  sleep 10
 
   # Deploy other components (sequence in which it is running does not matter here)
   deploy_agents
