@@ -1,5 +1,6 @@
 import requests
 import time
+import datetime
 import csv
 import constants
 import argparse
@@ -38,21 +39,20 @@ def get_energy_consumption():
     return {}
 
 # Main function to execute the experiment
-def run_experiment(archetype: str):
+def run_experiment(archetype: str, output_dir, exp_rep):
     results = []
     # Get request URL based on used data_steward
     data_steward = constants.ARCH_DATA_STEWARDS[archetype]
     data_request_url = constants.REQUEST_URLS[data_steward]
     print(f"Using data steward: {data_steward}, URL:{data_request_url}")
     
-    # TODO: uncomment idle energy when done.
-    # # Phase 1: Idle period
-    # # Wait idle period
-    # print("Waiting for idle period...")
-    # time.sleep(constants.IDLE_PERIOD)
-    # # Measure energy after idle (end_idle/start_active)
-    # idle_energy = get_energy_consumption()
-    # print(f"Idle Energy: {idle_energy} (in J)")
+    # Phase 1: Idle period
+    # Wait idle period
+    print("Waiting for idle period...")
+    time.sleep(constants.IDLE_PERIOD)
+    # Measure energy after idle (end_idle/start_active)
+    idle_energy = get_energy_consumption()
+    print(f"Idle Energy: {idle_energy} (in J)")
 
     # Phase 2: Active period
     runs = {}
@@ -60,7 +60,7 @@ def run_experiment(archetype: str):
     active_start_time = time.time()
     # Execute the runs for this experiment (active state)
     for run in range(constants.NUM_EXP_ACTIONS):
-        print(f"\nStarting action {run + 1}/{constants.NUM_EXP_ACTIONS}...")
+        print(f"Starting action {run + 1}/{constants.NUM_EXP_ACTIONS}...")
         # Execute request approval
         response_approval = requests.post(constants.APPROVAL_URL, json=constants.REQUEST_BODY_APPROVAL, headers=constants.HEADERS_APPROVAL)
         # Extract relevant data from the response
@@ -83,7 +83,12 @@ def run_experiment(archetype: str):
         print(f"Data request completed with status: {status_code_data_request}, execution time: {execution_time_data_request}s")
         
         # Save run data
-        runs[run] = {} # TODO: save run info, data request as well as approval
+        runs[run] = {
+            "appr_status_code": status_code_approval,
+            "appr_exec_time": execution_time_approval,
+            "data_status_code": status_code_data_request,
+            "data_req_exec_time": execution_time_data_request,
+        }
         # Apply interval between requests (if not last run of sequence) 
         if (run + 1) != constants.NUM_EXP_ACTIONS:
             print("Waiting before next action...")
@@ -101,50 +106,83 @@ def run_experiment(archetype: str):
     active_energy = get_energy_consumption()
     print(f"Active Energy: {active_energy} (in J)")
 
-    # # TODO: construct results, with runs, idle_energy, active_energy, etc.
+    # Extract results for this run
+    results = {
+        "runs": runs,
+        "idle_energy": idle_energy,
+        "active_energy": active_energy
+    }
 
-    # # Save experiment results 
-    # save_results(results)
+    # Save experiment results to files
+    save_results(results, output_dir, exp_rep)
 
 
-def save_results(results):
+def save_results(results, output_dir, exp_rep):
     print("Saving experiment results to file...")
-    # TODO: change to CSV file only, two files for each experiment:
-    # runs.csv (each run: run_nr,status_code,execution_time)
-    # experiment.csv (<forEachContainerEnergy, for idle and active>,TotalEnergy,average for execution time)
-    # TODO: exec time is based on runs
-
-    # TODO: make it save some sort of a timestamp with the filenames to distinquish between them,
-    # add it in that folder with the timestamp, then also the files with that timestamp
     
     # Ensure the output directory exists    
-    output_dir = 'data'
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir_exp = os.path.join(output_dir, f'exp_{exp_rep}')
+    os.makedirs(output_dir_exp, exist_ok=True)
 
-    # Save to a file in the specified directory
-    # output_file = os.path.join(output_dir, f'{filename}.csv')
-
-    # # Write the data to the output file
-    # # df.to_csv(output_file, index=False)
-
-    # # Output file location that is clickable for the user
-    # print(f'Saved data to {os.path.join(os.getcwd(), output_file)}')
-    
-    # Save to CSV
-    csv_file = "experiment_results.csv"
-    with open(csv_file, mode="w", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=results[0].keys())
+    # Save runs results to CSV
+    runs_csv_file = os.path.join(output_dir_exp, "runs_results.csv")
+    # Add the file
+    with open(runs_csv_file, mode="w", newline="") as file:
+        # Add run_nr as field and each key from the the runs list 
+        fieldnames = ["run_nr"] + list(results["runs"][0].keys())
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
-        writer.writerows(results)
-    print(f"Results saved to {csv_file}")
+        total_exec_time = 0
+        # For each run, write the data
+        for run_nr, run_data in results["runs"].items():
+            row = {"run_nr": run_nr}
+            row.update(run_data)
+            total_exec_time += run_data["appr_exec_time"] + run_data["data_req_exec_time"]
+            writer.writerow(row)
+    # Output file location that is clickable for the user
+    print(f"Runs results saved to {os.path.join(os.getcwd(), runs_csv_file)}")
 
-    # Save to text file
-    txt_file = "experiment_results.txt"
-    with open(txt_file, mode="w") as file:
-        for result in results:
-            file.write(f"{result}\n")
-    print(f"Results saved to {txt_file}")
-    
+    # Calculate average execution times
+    average_exec_time = total_exec_time / len(results["runs"])
+
+    # Save experiment results to CSV
+    experiment_csv_file = os.path.join(output_dir_exp, "full_experiment_results.csv")
+    with open(experiment_csv_file, mode="w", newline="") as file:
+        fieldnames = ["idle_energy_total", "active_energy_total", "total_energy_difference", "average_exec_time"]
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        # Calculate total idle, active and difference energy consumption
+        total_idle_energy = sum(float(value) for value in results["idle_energy"].values())
+        total_active_energy = sum(float(value) for value in results["active_energy"].values())
+        total_difference = total_active_energy - total_idle_energy
+        
+        # Add energy data
+        writer.writerow({
+            "idle_energy_total": total_idle_energy,
+            "active_energy_total": total_active_energy,
+            "total_energy_difference": total_difference,
+            "average_exec_time": average_exec_time
+        })
+    # Output file location that is clickable for the user
+    print(f"Full experiment results saved to {os.path.join(os.getcwd(), experiment_csv_file)}")
+
+    # Save full active and idle energy values to a text file
+    full_energy_file = os.path.join(output_dir_exp, "full_energy_values.txt")
+    with open(full_energy_file, mode="w") as file:
+        file.write("Idle Energy:\n")
+        for container, value in results["idle_energy"].items():
+            file.write(f"{container}: {value}\n")
+        file.write("\nActive Energy:\n")
+        for container, value in results["active_energy"].items():
+            file.write(f"{container}: {value}\n")
+    # Output file location that is clickable for the user
+    print(f"Full energy values saved to {os.path.join(os.getcwd(), full_energy_file)}")
+
+
+def format_timestamp():
+    # Generate the current timestamp
+    timestamp = datetime.datetime.now().strftime("%y%m%d-%H%M")
+    return timestamp
 
 
 if __name__ == "__main__":
@@ -176,11 +214,16 @@ if __name__ == "__main__":
 
         # Execute experiments for the number of repetitions for this implementation (with the selected archetype)
         exp_reps = args.exp_reps
+        exp_name = args.exp_name
+        # Create a folder for the output of these experiment repetitions and archetypes
+        output_dir = os.path.join('data', f'{exp_name}_{archetype}_{format_timestamp()}')
+        # Ensure the output directory exists
+        os.makedirs(output_dir, exist_ok=True)
         for exp_rep in range(exp_reps):
             # Print a new line before each experiment repetition
             print(f"\nStarting experiment repetition {exp_rep + 1}/{exp_reps} for archetype {archetype}...")
             # Run experiment with args
-            run_experiment(archetype)
+            run_experiment(archetype, output_dir, exp_rep)
 
             # Apply short rest period before the next experiment (if not last experiment of sequence) 
             if (exp_rep + 1) != exp_reps:
