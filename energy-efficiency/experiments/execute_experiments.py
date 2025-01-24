@@ -120,8 +120,8 @@ def run_experiment(archetype: str, output_dir, exp_rep):
 def save_results(results, output_dir, exp_rep):
     print("Saving experiment results to file...")
     
-    # Ensure the output directory exists    
-    output_dir_exp = os.path.join(output_dir, f'exp_{exp_rep}')
+    # Ensure the output directory exists
+    output_dir_exp = os.path.join(output_dir, f'exp_{(exp_rep+1)}')
     os.makedirs(output_dir_exp, exist_ok=True)
 
     # Save runs results to CSV
