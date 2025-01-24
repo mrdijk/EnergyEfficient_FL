@@ -145,3 +145,26 @@ watch_pods(){
 restart_core() {
   kubectl rollout restart deployment/rabbitmq -n core
 }
+
+# Redeploy all DYNAMOS components structurally. This ensures core is uninstalled first, then orchestrator, etc.
+# If it is not done in this sequence, sometimes it causes some issues, such as requests timing out, etc.
+redeploy_structurally() {
+  # Uninstall all and wait a while before it is all removed
+  uninstall_all
+  echo "Waiting for 1 minute..."
+  sleep 60
+
+  # Deploy core and wait for 10 seconds so orchestrator is running after core is done
+  deploy_core
+  echo "Waiting for 10 seconds..."
+  sleep 10
+
+  # Deploy orchestrator and wait a short time before deploying the rest
+  deploy_orchestrator
+  echo "Waiting for 5 seconds..."
+  sleep 5
+
+  # Deploy other components (sequence in which it is running does not matter here)
+  deploy_agents
+  deploy_api_gateway
+}

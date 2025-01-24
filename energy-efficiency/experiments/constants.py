@@ -27,6 +27,31 @@ INITIAL_REQUEST_BODY = {
     "algorithm": "",
     "options": {"graph": False, "aggregate": False},
     "user": {"id": "12324", "userName": "jorrit.stutterheim@cloudnation.nl"},
-    "requestMetadata": {"jobId": "-82dd3244"}
 }
-JOB_ID_PREFIX = "jorrit-stutterheim-"
+APPROVAL_URL = "http://api-gateway.api-gateway.svc.cluster.local:80/api/v1/requestApproval"
+HEADERS_APPROVAL = {"Content-Type": "application/json"}
+REQUEST_BODY_APPROVAL = {
+    "type": "sqlDataRequest",
+    "user": {
+        "id": "12324",
+        "userName": "jorrit.stutterheim@cloudnation.nl"
+    },
+    "dataProviders": ["UVA"]
+}
+
+# Update archetypes
+UPDATE_ARCH_URL = "http://orchestrator.orchestrator.svc.cluster.local:80/api/v1/archetypes/agreements"
+INITIAL_REQUEST_BODY_ARCH = {
+    "name": "computeToData",
+    "computeProvider": "dataProvider",
+    "resultRecipient": "requestor"
+}
+WEIGHTS = {
+    "ComputeToData": 100,
+    "DataThroughTTP": 300
+}
+ARCH_DATA_STEWARDS = {
+    # Each archetype has a different data steward it should request the data from
+    "ComputeToData": "uva",
+    "DataThroughTTP": "surf"
+}
