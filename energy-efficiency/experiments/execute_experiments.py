@@ -3,6 +3,7 @@ import time
 import csv
 import constants
 import argparse
+import os
 
 # Function to query Prometheus for energy consumption
 def get_energy_consumption():
@@ -50,59 +51,74 @@ def run_experiment(data_steward: str, job_id: str):
     request_body["requestMetadata"] = {"jobId": f"{constants.JOB_ID_PREFIX}{job_id}"}
     print(f"Using request body: {request_body}")
 
-    # Step 1: Measure energy (start_idle)
-    start_idle = get_energy_consumption()
-    print(f"Start Idle Energy: {start_idle} J")
+    # Phase 1: Idle period
     # Wait idle period
     print("Waiting for idle period...")
     time.sleep(constants.IDLE_PERIOD)
     # Measure energy after idle (end_idle/start_active)
-    end_idle_start_active = get_energy_consumption()
-    print(f"End Idle/Start Active Energy: {end_idle_start_active} J")
+    idle_energy = get_energy_consumption()
+    print(f"Idle Energy: {idle_energy} (in J)")
 
+    # Phase 2: Active period
+    runs = {}
+    # Record the start time of the active period
+    active_start_time = time.time()
     # Execute the runs for this experiment (active state)
     for run in range(constants.NUM_EXP_ACTIONS):
         print(f"Starting action {run + 1}/{constants.NUM_EXP_ACTIONS}...")
-
         # Execute data request
         response = requests.post(request_url, json=request_body, headers=constants.HEADERS)
         # Extract relevant data from the response
         status_code = response.status_code
         execution_time = response.elapsed.total_seconds()
         print(f"Request completed with status: {status_code}, execution time: {execution_time}s")
-        time.sleep(6)  # Interval between requests    
+        # Save run data
+        runs[run] = {} # TODO: save run info, such as 
+        # Apply interval between requests 
+        if run != constants.NUM_EXP_ACTIONS:
+            print("Waiting before next action...")
+            time.sleep(6)
 
+    # Before measuring the active energy, make sure the active period has passed for equal comparisons
+    elapsed_time = time.time() - active_start_time
+    # Add a few seconds to make sure a new Prometheus scrape is present
+    remaining_time = (constants.ACTIVE_PERIOD + 2) - elapsed_time
+    # If still time left to wait, sleep until the 2 minutes have passed
+    if remaining_time > 0:
+        print(f"Waiting for the remaining {remaining_time} seconds...")
+        time.sleep(remaining_time)
     # Measure energy after active period (end_active) after the active period
-    # TODO: add here measuring it if constants.ACTIVE_PERIOD has passed
-    end_active = get_energy_consumption()
-    # TODO: also print elapsed time before measuring energy here
-    print(f"End Active Energy: {end_active} J")
+    active_energy = get_energy_consumption()
+    print(f"Active Energy: {active_energy} (in J)")
 
-    # Calculate energy consumption for this experiment
-    idle_energy = end_idle_start_active - start_idle
-    active_energy = end_active - end_idle_start_active
-
-    # # Save results for this run
-    # results.append({
-    #     "Run": run + 1,
-    #     "Start Idle Energy (J)": start_idle,
-    #     "End Idle Energy/Start Active (J)": end_idle_start_active,
-    #     "End Active Energy (J)": end_active,
-    #     "Idle Energy (J)": idle_energy,
-    #     "Active Energy (J)": active_energy
-    # })
-
-    # Save results to files
+    # TODO: construct results, with runs, idle_energy, active_energy, etc.
+    
+    # Save experiment results 
     save_results(results)
 
 def save_results(results):
     print("Saving experiment results to file...")
     # TODO: change to CSV file only, two files for each experiment:
-    # runs.csv (each run: run_nr,status_code,execution_time,<forEachContainerEnergy>,TotalEnergy)
-    # experiment.csv (energy_idle,energy_active,total_exec_time)
+    # runs.csv (each run: run_nr,status_code,execution_time)
+    # experiment.csv (<forEachContainerEnergy, for idle and active>,TotalEnergy,average for execution time)
+    # TODO: exec time is based on runs
 
     # TODO: make it save some sort of a timestamp with the filenames to distinquish between them,
     # add it in that folder with the timestamp, then also the files with that timestamp
+    
+    # Ensure the output directory exists    
+    output_dir = 'data'
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Save to a file in the specified directory
+    output_file = os.path.join(output_dir, f'{filename}.csv')
+
+    # Write the data to the output file
+    # df.to_csv(output_file, index=False)
+
+    # Output file location that is clickable for the user
+    print(f'Saved data to {os.path.join(os.getcwd(), output_file)}')
+    
     # Save to CSV
     csv_file = "experiment_results.csv"
     with open(csv_file, mode="w", newline="") as file:
