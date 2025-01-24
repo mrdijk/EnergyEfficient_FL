@@ -11,11 +11,13 @@ def get_energy_consumption():
         f"{constants.PROMETHEUS_URL}/api/v1/query",
         params={
             "query": constants.PROM_ENERGY_QUERY_TOTAL
+            # "query": constants.PROM_ENERGY_QUERY_RANGE
         },
     )
     # Parse the response JSON
     response_json = response.json()
     print(f"Prometheus response status code: {response.status_code}")
+    # print(f"Prometheus response: {response_json}")
 
     # Extract the energy data
     energy_data = {}
@@ -23,12 +25,17 @@ def get_energy_consumption():
     if response.status_code == 200:
         # Construct as readable energy data for each container
         for result in response_json['data']['result']:
+            # Extract the container name
             container_name = result['metric'][constants.PROM_KEPLER_CONTAINER_LABEL]
+            # Extract the actual result (value[0] is the timestamp)
             value = result['value'][1]
             energy_data[container_name] = value
         # Print parsed result
-        print(f"Prometheus response status code: {response.status_code}")
+        print(f"Prometheus parsed energy result: {energy_data}")
+        # Return result
+        return energy_data
 
+    # If request failed, return empty
     return {}
 
 # Main function to execute the experiment
@@ -74,15 +81,15 @@ def run_experiment(data_steward: str, job_id: str):
     idle_energy = end_idle_start_active - start_idle
     active_energy = end_active - end_idle_start_active
 
-    # Save results for this run
-    results.append({
-        "Run": run + 1,
-        "Start Idle Energy (J)": start_idle,
-        "End Idle Energy/Start Active (J)": end_idle_start_active,
-        "End Active Energy (J)": end_active,
-        "Idle Energy (J)": idle_energy,
-        "Active Energy (J)": active_energy
-    })
+    # # Save results for this run
+    # results.append({
+    #     "Run": run + 1,
+    #     "Start Idle Energy (J)": start_idle,
+    #     "End Idle Energy/Start Active (J)": end_idle_start_active,
+    #     "End Active Energy (J)": end_active,
+    #     "Idle Energy (J)": idle_energy,
+    #     "Active Energy (J)": active_energy
+    # })
 
     # Save results to files
     save_results(results)
@@ -90,8 +97,11 @@ def run_experiment(data_steward: str, job_id: str):
 def save_results(results):
     print("Saving experiment results to file...")
     # TODO: change to CSV file only, two files for each experiment:
-    # runs.csv (each run: run_nr,status_code,execution_time,etc.)
+    # runs.csv (each run: run_nr,status_code,execution_time,<forEachContainerEnergy>,TotalEnergy)
     # experiment.csv (energy_idle,energy_active,total_exec_time)
+
+    # TODO: make it save some sort of a timestamp with the filenames to distinquish between them,
+    # add it in that folder with the timestamp, then also the files with that timestamp
     # Save to CSV
     csv_file = "experiment_results.csv"
     with open(csv_file, mode="w", newline="") as file:
