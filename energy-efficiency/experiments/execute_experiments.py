@@ -10,8 +10,8 @@ def get_energy_consumption():
     response = requests.get(
         f"{constants.PROMETHEUS_URL}/api/v1/query",
         params={
-            "query": constants.PROM_ENERGY_QUERY_TOTAL
-            # "query": constants.PROM_ENERGY_QUERY_RANGE
+            # Use range query, as we found that this was the most reliable in our thesis
+            "query": constants.PROM_ENERGY_QUERY_RANGE
         },
     )
     # Parse the response JSON
@@ -135,4 +135,4 @@ if __name__ == "__main__":
 
         # Apply short rest period before the next experiment
         print("Resting for a short period...")
-        time.sleep(10)  # Short rest period between runs
+        time.sleep(30)
