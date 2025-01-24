@@ -44,7 +44,7 @@ UPDATE_ARCH_URL = "http://orchestrator.orchestrator.svc.cluster.local:80/api/v1/
 INITIAL_REQUEST_BODY_ARCH = {
     "name": "computeToData",
     "computeProvider": "dataProvider",
-    "resultRecipient": "requestor"
+    "resultRecipient": "requestor",
 }
 WEIGHTS = {
     "ComputeToData": 100,

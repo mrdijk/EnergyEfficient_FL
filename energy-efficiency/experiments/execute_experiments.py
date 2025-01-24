@@ -31,8 +31,6 @@ def get_energy_consumption():
             # Extract the actual result (value[0] is the timestamp)
             value = result['value'][1]
             energy_data[container_name] = value
-        # Print parsed result
-        # print(f"Prometheus parsed energy result: {energy_data}")
         # Return result
         return energy_data
 
@@ -47,13 +45,14 @@ def run_experiment(archetype: str):
     data_request_url = constants.REQUEST_URLS[data_steward]
     print(f"Using data steward: {data_steward}, URL:{data_request_url}")
     
-    # Phase 1: Idle period
-    # Wait idle period
-    print("Waiting for idle period...")
-    time.sleep(constants.IDLE_PERIOD)
-    # Measure energy after idle (end_idle/start_active)
-    idle_energy = get_energy_consumption()
-    print(f"Idle Energy: {idle_energy} (in J)")
+    # TODO: uncomment idle energy when done.
+    # # Phase 1: Idle period
+    # # Wait idle period
+    # print("Waiting for idle period...")
+    # time.sleep(constants.IDLE_PERIOD)
+    # # Measure energy after idle (end_idle/start_active)
+    # idle_energy = get_energy_consumption()
+    # print(f"Idle Energy: {idle_energy} (in J)")
 
     # Phase 2: Active period
     runs = {}
@@ -61,16 +60,17 @@ def run_experiment(archetype: str):
     active_start_time = time.time()
     # Execute the runs for this experiment (active state)
     for run in range(constants.NUM_EXP_ACTIONS):
-        print(f"Starting action {run + 1}/{constants.NUM_EXP_ACTIONS}...")
+        print(f"\nStarting action {run + 1}/{constants.NUM_EXP_ACTIONS}...")
         # Execute request approval
         response_approval = requests.post(constants.APPROVAL_URL, json=constants.REQUEST_BODY_APPROVAL, headers=constants.HEADERS_APPROVAL)
-        print(f"Response approval: {response_approval.json()}")
-        
         # Extract relevant data from the response
         status_code_approval = response_approval.status_code
         execution_time_approval = response_approval.elapsed.total_seconds()
-        print(f"Approval request completed with status: {status_code_data_request}, execution time: {execution_time_data_request}s")
-        
+        print(f"Approval request completed with status: {status_code_approval}, execution time: {execution_time_approval}s")
+        # Get job-id
+        job_id = response_approval.json()["jobId"]
+        print(f"Using job-id: {job_id}")
+
         # Construct data request body
         request_body = constants.INITIAL_REQUEST_BODY
         # Add job-id to request body
@@ -85,7 +85,7 @@ def run_experiment(archetype: str):
         # Save run data
         runs[run] = {} # TODO: save run info, data request as well as approval
         # Apply interval between requests (if not last run of sequence) 
-        if run != constants.NUM_EXP_ACTIONS:
+        if (run + 1) != constants.NUM_EXP_ACTIONS:
             print("Waiting before next action...")
             time.sleep(6)
 
@@ -101,10 +101,10 @@ def run_experiment(archetype: str):
     active_energy = get_energy_consumption()
     print(f"Active Energy: {active_energy} (in J)")
 
-    # TODO: construct results, with runs, idle_energy, active_energy, etc.
+    # # TODO: construct results, with runs, idle_energy, active_energy, etc.
 
-    # Save experiment results 
-    save_results(results)
+    # # Save experiment results 
+    # save_results(results)
 
 
 def save_results(results):
@@ -152,45 +152,37 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run energy efficiency experiment")
     parser.add_argument("archetypes", type=str, nargs='+', choices=["ComputeToData", "DataThroughTTP"], 
                         help="The archetypes to use for the experiment (must be 'ComputeToData' and/or 'DataThroughTTP')")
+    parser.add_argument("exp_reps", type=int, help="The number of times the experiment should be repeated")
+    parser.add_argument("exp_name", type=str, help="The name of the experiment (will be used in output files)")
     # Parse args
     args = parser.parse_args()
 
-    # TODO: do a for loop for each archetype as well on top of this.
-    # TODO: also switch archetype and then automatically do the measurements for this one with the PUT weight request.
-    # TODO: then apply a 2-minute rest period in between switching archetypes
-    
     # Execute experiment for each archetype and the number of repetitions
     for archetype in args.archetypes:
         print(f"Starting experiments for archetype: {archetype}")
         # Switch on this archetype by updating the weight
         request_body = constants.INITIAL_REQUEST_BODY_ARCH
         # Add weight to request body (setting weight of ComputeToData higher or lower than DataThroughTTP switches archetypes)
-        request_body["weight"] = {f"{constants.WEIGHTS[archetype]}"}
+        request_body["weight"] = constants.WEIGHTS[archetype]
+        print(f"Request body for archetype update: {request_body}")
         # Execute request
-        response_data_request = requests.post(constants.UPDATE_ARCH_URL, json=request_body, headers=constants.HEADERS_APPROVAL)
+        response_archetype_update = requests.put(constants.UPDATE_ARCH_URL, json=request_body, headers=constants.HEADERS_APPROVAL)
         # Print result
-        print(f"Switching archetype completed with status: {response_data_request.status_code}, execution time: {response_data_request.elapsed.total_seconds()}s")
+        print(f"Switching archetype completed with status: {response_archetype_update.status_code}, execution time: {response_archetype_update.elapsed.total_seconds()}s")
 
-        # Apply idle period rest between switching archetypes
-        print("Resting for idle period before executing next experiments (after switching archetypes)...")
-        time.sleep(constants.IDLE_PERIOD)
+        # Apply short idle period after switching archetypes
+        print("Resting for short period before executing next experiments (after switching archetypes)...")
+        time.sleep(30)
 
-        # Execute experiments for the number of repetitions for this archetype
-        for exp_rep in range(args.exp_reps):
-            print(f"Starting experiment repetition {exp_rep + 1}/{args.exp_reps} for archetype {archetype}...")
+        # Execute experiments for the number of repetitions for this implementation (with the selected archetype)
+        exp_reps = args.exp_reps
+        for exp_rep in range(exp_reps):
+            # Print a new line before each experiment repetition
+            print(f"\nStarting experiment repetition {exp_rep + 1}/{exp_reps} for archetype {archetype}...")
             # Run experiment with args
             run_experiment(archetype)
 
-            # Apply short rest period before the next experiment
-            print("Resting for a short period...")
-            time.sleep(30)
-    # # Execute experiment for the number of repetitions for each archetype
-    # exp_reps = args.exp_reps
-    # for exp_rep in range(exp_reps):
-    #     print(f"Starting experiment repetition {exp_rep + 1}/{exp_reps}...")
-    #     # Run experiment with args
-    #     run_experiment(args.data_steward, args.job_id)
-
-    #     # Apply short rest period before the next experiment
-    #     print("Resting for a short period...")
-    #     time.sleep(30)
+            # Apply short rest period before the next experiment (if not last experiment of sequence) 
+            if (exp_rep + 1) != exp_reps:
+                print("Resting for a short period before doing next experiment repetition...")
+                time.sleep(30)

@@ -29,9 +29,10 @@ kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 909
 # Navigate to the experiments folder
 cd energy-efficiency/experiments
 # Run specific scripts (assuming Python is installed in WSL environment and the command is run in a WSL terminal)
-python3.10 execute_experiments.py <exp-reps> <archetypes>
-# For example:
-python3.10 execute_experiments.py 30 <archetypes>
-python execute_experiments.py "compute to data" "data through ttp"
+python3.10 execute_experiments.py <archetypes> <exp_reps> <exp_name>
+# For example for both archetypes:
+python3.10 execute_experiments.py "ComputeToData" "DataThroughTTP" 30 "baseline"
+# Or only one archetype and a different name
+python3.10 execute_experiments.py "DataThroughTTP" 30 "caching"
 ```
 Running the scripts from this location is crucial, since the imports are assuming the scripts are run from this location.
