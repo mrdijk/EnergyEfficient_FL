@@ -16,7 +16,11 @@ REQUEST_URLS = {
     "uva": "http://uva.uva.svc.cluster.local:80/agent/v1/sqlDataRequest/uva",
     "surf": "http://surf.surf.svc.cluster.local:80/agent/v1/sqlDataRequest/surf"
 }
-HEADERS = {"Content-Type": "application/json"}
+HEADERS = {
+    "Content-Type": "application/json",
+    # Access token required for data requests in DYNAMOS
+    "Authorization": "bearer 1234"
+}
 INITIAL_REQUEST_BODY = {
     "type": "sqlDataRequest",
     "query": "SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000",

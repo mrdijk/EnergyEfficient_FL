@@ -16,7 +16,7 @@ def get_energy_consumption():
     )
     # Parse the response JSON
     response_json = response.json()
-    print(f"Prometheus response status code: {response.status_code}")
+    # print(f"Prometheus response status code: {response.status_code}")
     # print(f"Prometheus response: {response_json}")
 
     # Extract the energy data
@@ -31,7 +31,7 @@ def get_energy_consumption():
             value = result['value'][1]
             energy_data[container_name] = value
         # Print parsed result
-        print(f"Prometheus parsed energy result: {energy_data}")
+        # print(f"Prometheus parsed energy result: {energy_data}")
         # Return result
         return energy_data
 
@@ -43,7 +43,7 @@ def run_experiment(data_steward: str, job_id: str):
     results = []
     # Get request URL based on used data_steward
     request_url = constants.REQUEST_URLS[data_steward]
-    print(f"Using data steward: {data_steward}, \nURL:{request_url}")
+    print(f"Using data steward: {data_steward}, URL:{request_url}")
     # Set request body
     request_body = constants.INITIAL_REQUEST_BODY
     # Add job-id to request body
@@ -66,6 +66,7 @@ def run_experiment(data_steward: str, job_id: str):
 
         # Execute data request
         response = requests.post(request_url, json=request_body, headers=constants.HEADERS)
+        # Extract relevant data from the response
         status_code = response.status_code
         execution_time = response.elapsed.total_seconds()
         print(f"Request completed with status: {status_code}, execution time: {execution_time}s")
