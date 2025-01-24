@@ -21,4 +21,8 @@ var kubeconfig = ""
 var rabbitMqUser = "normal_user"
 var etcdJobRootKey = "/agents/jobs"
 var tracingHost = "collector.linkerd-jaeger:55678"
-var queueDeleteAfter = int64(600)
+// TTL (time-to-live) used for job queue in etcd (in seconds)
+// TODO: set back to default after executed experiments, now 2 hours to execute energy experiments
+var queueDeleteAfter = int64(7200)
+// Old (default) setting of DYNAMOS: 10 minutes
+// var queueDeleteAfter = int64(600)
