@@ -60,7 +60,7 @@ def run_experiment(archetype: str, output_dir, exp_rep):
     active_start_time = time.time()
     # Execute the runs for this experiment (active state)
     for run in range(constants.NUM_EXP_ACTIONS):
-        print(f"Starting action {run + 1}/{constants.NUM_EXP_ACTIONS}...")
+        print(f"\nStarting action {run + 1}/{constants.NUM_EXP_ACTIONS}...")
         # Execute request approval
         response_approval = requests.post(constants.APPROVAL_URL, json=constants.REQUEST_BODY_APPROVAL, headers=constants.HEADERS_APPROVAL)
         # Extract relevant data from the response
@@ -81,6 +81,9 @@ def run_experiment(archetype: str, output_dir, exp_rep):
         status_code_data_request = response_data_request.status_code
         execution_time_data_request = response_data_request.elapsed.total_seconds()
         print(f"Data request completed with status: {status_code_data_request}, execution time: {execution_time_data_request}s")
+        # For logging purposes print the request body if it fails
+        if status_code_data_request != 200:
+            print(f"Data request was not successful: request body for data request: {request_body}")
         
         # Save run data
         runs[run] = {
@@ -92,7 +95,7 @@ def run_experiment(archetype: str, output_dir, exp_rep):
         # Apply interval between requests (if not last run of sequence) 
         if (run + 1) != constants.NUM_EXP_ACTIONS:
             print("Waiting before next action...")
-            time.sleep(6)
+            time.sleep(7)
 
     # Before measuring the active energy, make sure the active period has passed for equal comparisons
     elapsed_time = time.time() - active_start_time
