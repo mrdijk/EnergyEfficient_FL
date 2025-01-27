@@ -7,10 +7,10 @@ EXP_FILENAME = 'full_experiment_results.csv'
 
 # Load all full_experiment_results.csv files into a single DataFrame
 def load_experiment_results(prefix: str, archetype: str):
-    print(f"Using data folder: {DATA_FOLDER}")
+    # print(f"Using data folder: {DATA_FOLDER}")
     # Set the prefix for all experiment folders
     prefix = f"{prefix}_{archetype}"
-    print(f"Using prefix: {prefix}")
+    # print(f"Using prefix: {prefix}")
     # Get the directories in the data folder
     data_folder_exp_dirs = []
     for dir in os.listdir(DATA_FOLDER):
@@ -23,10 +23,10 @@ def load_experiment_results(prefix: str, archetype: str):
     for exp_dir in data_folder_exp_dirs:
         # Get the experiment directory path
         exp_dir_path = os.path.join(DATA_FOLDER, exp_dir)
-        print(f"Exp dir path: {exp_dir_path}")
+        # print(f"Exp dir path: {exp_dir_path}")
         # Experiment repetitions
         exp_rep_dirs = os.listdir(exp_dir_path)
-        print(f"Exp rep dirs: {exp_rep_dirs}")
+        # print(f"Exp rep dirs: {exp_rep_dirs}")
         # Get the file paths
         for exp_rep_dir in exp_rep_dirs:
             file_path = os.path.join(exp_dir_path, exp_rep_dir, EXP_FILENAME)
