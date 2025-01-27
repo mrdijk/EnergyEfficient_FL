@@ -3,6 +3,7 @@ from sklearn.cluster import DBSCAN
 import argparse
 import utils
 import os
+import shutil
 
 def execute_DBSCAN_AD_algorithm(df: pd.DataFrame, exp_dirs, anomaly_folders):
     # Detect anomalies using DBSCAN
@@ -39,11 +40,20 @@ def check_runs_results(exp_dirs, anomaly_folders):
         else:
             print(f"File not found: {file_path}")
 
+def remove_anomaly_folders(anomaly_folders):
+    for folder in anomaly_folders:
+        if os.path.exists(folder):
+            shutil.rmtree(folder)
+            print(f"Removed folder: {folder}")
+        else:
+            print(f"Folder not found: {folder}")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run energy efficiency experiment")
     parser.add_argument("archetype", type=str, choices=["ComputeToData", "DataThroughTTP"], 
                         help="Archetype to detect anomalies from.")
     parser.add_argument("prefix", type=str, help="Prefix of the experiment folders")
+    parser.add_argument("--remove", action="store_true", help="Remove anomaly folders")
     args = parser.parse_args()
 
     # Load the data
@@ -67,3 +77,7 @@ if __name__ == "__main__":
         print(f"\nFolders containing anomalies: ({len(anomaly_folders)} total anomalies)")
         for folder in anomaly_folders:
             print(folder)
+
+        # Remove anomaly folders if the argument is set to True
+        if args.remove:
+            remove_anomaly_folders(anomaly_folders)

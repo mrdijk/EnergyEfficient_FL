@@ -51,4 +51,6 @@ python3.10 detect_anomalies.py "DataThroughTTP" "caching"
 python3.10 calculate_mean.py "ComputeToData" "baseline"
 # Or with a different prefix or archetype:
 python3.10 calculate_mean.py "DataThroughTTP" "caching"
+
+# If you want to remove anomalies, add the --remove flag (BE CAREFUL: this will remove the experiment folders)
 ```
