@@ -4,14 +4,12 @@ import argparse
 import utils
 import os
 
-# Detect anomalies using DBSCAN
-def execute_DBSCAN_AD_algorithm(df: pd.DataFrame, exp_dirs):
+def execute_DBSCAN_AD_algorithm(df: pd.DataFrame, exp_dirs, anomaly_folders):
+    # Detect anomalies using DBSCAN
     column_to_use = 'total_energy_difference'
     X = df[[column_to_use]].values
 
     # DBSCAN parameters, increase eps to detect fewer anomalies
-    # TODO: play around with the eps value, starting with a low one and then gradually making it higher
-    # so you can see anomalies and manually decide to remove them, such as based on the calculated mean
     dbscan = DBSCAN(eps=47, min_samples=3)
     labels = dbscan.fit_predict(X)
 
@@ -19,12 +17,27 @@ def execute_DBSCAN_AD_algorithm(df: pd.DataFrame, exp_dirs):
     anomalies = df[labels == -1]
     anomaly_indices = anomalies.index.tolist()
 
-    print("Anomalies detected:")
+    print(f"Anomalies detected ({len(anomaly_indices)} anomalies):")
     for idx in anomaly_indices:
         exp_dir_path, exp_rep_dir = exp_dirs[idx]
         file_path = os.path.join(exp_dir_path, exp_rep_dir, utils.EXP_FILENAME)
         print(f"File: {file_path}")
         print(anomalies.loc[idx])
+        anomaly_folders.add(os.path.join(exp_dir_path, exp_rep_dir))
+
+def check_runs_results(exp_dirs, anomaly_folders):
+    # Check runs_results.csv for status codes not equal to 200
+    for exp_dir_path, exp_rep_dir in exp_dirs:
+        file_path = os.path.join(exp_dir_path, exp_rep_dir, 'runs_results.csv')
+        if os.path.isfile(file_path):
+            runs_df = pd.read_csv(file_path)
+            anomalies = runs_df[(runs_df['appr_status_code'] != 200) | (runs_df['data_status_code'] != 200)]
+            if not anomalies.empty:
+                print(f"Anomalies in {file_path}:")
+                print(anomalies)
+                anomaly_folders.add(os.path.join(exp_dir_path, exp_rep_dir))
+        else:
+            print(f"File not found: {file_path}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run energy efficiency experiment")
@@ -39,6 +52,18 @@ if __name__ == "__main__":
     if df.empty:
         print("No data loaded. Exiting.")
     else:
-        # Call your new DBSCAN-based function
-        execute_DBSCAN_AD_algorithm(df, exp_dirs)
+        anomaly_folders = set()
 
+        # Call DBSCAN function to detect anomalies
+        execute_DBSCAN_AD_algorithm(df, exp_dirs, anomaly_folders)
+
+        # Print empty line between functions
+        print("")
+
+        # Check runs_results.csv for status codes not equal to 200
+        check_runs_results(exp_dirs, anomaly_folders)
+
+        # Print combined list of folders containing anomalies
+        print(f"\nFolders containing anomalies: ({len(anomaly_folders)} total anomalies)")
+        for folder in anomaly_folders:
+            print(folder)
