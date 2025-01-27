@@ -49,7 +49,9 @@ python3.10 detect_anomalies.py "DataThroughTTP" "caching"
 
 # If you want to remove anomalies, add the --remove flag (BE CAREFUL: this will remove the experiment folders)
 # You can manually verify the files removed in Git source control extension in VSC for example to be sure
-python3.10 detect_anomalies.py "DataThroughTTP" "baseline" --remove
+python3.10 detect_anomalies.py "ComputeToData" "baseline" --remove
+# Or different archetype and prefix
+python3.10 detect_anomalies.py "DataThroughTTP" "caching" --remove
 ```
 
 ### Test normality
