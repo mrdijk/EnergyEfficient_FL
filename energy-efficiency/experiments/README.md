@@ -36,3 +36,11 @@ python3.10 execute_experiments.py "ComputeToData" "DataThroughTTP" 30 "baseline"
 python3.10 execute_experiments.py "DataThroughTTP" 30 "caching"
 ```
 Running the scripts from this location is crucial, since the imports are assuming the scripts are run from this location.
+
+
+### Executing anomaly detection
+```sh
+python3.10 detect_anomalies.py "ComputeToData" "baseline"
+# Or with a different prefix or archetype:
+python3.10 detect_anomalies.py "DataThroughTTP" "caching"
+```
