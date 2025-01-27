@@ -11,6 +11,8 @@ def execute_DBSCAN_AD_algorithm(df: pd.DataFrame, exp_dirs, anomaly_folders):
     X = df[[column_to_use]].values
 
     # DBSCAN parameters, increase eps to detect fewer anomalies
+    # TODO: when using this first try to play around with these values to somewhat manually control
+    # which are anomalies, mainly use eps. The current threshold is used for earlier anomaly detection and could be good already.
     dbscan = DBSCAN(eps=47, min_samples=3)
     labels = dbscan.fit_predict(X)
 
@@ -18,6 +20,7 @@ def execute_DBSCAN_AD_algorithm(df: pd.DataFrame, exp_dirs, anomaly_folders):
     anomalies = df[labels == -1]
     anomaly_indices = anomalies.index.tolist()
 
+    # Print anomalies
     print(f"Anomalies detected ({len(anomaly_indices)} anomalies):")
     for idx in anomaly_indices:
         exp_dir_path, exp_rep_dir = exp_dirs[idx]
@@ -41,6 +44,7 @@ def check_runs_results(exp_dirs, anomaly_folders):
             print(f"File not found: {file_path}")
 
 def remove_anomaly_folders(anomaly_folders):
+    # Remove experiment folders found to be anomalies
     for folder in anomaly_folders:
         if os.path.exists(folder):
             shutil.rmtree(folder)
@@ -52,11 +56,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run energy efficiency experiment")
     parser.add_argument("archetype", type=str, choices=["ComputeToData", "DataThroughTTP"], 
                         help="Archetype to detect anomalies from.")
-    parser.add_argument("prefix", type=str, help="Prefix of the experiment folders")
+    parser.add_argument("prefix", type=str, choices=["baseline", "caching", "compression"], help="Prefix of the experiment folders")
     parser.add_argument("--remove", action="store_true", help="Remove anomaly folders")
     args = parser.parse_args()
 
-    # Load the data
+    # Load the data (will load all experiments folders and its data with the prefix)
     df, exp_dirs = utils.load_experiment_results(args.prefix, args.archetype)
 
     if df.empty:

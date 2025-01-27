@@ -194,7 +194,8 @@ if __name__ == "__main__":
     parser.add_argument("archetypes", type=str, nargs='+', choices=["ComputeToData", "DataThroughTTP"], 
                         help="The archetypes to use for the experiment (must be 'ComputeToData' and/or 'DataThroughTTP')")
     parser.add_argument("exp_reps", type=int, help="The number of times the experiment should be repeated")
-    parser.add_argument("exp_name", type=str, help="The name of the experiment (will be used in output files)")
+    parser.add_argument("exp_name", type=str, choices=["baseline", "caching", "compression"], 
+                        help="The name of the experiment (will be used in output files)")
     # Parse args
     args = parser.parse_args()
 
