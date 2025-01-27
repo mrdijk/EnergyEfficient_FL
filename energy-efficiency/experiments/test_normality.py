@@ -6,7 +6,7 @@ import utils
 
 def test_normality(df: pd.DataFrame, exp_dirs):
     # Perform Shapiro-Wilk normality test
-    columns_to_test = ['total_energy_difference', 'average_exec_time']
+    columns_to_test = ['total_energy_difference']
     not_normal = {col: 0 for col in columns_to_test}
     normal = {col: 0 for col in columns_to_test}
 
@@ -21,9 +21,10 @@ def test_normality(df: pd.DataFrame, exp_dirs):
             if p < 0.01:
                 not_normal[column] += 1
                 print(f"Not normal distribution for column: {column}")
-                print(f"Statistic (Shapiro-Wilk test): {stat}, p-value: {p}")
             else:
                 normal[column] += 1
+            # Print stastic and p-value
+            print(f"Statistic (Shapiro-Wilk test): {stat}, p-value: {p}")
         else:
             print(f"Not enough data points for normality test in column: {column}")
 
