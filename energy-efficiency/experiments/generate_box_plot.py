@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     # If all is selected, use all archetypes and set different figsize
     archetypes = ["ComputeToData", "DataThroughTTP"] if args.archetype == "all" else [args.archetype]
-    figsize = (12, 6) if args.archetype == "all" else (6, 6)
+    figsize = (10, 6) if args.archetype == "all" else (6, 6)
     # Set archetype acronyms
     archetype_acronyms = {
         "ComputeToData": "CtD", 
