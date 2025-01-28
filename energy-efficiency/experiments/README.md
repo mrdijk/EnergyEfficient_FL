@@ -62,9 +62,17 @@ python3.10 test_normality.py "DataThroughTTP" "caching"
 ```
 
 
-### Executing mean calculation
+### Executing mean calculation and others
 ```sh
 python3.10 calculate_mean.py "ComputeToData" "baseline"
 # Or with a different prefix or archetype:
 python3.10 calculate_mean.py "DataThroughTTP" "caching"
+```
+
+
+### Generate box plots
+```sh
+python3.10 generate_box_plot.py "ComputeToData" "baseline" total_energy_difference
+# Or with a different prefix or archetype:
+python3.10 generate_box_plot.py "DataThroughTTP" "caching"
 ```

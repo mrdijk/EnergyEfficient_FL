@@ -26,6 +26,8 @@ if __name__ == "__main__":
     # Load the data (will load all experiments folders and its data with the prefix)
     df, exp_dirs = utils.load_experiment_results(args.prefix, args.archetype)
 
+    # TODO: calculate average and STD.
+
     if df.empty:
         print("No data loaded. Exiting.")
     else:
