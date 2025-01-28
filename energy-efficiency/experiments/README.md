@@ -72,9 +72,10 @@ python3.10 calculate_mean.py "DataThroughTTP" "caching"
 
 ### Generate box plots
 ```sh
-python3.10 generate_box_plot.py "ComputeToData" "baseline" total_energy_difference
-# Or with a different prefix or archetype:
-python3.10 generate_box_plot.py "DataThroughTTP" "caching"
+python3.10 generate_box_plot.py "ComputeToData"
+# Or with a different archetype:
+python3.10 generate_box_plot.py "DataThroughTTP"
+python3.10 generate_box_plot.py "all"
 ```
 
 TODO: use all no option for box plot, as it should include all and only make a distinction in archetype.

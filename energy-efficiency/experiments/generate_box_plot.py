@@ -4,20 +4,21 @@ import argparse
 import utils
 import os
 
-def generate_box_plot(data_dict, column: str, archetype: str, ylabel: str, xlabel: str):
-    data = [df[column].values for df in data_dict.values()]
+def generate_box_plot(data_dict, archetype: str, figsize):
+    # Get the energy values from the df
+    data = [df["total_energy_difference"].values for df in data_dict.values()]
     labels = list(data_dict.keys())
 
     # Generate box plot for the column
     # Set the x and y sizes
-    plt.figure(figsize=(6, 6))
+    plt.figure(figsize=figsize)
     plt.boxplot(data, labels=labels)
     # No title is set now, since it is added in thesis directly
     # plt.title(f'Box Plot for {column}')
     # Change labels accordingly
-    plt.ylabel(ylabel)
-    plt.xlabel(xlabel)
-    fig_name = f'boxplot_{archetype}_{column}.png'
+    plt.ylabel("Energy consumption (J)")
+    plt.xlabel("Implementation and Archetype acronym")
+    fig_name = f'boxplot_{archetype}_energy.png'
     plt.savefig(fig_name)
     plt.close()
     # Output file location that is clickable for the user
@@ -25,29 +26,31 @@ def generate_box_plot(data_dict, column: str, archetype: str, ylabel: str, xlabe
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate box plot for energy efficiency experiment data")
-    parser.add_argument("archetype", type=str, choices=["ComputeToData", "DataThroughTTP"], 
+    parser.add_argument("archetype", type=str, choices=["ComputeToData", "DataThroughTTP", "all"], 
                         help="Archetype to generate box plot from.")
-    parser.add_argument("column", type=str, choices=["total_energy_difference", "average_exec_time"], help="Column to generate box plot for")
     args = parser.parse_args()
 
     # All prefixes, i.e. implementations
     prefixes = ["baseline", "caching", "compression"]
     data_dict = {}
 
-    # Set the labels that will be used (default is energy)
-    ylabel = "Energy consumption (J)"
-    xlabel = "Implementation"
-    # Change y label if execution time is used
-    if args.column == "average_exec_time":
-        ylabel = "Execution time (s)"
+    # If all is selected, use all archetypes and set different figsize
+    archetypes = ["ComputeToData", "DataThroughTTP"] if args.archetype == "all" else [args.archetype]
+    figsize = (10, 6) if args.archetype == "all" else (6, 6)
+    # Set archetype acronyms
+    archetype_acronyms = {
+        "ComputeToData": "CtD", 
+        "DataThroughTTP": "DtTTP"
+    }
 
-    # Load the data for each prefix
-    for prefix in prefixes:
-        df, exp_dirs = utils.load_experiment_results(prefix, args.archetype)
-        if not df.empty:
-            data_dict[prefix] = df
-        else:
-            print(f"No data loaded for prefix: {prefix}")
+    # Load the data for each prefix and archetype
+    for archetype in archetypes:
+        for prefix in prefixes:
+            df, exp_dirs = utils.load_experiment_results(prefix, archetype)
+            if not df.empty:
+                data_dict[f"{prefix}_{archetype_acronyms[archetype]}"] = df
+            else:
+                print(f"No data loaded for prefix: {prefix} and archetype: {archetype}")
 
     if not data_dict:
         print("No data loaded for any prefix. Exiting.")
@@ -55,4 +58,4 @@ if __name__ == "__main__":
         # Logging purposes
         print(f"Data dict used for box plot: {data_dict}")
         # Generate box plot
-        generate_box_plot(data_dict, args.column, args.archetype, ylabel, xlabel)
+        generate_box_plot(data_dict, args.archetype, figsize)
