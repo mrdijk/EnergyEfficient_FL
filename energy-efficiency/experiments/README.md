@@ -76,3 +76,5 @@ python3.10 generate_box_plot.py "ComputeToData" "baseline" total_energy_differen
 # Or with a different prefix or archetype:
 python3.10 generate_box_plot.py "DataThroughTTP" "caching"
 ```
+
+TODO: use all no option for box plot, as it should include all and only make a distinction in archetype.

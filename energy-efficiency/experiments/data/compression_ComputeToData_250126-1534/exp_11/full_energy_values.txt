@@ -1,0 +1,25 @@
+Idle Energy:
+system_processes: 20776.707409218398
+policy: 0
+rabbitmq: 118.14125072225431
+api-gateway: 0
+sidecar: 0
+orchestrator: 150.01866749633277
+policy-enforcer: 0
+vu: 0
+uva: 61.84274856660302
+surf: 0
+
+Active Energy:
+system_processes: 21729.584319477013
+policy: 0
+rabbitmq: 98.64728824294117
+api-gateway: 0
+sidecar: 0
+orchestrator: 111.39971332377762
+policy-enforcer: 0
+vu: 0
+uva: 70.44634821160707
+surf: 0
+sql-algorithm: 0
+sql-query: 0
