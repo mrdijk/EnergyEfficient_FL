@@ -9,8 +9,12 @@ def generate_box_plot(data_dict, archetype: str, figsize):
     data = [df["total_energy_difference"].values for df in data_dict.values()]
     labels = list(data_dict.keys())
 
+    # Modify labels if archetype is "all"
+    if archetype == "all":
+        labels = [label.replace("ComputeToData", "CtD").replace("DataThroughTTP", "DtTTP") for label in labels]
+        figsize = (12, 6)  # Wider figure size for "all" option
+
     # Generate box plot for the column
-    # Set the x and y sizes
     plt.figure(figsize=figsize)
     plt.boxplot(data, labels=labels)
     # No title is set now, since it is added in thesis directly
@@ -36,16 +40,17 @@ if __name__ == "__main__":
 
     # If all is selected, use all archetypes and set different figsize
     archetypes = ["ComputeToData", "DataThroughTTP"] if args.archetype == "all" else [args.archetype]
-    figsize = (10, 6) if args.archetype == "all" else (6, 6)
+    figsize = (12, 6) if args.archetype == "all" else (6, 6)
     # Set archetype acronyms
     archetype_acronyms = {
         "ComputeToData": "CtD", 
         "DataThroughTTP": "DtTTP"
     }
 
-    # Load the data for each prefix and archetype
-    for archetype in archetypes:
-        for prefix in prefixes:
+    # Load the data for each prefix and archetype (do prefix as the parent loop 
+    # to ensure implementations are shown next to each other)
+    for prefix in prefixes:
+        for archetype in archetypes:
             df, exp_dirs = utils.load_experiment_results(prefix, archetype)
             if not df.empty:
                 data_dict[f"{prefix}_{archetype_acronyms[archetype]}"] = df
