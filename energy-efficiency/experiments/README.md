@@ -78,3 +78,11 @@ python3.10 generate_box_plot.py "ComputeToData"
 python3.10 generate_box_plot.py "DataThroughTTP"
 python3.10 generate_box_plot.py "all"
 ```
+
+### Calculate statistics (statistical significance and effect size)
+```sh
+python3.10 calculate_significance_effect.py "ComputeToData"
+# Or with a different archetype:
+python3.10 calculate_significance_effect.py "DataThroughTTP"
+python3.10 calculate_significance_effect.py "all"
+```

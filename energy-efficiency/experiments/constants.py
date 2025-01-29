@@ -1,6 +1,7 @@
 # Experiment script values
 # All prefixes, i.e. implementations
 IMPLEMENTATIONS_PREFIXES = ["baseline", "compression", "caching"]
+OPTIMIZATIONS_PREFIXES = ["compression", "caching"]
 ARCHETYPES = ["ComputeToData", "DataThroughTTP"]
 ARCHETYPE_ACRONYMS = {
     "ComputeToData": "CtD", 

@@ -24,7 +24,6 @@ if __name__ == "__main__":
                         help="Archetype to calculate means from.")
     args = parser.parse_args()
 
-    data_dict = {}
     # If all is selected, use all archetypes
     archetypes = constants.ARCHETYPES if args.archetype == "all" else [args.archetype]
 
@@ -43,11 +42,10 @@ if __name__ == "__main__":
                 # Print results for this archetype and implementation
                 print("\n***************************************************************************")
                 print(f"Implementation: {prefix}\nArchetype: {archetype}")
-                print(f"Total number of experiment repetitions used: {total_repetitions}")
-                print(f"Energy per task: {energy_per_task}")
-                print("Means for specified columns:")
+                print(f"    Total number of experiment repetitions used: {total_repetitions}")
+                print(f"    Energy per task: {energy_per_task}")
+                print("     Means for specified columns:")
                 print(means)
                 print("\n***************************************************************************")
-                # data_dict[f"{constants.ARCHETYPE_ACRONYMS[archetype]}_prefix"] = df
             else:
                 print(f"No data loaded for prefix: {prefix} and archetype: {archetype}")
