@@ -43,3 +43,28 @@ def load_experiment_results(prefix: str, archetype: str):
 
     df_list = [pd.read_csv(file) for file in all_files]
     return pd.concat(df_list, ignore_index=True), exp_dirs
+
+
+def interpret_guilford_scale(correlation: float) -> str:
+    """
+    Interpret a correlation value using the standard Guilford scale.
+    Handles both positive and negative correlations symmetrically.
+
+    :param correlation: Correlation coefficient (range: -1.0 to 1.0)
+    :return: Interpretation string (e.g., "High positive correlation")
+    """
+    abs_corr = abs(correlation)
+
+    if abs_corr < 0.2:
+        strength = "Slight"
+    elif abs_corr < 0.4:
+        strength = "Low"
+    elif abs_corr < 0.7:
+        strength = "Moderate"
+    elif abs_corr < 0.9:
+        strength = "High"
+    else:
+        strength = "Very high"
+
+    direction = "positive" if correlation > 0 else "negative" if correlation < 0 else "neutral"
+    return f"{strength} {direction} correlation"

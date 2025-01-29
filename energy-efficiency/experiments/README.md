@@ -79,10 +79,19 @@ python3.10 generate_box_plot.py "DataThroughTTP"
 python3.10 generate_box_plot.py "all"
 ```
 
-### Calculate statistics (statistical significance and effect size)
+### Calculate statistics (statistical significance and effect size) for each optimization compared to baseline for its corresponding archetype
 ```sh
 python3.10 calculate_significance_effect.py "ComputeToData"
 # Or with a different archetype:
 python3.10 calculate_significance_effect.py "DataThroughTTP"
 python3.10 calculate_significance_effect.py "all"
+```
+
+
+### Calculate correlation between energy and time for all experiments
+```sh
+python3.10 calculate_correlation_ener_time.py "ComputeToData"
+# Or with a different archetype:
+python3.10 calculate_correlation_ener_time.py "DataThroughTTP"
+python3.10 calculate_correlation_ener_time.py "all"
 ```

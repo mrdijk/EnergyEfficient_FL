@@ -28,7 +28,7 @@ if __name__ == "__main__":
     archetypes = constants.ARCHETYPES if args.archetype == "all" else [args.archetype]
 
     # Load the data for each prefix and archetype (do archetype as the parent loop 
-    # to ensure implementations are shown next to each other)
+    # to ensure each implementation of the first archetype is shown first and then the second archetype)
     for archetype in archetypes:
         for prefix in constants.IMPLEMENTATIONS_PREFIXES:
             # Load the data (will load all experiments folders and its data with the prefix)

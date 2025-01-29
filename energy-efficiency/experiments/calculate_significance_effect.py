@@ -35,12 +35,15 @@ def test_statistical_significance(df_baseline: pd.DataFrame, df_opt: pd.DataFram
 
             # Compute Rank Biserial Correlation for effect size
             rbc = calculate_rank_biserial(u_stat, len(df_baseline), len(df_opt))
+            # Interpret correlation strength using helper function for the scale
+            strength = utils.interpret_guilford_scale(rbc)
 
             # Print results for this optimization
             print(f"\nComparison: {optimization} vs. baseline and {archetype} for {column}")
             print(f"    Mann-Whitney U Statistic: {u_stat}")
             print(f"    p-value: {p_value} {'(Significant)' if p_value < 0.05 else '(Not Significant)'}")
             print(f"    Rank Biserial Correlation (Effect Size): {rbc}")
+            print(f"    Strength: {strength}")
         else:
             print(f"\nNot enough data for Mann-Whitney U test for {optimization} and {archetype} on {column}")
 
