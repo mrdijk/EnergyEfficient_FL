@@ -62,11 +62,12 @@ python3.10 test_normality.py "DataThroughTTP" "caching"
 ```
 
 
-### Executing mean calculation and others
+### Executing mean calculations
 ```sh
-python3.10 calculate_mean.py "ComputeToData" "baseline"
-# Or with a different prefix or archetype:
-python3.10 calculate_mean.py "DataThroughTTP" "caching"
+python3.10 calculate_mean.py "ComputeToData"
+# Or with a different archetype:
+python3.10 calculate_mean.py "DataThroughTTP"
+python3.10 calculate_mean.py "all"
 ```
 
 
@@ -77,5 +78,3 @@ python3.10 generate_box_plot.py "ComputeToData"
 python3.10 generate_box_plot.py "DataThroughTTP"
 python3.10 generate_box_plot.py "all"
 ```
-
-TODO: use all no option for box plot, as it should include all and only make a distinction in archetype.

@@ -1,3 +1,12 @@
+# Experiment script values
+# All prefixes, i.e. implementations
+IMPLEMENTATIONS_PREFIXES = ["baseline", "compression", "caching"]
+ARCHETYPES = ["ComputeToData", "DataThroughTTP"]
+ARCHETYPE_ACRONYMS = {
+    "ComputeToData": "CtD", 
+    "DataThroughTTP": "DtTTP"
+}
+
 # Prometheus 
 PROMETHEUS_URL = "http://localhost:9090"
 PROM_CONTAINERS = "{container_name=~\"system_processes|uva|vu|surf|sql.*|policy.*|orchestrator|sidecar|rabbitmq|api-gateway\"}"

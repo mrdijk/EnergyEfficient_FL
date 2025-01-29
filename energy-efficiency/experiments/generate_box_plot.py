@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import argparse
 import utils
 import os
+import constants
 
 def generate_box_plot(data_dict, archetype: str, figsize):
     # Get the energy values from the df
@@ -29,26 +30,20 @@ if __name__ == "__main__":
                         help="Archetype to generate box plot from.")
     args = parser.parse_args()
 
-    # All prefixes, i.e. implementations
-    prefixes = ["baseline", "caching", "compression"]
     data_dict = {}
 
     # If all is selected, use all archetypes and set different figsize
-    archetypes = ["ComputeToData", "DataThroughTTP"] if args.archetype == "all" else [args.archetype]
-    figsize = (10, 6) if args.archetype == "all" else (6, 6)
-    # Set archetype acronyms
-    archetype_acronyms = {
-        "ComputeToData": "CtD", 
-        "DataThroughTTP": "DtTTP"
-    }
+    archetypes = constants.ARCHETYPES if args.archetype == "all" else [args.archetype]
+    figsize = (10, 6) if args.archetype == "all" else (6, 6)    
 
     # Load the data for each prefix and archetype (do prefix as the parent loop 
     # to ensure implementations are shown next to each other)
-    for prefix in prefixes:
+    for prefix in constants.IMPLEMENTATIONS_PREFIXES:
         for archetype in archetypes:
+            # Load the data (will load all experiments folders and its data with the prefix)
             df, exp_dirs = utils.load_experiment_results(prefix, archetype)
             if not df.empty:
-                data_dict[f"{prefix}_{archetype_acronyms[archetype]}"] = df
+                data_dict[f"{prefix}_{constants.ARCHETYPE_ACRONYMS[archetype]}"] = df
             else:
                 print(f"No data loaded for prefix: {prefix} and archetype: {archetype}")
 

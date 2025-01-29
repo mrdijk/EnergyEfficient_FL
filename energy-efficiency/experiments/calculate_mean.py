@@ -20,24 +20,34 @@ def calculate_means(df: pd.DataFrame):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run energy efficiency experiment")
-    parser.add_argument("archetype", type=str, choices=["ComputeToData", "DataThroughTTP"], 
-                        help="Archetype to detect anomalies from.")
-    parser.add_argument("prefix", type=str, choices=["baseline", "caching", "compression"], help="Prefix of the experiment folders")
+    parser.add_argument("archetype", type=str, choices=["ComputeToData", "DataThroughTTP", "all"], 
+                        help="Archetype to calculate means from.")
     args = parser.parse_args()
 
-    # Load the data (will load all experiments folders and its data with the prefix)
-    df, exp_dirs = utils.load_experiment_results(args.prefix, args.archetype)
+    data_dict = {}
+    # If all is selected, use all archetypes
+    archetypes = constants.ARCHETYPES if args.archetype == "all" else [args.archetype]
 
-    # TODO: calculate average and STD.
-
-    if df.empty:
-        print("No data loaded. Exiting.")
-    else:
-        # Print results
-        total_runs = len(df)
-        means = calculate_means(df)
-        energy_per_task = means["total_energy_difference"] / constants.NUM_EXP_ACTIONS
-        print(f"Total number of runs used: {total_runs}")
-        print("Means for specified columns:")
-        print(means)
-        print(f"Energy per task: {energy_per_task}")
+    # Load the data for each prefix and archetype (do archetype as the parent loop 
+    # to ensure implementations are shown next to each other)
+    for archetype in archetypes:
+        for prefix in constants.IMPLEMENTATIONS_PREFIXES:
+            # Load the data (will load all experiments folders and its data with the prefix)
+            df, exp_dirs = utils.load_experiment_results(prefix, archetype)
+            # If data is not empty, calculate the mean values
+            if not df.empty:
+                # Calculate results
+                total_repetitions = len(df)
+                means = calculate_means(df)
+                energy_per_task = means["total_energy_difference"] / constants.NUM_EXP_ACTIONS
+                # Print results for this archetype and implementation
+                print("\n***************************************************************************")
+                print(f"Implementation: {prefix}\nArchetype: {archetype}")
+                print(f"Total number of experiment repetitions used: {total_repetitions}")
+                print(f"Energy per task: {energy_per_task}")
+                print("Means for specified columns:")
+                print(means)
+                print("\n***************************************************************************")
+                # data_dict[f"{constants.ARCHETYPE_ACRONYMS[archetype]}_prefix"] = df
+            else:
+                print(f"No data loaded for prefix: {prefix} and archetype: {archetype}")
