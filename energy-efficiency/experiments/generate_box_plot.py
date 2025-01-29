@@ -9,11 +9,6 @@ def generate_box_plot(data_dict, archetype: str, figsize):
     data = [df["total_energy_difference"].values for df in data_dict.values()]
     labels = list(data_dict.keys())
 
-    # Modify labels if archetype is "all"
-    if archetype == "all":
-        labels = [label.replace("ComputeToData", "CtD").replace("DataThroughTTP", "DtTTP") for label in labels]
-        figsize = (12, 6)  # Wider figure size for "all" option
-
     # Generate box plot for the column
     plt.figure(figsize=figsize)
     plt.boxplot(data, labels=labels)

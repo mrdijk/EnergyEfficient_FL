@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import argparse
 import utils
+import constants
 
 # Calculate the mean for specified columns
 def calculate_means(df: pd.DataFrame):
@@ -15,6 +16,7 @@ def calculate_means(df: pd.DataFrame):
     # Calculate the mean values
     means = df[columns_to_calculate].mean()
     return means
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run energy efficiency experiment")
@@ -34,6 +36,8 @@ if __name__ == "__main__":
         # Print results
         total_runs = len(df)
         means = calculate_means(df)
+        energy_per_task = means["total_energy_difference"] / constants.NUM_EXP_ACTIONS
         print(f"Total number of runs used: {total_runs}")
         print("Means for specified columns:")
         print(means)
+        print(f"Energy per task: {energy_per_task}")
