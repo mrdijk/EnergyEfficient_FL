@@ -40,6 +40,7 @@ def display_results(baseline_means_df: pd.DataFrame, means_df: pd.DataFrame, tot
     print(f"    Energy per task: {energy_per_task}")
     print("     Means for all columns:")
     print(means_df)
+    # Show differences, with main first to show the difference with main
     print(f"    Mean energy difference with baseline: {calculate_difference_percentage(baseline_means_df['total_energy_difference'], means_df['total_energy_difference'])}%")
     print(f"    Mean exec time difference with baseline: {calculate_difference_percentage(baseline_means_df['average_exec_time'], means_df['average_exec_time'])}%")
     print("\n***************************************************************************")

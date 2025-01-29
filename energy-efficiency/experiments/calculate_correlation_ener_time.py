@@ -53,8 +53,8 @@ if __name__ == "__main__":
     if all_dfs:
         combined_df = pd.concat(all_dfs, ignore_index=True)
         # Logging purposes
-        print(f"Combined df: {combined_df}")
-        print(f"Length of df: {len(combined_df)}")
+        # print(f"Combined df: {combined_df}")
+        # print(f"Length of df: {len(combined_df)}")
         # Perform Kendall Tau correlation test on the combined DataFrame
         test_kendall_tau(combined_df, args.archetype)
     else:
