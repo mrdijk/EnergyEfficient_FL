@@ -62,7 +62,7 @@ python3.10 test_normality.py "DataThroughTTP" "caching"
 ```
 
 
-### Executing mean calculations
+### Executing mean calculations and display means and differences
 ```sh
 python3.10 calculate_mean.py "ComputeToData"
 # Or with a different archetype:
