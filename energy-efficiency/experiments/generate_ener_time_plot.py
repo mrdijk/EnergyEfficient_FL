@@ -25,7 +25,7 @@ def generate_scatter_plot(data_dict, archetype: str, figsize, use_mean: bool):
     plt.xlabel(xlabel)
     plt.ylabel("Energy Consumption (J)")
     plt.legend()
-    fig_name = f'scatter_plot_{archetype}.png'
+    fig_name = f'scatter_plot_{archetype}_mean.png' if use_mean else f'scatter_plot_{archetype}.png'
     plt.savefig(fig_name)
     plt.close()
     # Output file location that is clickable for the user
