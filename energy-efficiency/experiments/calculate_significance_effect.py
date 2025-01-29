@@ -30,7 +30,8 @@ def test_statistical_significance(df_baseline: pd.DataFrame, df_opt: pd.DataFram
         # Ensure both groups have enough data points
         if len(df_baseline) >= 3 and len(df_opt) >= 3:
             # Calculate values using Mann Whitney U test for statistical significance
-            # u_stat, p_value = mannwhitneyu(df_baseline[column], df_opt[column], alternative='two-sided')
+            # Use optimization as the first one, as we want to know the difference it has on the baseline
+            # Use two-sided MWU test
             u_stat, p_value = mannwhitneyu(df_opt[column], df_baseline[column], alternative='two-sided')
 
             # Compute Rank Biserial Correlation for effect size
