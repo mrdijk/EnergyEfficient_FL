@@ -61,4 +61,4 @@ if __name__ == "__main__":
         # Logging purposes
         # print(f"Data dict used for scatter plot: {data_dict}")
         # Generate scatter plot
-        generate_scatter_plot(data_dict, args.archetype, figsize, args.use_mean)
+        generate_scatter_plot(data_dict, args.archetype, figsize, args.mean)
