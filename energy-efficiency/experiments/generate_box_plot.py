@@ -51,6 +51,6 @@ if __name__ == "__main__":
         print("No data loaded for any prefix. Exiting.")
     else:
         # Logging purposes
-        print(f"Data dict used for box plot: {data_dict}")
+        # print(f"Data dict used for box plot: {data_dict}")
         # Generate box plot
         generate_box_plot(data_dict, args.archetype, figsize)

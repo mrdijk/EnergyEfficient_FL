@@ -70,7 +70,6 @@ python3.10 calculate_mean.py "DataThroughTTP"
 python3.10 calculate_mean.py "all"
 ```
 
-
 ### Generate box plots
 ```sh
 python3.10 generate_box_plot.py "ComputeToData"
@@ -87,11 +86,20 @@ python3.10 calculate_significance_effect.py "DataThroughTTP"
 python3.10 calculate_significance_effect.py "all"
 ```
 
-
 ### Calculate correlation between energy and time for all experiments
 ```sh
 python3.10 calculate_correlation_ener_time.py "ComputeToData"
 # Or with a different archetype:
 python3.10 calculate_correlation_ener_time.py "DataThroughTTP"
 python3.10 calculate_correlation_ener_time.py "all"
+```
+
+### Generate energy and time plots
+```sh
+python3.10 generate_ener_time_plot.py "ComputeToData"
+# Or with a different archetype:
+python3.10 generate_ener_time_plot.py "DataThroughTTP"
+python3.10 generate_ener_time_plot.py "all"
+# Or use the --mean flag to use mean values
+python3.10 generate_ener_time_plot.py "all" --mean
 ```
