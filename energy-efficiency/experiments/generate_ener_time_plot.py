@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     # If all is selected, use all archetypes and set different figsize
     archetypes = constants.ARCHETYPES if args.archetype == "all" else [args.archetype]
-    figsize = (8, 6) if args.archetype == "all" else (6, 6)    
+    figsize = (8, 6)    
 
     # Load the data for each prefix and archetype (do prefix as the parent loop 
     # to ensure implementations are shown next to each other)
