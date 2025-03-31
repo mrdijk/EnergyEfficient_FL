@@ -12,4 +12,5 @@ TODO: add here the sequence of notebooks:
 
 1. Configure and validate the FABRIC environment and project to be used: [configure_and_validate.ipynb](./notebooks/configure_and_validate.ipynb)
 2. Create a slice with the nodes to be used: [create_slice.ipynb](./notebooks/create_slice.ipynb)
+3. TODO: specific Kubernetes notebook to setup the cluster, including DYNAMOS setup and energy efficiency setups, etc.
 TODO: next is probably to configure the nodes in other notebooks.
