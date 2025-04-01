@@ -84,7 +84,16 @@ linkerd version
 ```
 
 ## Install Brew on WSL
-Use this guide: https://docs.brew.sh/Homebrew-on-Linux
+Follow this guide: https://docs.brew.sh/Homebrew-on-Linux. The command for linux can be found here: https://brew.sh/
+
+At the time of making this it was the following command (but see the guide for the latest version, as this might have changed):
+```sh
+# Install homebrew on linux
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# After installing it, follow the next steps shown in the terminal
+# Verify installation 
+brew install hello
+```
 
 ## Install k9s for WSL (optional)
 Use this guide: https://k9scli.io/topics/install/
