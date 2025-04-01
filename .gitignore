@@ -111,3 +111,5 @@ datasets/*.csv
 
 # Kubespray
 kubespray*
+# FABRIC config
+fabric_config

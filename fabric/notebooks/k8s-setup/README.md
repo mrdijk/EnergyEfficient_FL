@@ -22,4 +22,10 @@ pip3 install  -r ./requirements.txt
 
 # Set up your inventory for your cluster (will create files in fabric/kubespray/inventory/x)
 cp -rfp inventory/sample inventory/dynamos-cluster
+# Then add the inventory.ini file in the created dynamos-cluster folder. The k8s_setup.ipynb notebook gets the necessary information
+
+# Then after adding the inventory file, execute the playbook to configure the cluster
+ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/private_key
+# TODO: now working on SSH access, and continue locally
+# TODO: key required for SSH access is probably the slice_key OR something else from /fabric_config, such as fabric_bastion_key, test that!
 ```
