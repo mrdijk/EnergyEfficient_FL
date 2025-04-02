@@ -32,16 +32,15 @@ cd fabric/kubespray
 cp -rfp inventory/sample inventory/dynamos-cluster
 # Then add the inventory.ini file in the created dynamos-cluster folder. The k8s_setup.ipynb notebook gets the necessary information
 
-# Then after adding the inventory file, execute the playbook to configure the cluster
-# TODO: this needs to be bastion key? See k8s-setup.ipynb
+# Configure the Ansible config file (by default it does not allow it in the working directory: https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir)
+# For example:
+export ANSIBLE_CONFIG=/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/fabric/kubespray/ansible.cfg
+
+# Then execute the playbook to configure the cluster, this takes a while to execute, the more nodes the longer it takes
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/fabric_bastion_key
+# TODO: test this now and see the results and fix any problems
+# TODO: this needs to be bastion key? See k8s-setup.ipynb
 # TODO: now working on SSH access, and continue locally
 # TODO: key required for SSH access is probably the slice_key OR something else from /fabric_config, such as fabric_bastion_key, test that!
-
-TODO: set env var, see:
-https://docs.ansible.com/ansible/devel/reference_appendices/config.html#envvar-ANSIBLE_CONFIG
-to set the env var, and then run the ansible command above
-
-# TODO: maybe make a venv as described in kubespray documentation?
 
 ```
