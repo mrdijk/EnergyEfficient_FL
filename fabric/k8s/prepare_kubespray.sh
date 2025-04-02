@@ -29,7 +29,7 @@ rm -rf test-infra tests # Tests not necessary
 # Git specific files
 rm -f .gitattributes .gitignore .gitlab-ci.yml .gitmodules .pre-commit-config.yaml
 # Remove lint and style files
-rm -f .ansible-lint .ansible-lint-ignore .md_style.rb .mdlrc .nojekyll .yamllint
+rm -f .ansible-lint .ansible-lint-ignore .editorconfig .md_style.rb .mdlrc .nojekyll .yamllint
 # License and other docs files not necessary
 rm -f CHANGELOG.MD code-of-conduct.md CONTRIBUTING.md OWNERS OWNERS_ALIASES README.md RELEASE.MD LICENSE SECURITY_CONTACTS
 # Other files
