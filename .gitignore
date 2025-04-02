@@ -109,7 +109,5 @@ datasets/*.csv
 *.drawio.bkp
 *.drawio.dtmp
 
-# Kubespray
-kubespray*
 # FABRIC config
 fabric_config
