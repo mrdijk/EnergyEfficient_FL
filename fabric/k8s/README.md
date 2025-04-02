@@ -15,6 +15,7 @@ cd fabric
 
 # Use custom script to prepare kubespray, fetching the code from GitHub and cleaning up unnecessary files
 ./k8s/prepare_kubespray.sh
+# TODO: now added manually, test the new script now.
 ```
 Now, when you want a new Kubespray version you can follow these steps again, but keep in mind that the local changes might get lost, so make a copy of those before doing this script.  Also, keep in mind that the script is specific for a version of Kubespray, files may be renamed or added, etc., so the script section removing files may need to be slightly altered when updating versions.
 

@@ -17,7 +17,7 @@ git checkout release-2.27
 # Step 3: Install Python dependencies (installs Ansible, etc.)
 pip3 install -r requirements.txt
 
-# ================================= Step 4: Clean up unnecessary files =================================
+# ================================= Step 3: Clean up unnecessary files =================================
 # (-rf is -r for recursive to delete folders and -f to force delete)
 rm -rf .git # Git file with a lot of Git related files that are not necessary
 rm -rf docs # Docs is not necessary, can be viewed here: https://github.com/kubernetes-sigs/kubespray
@@ -26,10 +26,7 @@ rm -rf contrib # Contributing not necessary
 rm -rf logo # Logo images not necessary
 rm -rf scripts # Scripts not necessary
 rm -rf test-infra tests # Tests not necessary
-# Remove extra playbooks, causes errors based on the links in GitHub and not necessary in our case
-# (see https://github.com/kubernetes-sigs/kubespray/tree/master/extra_playbooks), logs from Git push:
-# error: open("fabric/kubespray/extra_playbooks/inventory"): Invalid argument error: unable to index file 'fabric/kubespray/extra_playbooks/inventory' fatal: adding files failed
-rm -rf extra_playbooks
+rm -rf extra_playbooks # Extra playbooks not necessary
 
 # Delete specific files that are not necessary
 # Git specific files
@@ -40,6 +37,38 @@ rm -f .ansible-lint .ansible-lint-ignore .editorconfig .md_style.rb .mdlrc .noje
 rm -f CHANGELOG.MD code-of-conduct.md CONTRIBUTING.md OWNERS OWNERS_ALIASES README.md RELEASE.MD LICENSE SECURITY_CONTACTS
 # Other files
 rm -f index.html
+
+# ================================= Step 4: Replace symbolic links with their targets =================================
+# This step is done after removing unnecessary files to avoid doing unnecessary additional operations of symlinks for removed files.
+
+# Sybolic links can cause problems (this is used in Kubespray, such as: https://github.com/kubernetes-sigs/kubespray/blob/release-2.27/extra_playbooks/inventory)
+# It is used to refer to files, mainly in Linux environments, to avoid copying them. This resulted in errors, such as:
+# error: open("fabric/kubespray/extra_playbooks/inventory"): Invalid argument 
+# error: unable to index file 'fabric/kubespray/extra_playbooks/inventory' 
+# fatal: adding files failed
+
+# Therefore, we find them and replace them with their target files with these commands
+# Enable symlink in git
+git config --global core.symlinks true
+# Find all symbolic links and replace them with their actual content
+find . -type l | while read symlink; do
+    target=$(readlink "$symlink")                       # Relative target of the symlink
+    symlink_dir=$(dirname "$symlink")                  # Directory where the symlink lives
+    absolute_target=$(realpath "$symlink_dir/$target") # Full path to the target
+    resolved_symlink=$(realpath -m "$target")         # Where it will copy to
+
+    rm "$symlink"  # Remove the symlink
+
+    if [ -d "$absolute_target" ]; then
+        cp -a "$absolute_target" "$resolved_symlink"
+        echo "Replaced directory symlink $symlink with copy of $absolute_target"
+    else
+        cp "$absolute_target" "$resolved_symlink"
+        echo "Replaced file symlink $symlink with copy of $absolute_target"
+    fi
+done
+# TODO: now working but paths are not correct: cp: cannot create directory '/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/fabric/sample/group_vars': No such file or directory
+# TODO: test and commit when working.
 
 # ================================= Display result message =================================
 echo "Kubespray prepared and cleaned. Now you can configure it and use it to manage and configure the Kubernetes cluster."
