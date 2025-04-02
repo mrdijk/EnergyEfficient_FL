@@ -108,6 +108,3 @@ datasets/*.csv
 
 *.drawio.bkp
 *.drawio.dtmp
-
-# FABRIC config
-fabric_config

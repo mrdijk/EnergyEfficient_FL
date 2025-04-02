@@ -25,21 +25,23 @@ TODO: explain here to use the k8s-setup.ipynb notebook first.
 
 In a Linux terminal (e.g. WSL), execute the following commands to use Kubespray to setup the Kubernetes cluster:
 ```sh
+# Go into the kubespray directory
+cd fabric/kubespray
+
 # Set up your inventory for your cluster (will create files in fabric/kubespray/inventory/x)
 cp -rfp inventory/sample inventory/dynamos-cluster
 # Then add the inventory.ini file in the created dynamos-cluster folder. The k8s_setup.ipynb notebook gets the necessary information
 
 # Then after adding the inventory file, execute the playbook to configure the cluster
 # TODO: this needs to be bastion key? See k8s-setup.ipynb
-ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/private_key
+ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/fabric_bastion_key
 # TODO: now working on SSH access, and continue locally
 # TODO: key required for SSH access is probably the slice_key OR something else from /fabric_config, such as fabric_bastion_key, test that!
-[kube_control_plane]
-node1 ansible_host=10.30.6.64 ip=10.30.6.64 etcd_member_name=etcd1
 
-[etcd:children]
-kube_control_plane
+TODO: set env var, see:
+https://docs.ansible.com/ansible/devel/reference_appendices/config.html#envvar-ANSIBLE_CONFIG
+to set the env var, and then run the ansible command above
 
-[kube_node]
-node2 ansible_host=10.30.6.154 ip=10.30.6.154
+# TODO: maybe make a venv as described in kubespray documentation?
+
 ```
