@@ -14,7 +14,8 @@ cd fabric
 
 # TODO use script here instead of manual commands
 # TODO: explain if you want to use a new version, you can follow these steps again, but keep in mind that the local changes might get lost, so make a copy of those before doing this script.
-./notebooks/k8s-setup/prepare_kubespray.sh
+./k8s-setup/prepare_kubespray.sh
+# TODO: change to correct path when cleaned up fabric folder a bit and test again.
 
 # Set up your inventory for your cluster (will create files in fabric/kubespray/inventory/x)
 cp -rfp inventory/sample inventory/dynamos-cluster
