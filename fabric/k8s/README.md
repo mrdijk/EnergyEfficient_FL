@@ -7,16 +7,24 @@ TODO: explain here how to do that.
 
 
 ## Configure Kubernetes environment
-In a Linux terminal (e.g. WSL), execute the following commands:
+### Preparing Kubespary
+In a Linux terminal (e.g. WSL), execute the following commands to prepare Kubespray for usage:
 ```sh
 # Navigate to the fabric folder
 cd fabric
 
-# TODO use script here instead of manual commands
-# TODO: explain if you want to use a new version, you can follow these steps again, but keep in mind that the local changes might get lost, so make a copy of those before doing this script.
-./k8s-setup/prepare_kubespray.sh
-# TODO: change to correct path when cleaned up fabric folder a bit and test again.
+# Use custom script to prepare kubespray, fetching the code from GitHub and cleaning up unnecessary files
+./k8s/prepare_kubespray.sh
+```
+Now, when you want a new Kubespray version you can follow these steps again, but keep in mind that the local changes might get lost, so make a copy of those before doing this script. 
 
+This seutp allows for easily configuring Kubespray with only the necessary files and saving changes in this GitHub repository for this project without interference or more manual steps to set it up in the future, etc.
+
+### Using Kubespray
+TODO: explain here to use the k8s-setup.ipynb notebook first.
+
+In a Linux terminal (e.g. WSL), execute the following commands to use Kubespray to setup the Kubernetes cluster:
+```sh
 # Set up your inventory for your cluster (will create files in fabric/kubespray/inventory/x)
 cp -rfp inventory/sample inventory/dynamos-cluster
 # Then add the inventory.ini file in the created dynamos-cluster folder. The k8s_setup.ipynb notebook gets the necessary information
