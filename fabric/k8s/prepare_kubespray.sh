@@ -52,23 +52,23 @@ rm -f index.html
 git config --global core.symlinks true
 # Find all symbolic links and replace them with their actual content
 find . -type l | while read symlink; do
-    target=$(readlink "$symlink")                       # Relative target of the symlink
-    symlink_dir=$(dirname "$symlink")                  # Directory where the symlink lives
-    absolute_target=$(realpath "$symlink_dir/$target") # Full path to the target
-    resolved_symlink=$(realpath -m "$target")         # Where it will copy to
+    target=$(readlink "$symlink")
+    symlink_dir=$(dirname "$symlink")
+    absolute_target=$(realpath "$symlink_dir/$target")
 
-    rm "$symlink"  # Remove the symlink
+    echo "[INFO] $symlink → $target"
+    echo "[INFO] Copying from $absolute_target to $symlink"
+
+    rm "$symlink"
 
     if [ -d "$absolute_target" ]; then
-        cp -a "$absolute_target" "$resolved_symlink"
-        echo "Replaced directory symlink $symlink with copy of $absolute_target"
+        cp -a "$absolute_target" "$symlink"
+        echo "Replaced directory symlink $symlink with directory copy of $absolute_target"
     else
-        cp "$absolute_target" "$resolved_symlink"
-        echo "Replaced file symlink $symlink with copy of $absolute_target"
+        cp "$absolute_target" "$symlink"
+        echo "Replaced file symlink $symlink with file copy of $absolute_target"
     fi
 done
-# TODO: now working but paths are not correct: cp: cannot create directory '/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/fabric/sample/group_vars': No such file or directory
-# TODO: test and commit when working.
 
 # ================================= Display result message =================================
 echo "Kubespray prepared and cleaned. Now you can configure it and use it to manage and configure the Kubernetes cluster."
