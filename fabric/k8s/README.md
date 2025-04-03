@@ -5,6 +5,18 @@ Note: this guide used WSL for the underlying testing and validation.
 
 TODO: explain here how to do that.
 
+## SSH 
+You can configure SSH to access the VMs by following the steps in the k8s-setup.ipynb notebook file. 
+
+### Test root access
+To test root access, run the following commands:
+```sh
+# After SSH access into the VM, run:
+sudo whoami
+# If it returns the following for example it means you have root access, meaning the ubuntu VM has passwordless sudo working correctly on the node:
+ubuntu@Node2:~$ sudo whoami
+root
+``` 
 
 ## Configure Kubernetes environment
 ### Preparing Kubespary
@@ -35,12 +47,17 @@ cp -rfp inventory/sample inventory/dynamos-cluster
 # Configure the Ansible config file (by default it does not allow it in the working directory: https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir)
 # For example:
 export ANSIBLE_CONFIG=/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/fabric/kubespray/ansible.cfg
+# Otherwise, it will give the warning: 
+[WARNING]: Ansible is being run in a world writable directory
+(/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/fabric/kubespray), ignoring it as an ansible.cfg source. For more
+information see https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir
+# Resulting in ERROR! the role 'kubespray-defaults' was not found
 
 # Then execute the playbook to configure the cluster, this takes a while to execute, the more nodes the longer it takes
+# -b: Tells Ansible to use become (i.e., use sudo) for privilege escalation on remote machines
+# -v: Runs in verbose mode, showing more output (you can add more vs for even more detail, like -vv or -vvv)
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/fabric_bastion_key
-# TODO: test this now and see the results and fix any problems
-# TODO: this needs to be bastion key? See k8s-setup.ipynb
-# TODO: now working on SSH access, and continue locally
-# TODO: key required for SSH access is probably the slice_key OR something else from /fabric_config, such as fabric_bastion_key, test that!
+# TODO: problem is that Ansible now does not use a bastion correctly yet, that is the difference when I connect with SSH from a command line and executing the above Ansible script.
+# TODO: now added the ssh_config, but it still does not see that bastion.
 
 ```
