@@ -56,8 +56,9 @@ information see https://docs.ansible.com/ansible/devel/reference_appendices/conf
 # Then execute the playbook to configure the cluster, this takes a while to execute, the more nodes the longer it takes
 # -b: Tells Ansible to use become (i.e., use sudo) for privilege escalation on remote machines
 # -v: Runs in verbose mode, showing more output (you can add more vs for even more detail, like -vv or -vvv)
-ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/fabric_bastion_key
+ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/slice_key
 # TODO: problem is that Ansible now does not use a bastion correctly yet, that is the difference when I connect with SSH from a command line and executing the above Ansible script.
+# TODO: add that in explanation.
 # TODO: now added the ssh_config, but it still does not see that bastion.
 
 ```
