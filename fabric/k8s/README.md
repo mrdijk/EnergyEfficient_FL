@@ -76,20 +76,26 @@ information see https://docs.ansible.com/ansible/devel/reference_appendices/conf
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu
 # Next, you can follow the subsequent step in the k8s_setup.ipynb notebook
 
+# You can run the above command with some modifications to test variables, such as:
+# This command is used to test if a variable is loaded from the group_vars in the inventory file (change node1 to something else, such as etcd) 
+ansible -i inventory/dynamos-cluster/inventory.ini node1 \
+  -m debug -a "var=etcd_listen_client_urls" \
+  --private-key=~/.ssh/slice_key
+# TODO: test
+
 # If things fail and you need to fix that in between, use the reset.yml to reset the cluster first before trying again the above command
 # This is because if some things failed mid-deploy, such as etcd, it might conflict/skip important files, etc.
 # This automatically prompts yes to continue without manual intervention required
-ansible-playbook -i inventory/dynamos-cluster/inventory.ini reset.yml -b -v \
-  --private-key=~/.ssh/slice_key -u ubuntu \
-  -e reset_confirmation=yes
+ansible-playbook -i inventory/dynamos-cluster/inventory.ini reset.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu -e reset_confirmation=yes
 
 # TODO: now it works mostly, only error now:
 TASK [etcd : Configure | Ensure etcd is running] ********************************************************************************************************************************************
 fatal: [node1]: FAILED! => {"changed": false, "msg": "Unable to start service etcd: Job for etcd.service failed because the control process exited with error code.\nSee \"systemctl status etcd.service\" and \"journalctl -xe\" for details.\n"}
 ```
 
-#### Troubleshooting
-etcd problems:
+### Troubleshooting
+#### etcd problems:
+If you encounter problems with etcd, such as during kubespray cluster configuration, these steps might help:
 ```sh
 # SSH into the control plane using the SSH command from earlier for node1
 
@@ -103,6 +109,13 @@ sudo cat /etc/systemd/system/etcd.service
 
 # Examples:
 {"level":"warn","ts":"2025-04-04T09:31:28.416172Z","caller":"etcdmain/etcd.go:75","msg":"failed to verify flags","error":"invalid value \"https://2001:610:2d0:fabc:f816:3eff:fe65:a464:2380\" for ETCD_LISTEN_PEER_URLS: URL address does not have the form \"host:port\": https://2001:610:2d0:fabc:f816:3eff:fe65:a464:2380"}
-# Fix: add TODO
+# Fix: added to kubespray/inventory/dynamos-cluster/group_vars//etcd/k8s-cluster.yml some additions to allow correct read of IPv6 address:
+# In FABRIC, we use IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464
+# So the IP has to be enclosed in [], using the ip address value from the .ini file, otherwise it will cause errors for etcd
+etcd_listen_client_urls: "https://[{{ ip }}]:2379"
+etcd_advertise_client_urls: "https://[{{ ip }}]:2379"
+etcd_listen_peer_urls: "https://[{{ ip }}]:2380"
+etcd_initial_advertise_peer_urls: "https://[{{ ip }}]:2380"
+# TODO: did that work?
 ```
 
