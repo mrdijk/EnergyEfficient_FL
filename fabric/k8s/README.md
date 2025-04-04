@@ -33,7 +33,20 @@ Now, when you want a new Kubespray version you can follow these steps again, but
 This seutp allows for easily configuring Kubespray with only the necessary files and saving changes in this GitHub repository for this project without interference or more manual steps to set it up in the future, etc.
 
 ### Using Kubespray
-TODO: explain here to use the k8s-setup.ipynb notebook first.
+TODO: explain here to use the k8s-setup.ipynb notebook first to run the SSH setup.
+
+Then verify a few steps before doing the following steps:
+```sh
+# Verify you can ssh into all the nodes (or a subset is also enough), using the commands provided from the Notebook step (see steps in notebook), such as:
+ssh -i ~/.ssh/slice_key -F ssh_config ubuntu@2001:610:2d0:fabc:f816:3eff:fe65:a464
+# Inside each node, test if they can reach the other two nodes with the IP address, such as:
+ping 2001:610:2d0:fabc:f816:3eff:fe65:a464
+# It works if you receive results, such as "64 bytes from 2001:610:2d0:fabc:f816:3eff:fe95:d90f: icmp_seq=1 ttl=64 time=0.402 ms" 
+# You can use ctrl+c to exit
+# Note: IPv4 will probably not work in FABRIC, such as:
+ping 10.30.6.107
+# This will likely give nothing back and timeout eventually
+```
 
 In a Linux terminal (e.g. WSL), execute the following commands to use Kubespray to setup the Kubernetes cluster:
 ```sh
@@ -43,6 +56,7 @@ cd fabric/kubespray
 # Set up your inventory for your cluster (will create files in fabric/kubespray/inventory/x)
 cp -rfp inventory/sample inventory/dynamos-cluster
 # Then add the inventory.ini file in the created dynamos-cluster folder. The k8s_setup.ipynb notebook gets the necessary information
+# It is important to use the correct IPs: the IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464, since it is not reachable with the IPv4 in FABRIC.
 
 # Configure the Ansible config file (by default it does not allow it in the working directory: https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir)
 # For example:
@@ -60,11 +74,15 @@ information see https://docs.ansible.com/ansible/devel/reference_appendices/conf
 # TODO: update documentation here
 # Use username ubuntu (-u), this is the same as the local ssh command used to log into the VM
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu
-# TODO: now the connection works and the cluster.yml is executing, still need to test if it now does everything correctly after executing
+# TODO: now the connection works and the cluster.yml is executing, but nodes not connected, now try with new IPv6
 # TODO: then run next step to check the nodes with the script
 
 TODO: Update: now used ip address with local SSH and that also times out and does not work. So, now tried to mimic SSH command with IPv6 for ansible_host, such as:
 node1 ansible_host=2001:610:2d0:fabc:f816:3eff:fe65:a464 ip=10.30.6.111 etcd_member_name=etcd1
+# TODO: now run again with IPv6 in inventory
+
+
+# TODO: before changing ip to also the IPv6:
 TODO: Did get these fatal errors in the process, but it continued, might not be that important:
 # TASK [kubernetes/node : Modprobe conntrack module] ******************************************************************************************************************************************
 # changed: [node3] => (item=nf_conntrack) => {"ansible_loop_var": "item", "changed": true, "item": "nf_conntrack", "name": "nf_conntrack", "params": "", "state": "present"}
