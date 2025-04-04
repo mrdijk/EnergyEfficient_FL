@@ -33,7 +33,7 @@ Now, when you want a new Kubespray version you can follow these steps again, but
 This seutp allows for easily configuring Kubespray with only the necessary files and saving changes in this GitHub repository for this project without interference or more manual steps to set it up in the future, etc.
 
 ### Using Kubespray
-TODO: explain here to use the k8s-setup.ipynb notebook first to run the SSH setup.
+Make sure to first follow the steps from the k8s_setup.ipynb notebook, specifically the SSH setup steps to connect to the VMs.
 
 Then verify a few steps before doing the following steps:
 ```sh
@@ -47,6 +47,7 @@ ping 2001:610:2d0:fabc:f816:3eff:fe65:a464
 ping 10.30.6.107
 # This will likely give nothing back and timeout eventually
 ```
+After these steps, you can move to the next step below.
 
 In a Linux terminal (e.g. WSL), execute the following commands to use Kubespray to setup the Kubernetes cluster:
 ```sh
@@ -70,38 +71,38 @@ information see https://docs.ansible.com/ansible/devel/reference_appendices/conf
 # Then execute the playbook to configure the cluster, this takes a while to execute, the more nodes the longer it takes
 # -b: Tells Ansible to use become (i.e., use sudo) for privilege escalation on remote machines
 # -v: Runs in verbose mode, showing more output (you can add more vs for even more detail, like -vv or -vvv)
-# --private-key=<path-to-private-key> is not necessary here as it will override the ssh_config used in ansible.cfg, which is not what we want
-# TODO: update documentation here
+# Use the slice key here as the private key to connect to the nodes from the slice in FABRIC
 # Use username ubuntu (-u), this is the same as the local ssh command used to log into the VM
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu
-# TODO: now the connection works and the cluster.yml is executing, but nodes not connected, now try with new IPv6
-# TODO: then run next step to check the nodes with the script
+# Next, you can follow the subsequent step in the k8s_setup.ipynb notebook
 
-TODO: Update: now used ip address with local SSH and that also times out and does not work. So, now tried to mimic SSH command with IPv6 for ansible_host, such as:
-node1 ansible_host=2001:610:2d0:fabc:f816:3eff:fe65:a464 ip=10.30.6.111 etcd_member_name=etcd1
-# TODO: now run again with IPv6 in inventory
+# If things fail and you need to fix that in between, use the reset.yml to reset the cluster first before trying again the above command
+# This is because if some things failed mid-deploy, such as etcd, it might conflict/skip important files, etc.
+# This automatically prompts yes to continue without manual intervention required
+ansible-playbook -i inventory/dynamos-cluster/inventory.ini reset.yml -b -v \
+  --private-key=~/.ssh/slice_key -u ubuntu \
+  -e reset_confirmation=yes
 
-
-# TODO: before changing ip to also the IPv6:
-TODO: Did get these fatal errors in the process, but it continued, might not be that important:
-# TASK [kubernetes/node : Modprobe conntrack module] ******************************************************************************************************************************************
-# changed: [node3] => (item=nf_conntrack) => {"ansible_loop_var": "item", "changed": true, "item": "nf_conntrack", "name": "nf_conntrack", "params": "", "state": "present"}
-# fatal: [node3]: FAILED! => {"msg": "The conditional check '(modprobe_conntrack_module|default({'rc': 1})).rc != 0' failed. The error was: error while evaluating conditional ((modprobe_conntrack_module|default({'rc': 1})).rc != 0): 'dict object' has no attribute 'rc'. 'dict object' has no attribute 'rc'\n\nThe error appears to be in '/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/fabric/kubespray/roles/kubernetes/node/tasks/main.yml': line 121, column 3, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n\n- name: Modprobe conntrack module\n  ^ here\n"}
-# ...ignoring
-# changed: [node2] => (item=nf_conntrack) => {"ansible_loop_var": "item", "changed": true, "item": "nf_conntrack", "name": "nf_conntrack", "params": "", "state": "present"}
-# fatal: [node2]: FAILED! => {"msg": "The conditional check '(modprobe_conntrack_module|default({'rc': 1})).rc != 0' failed. The error was: error while evaluating conditional ((modprobe_conntrack_module|default({'rc': 1})).rc != 0): 'dict object' has no attribute 'rc'. 'dict object' has no attribute 'rc'\n\nThe error appears to be in '/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/fabric/kubespray/roles/kubernetes/node/tasks/main.yml': line 121, column 3, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n\n- name: Modprobe conntrack module\n  ^ here\n"}
-# ...ignoring
-# changed: [node1] => (item=nf_conntrack) => {"ansible_loop_var": "item", "changed": true, "item": "nf_conntrack", "name": "nf_conntrack", "params": "", "state": "present"}
-# fatal: [node1]: FAILED! => {"msg": "The conditional check '(modprobe_conntrack_module|default({'rc': 1})).rc != 0' failed. The error was: error while evaluating conditional ((modprobe_conntrack_module|default({'rc': 1})).rc != 0): 'dict object' has no attribute 'rc'. 'dict object' has no attribute 'rc'\n\nThe error appears to be in '/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/fabric/kubespray/roles/kubernetes/node/tasks/main.yml': line 121, column 3, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n\n- name: Modprobe conntrack module\n  ^ here\n"}
-# ...ignoring
-
-# Another one:
-# TASK [kubernetes/control-plane : Check which kube-control nodes are already members of the cluster] *****************************************************************************************
-# fatal: [node1]: FAILED! => {"changed": false, "cmd": ["/usr/local/bin/kubectl", "get", "nodes", "--selector=node-role.kubernetes.io/control-plane", "-o", "json"], "delta": "0:00:00.037381", "end": "2025-04-04 08:05:42.432051", "msg": "non-zero return code", "rc": 1, "start": "2025-04-04 08:05:42.394670", "stderr": "E0404 08:05:42.423966   35848 memcache.go:265] \"Unhandled Error\" err=\"couldn't get current server API group list: Get \\\"http://localhost:8080/api?timeout=32s\\\": dial tcp 127.0.0.1:8080: connect: connection refused\"\nE0404 08:05:42.425474   35848 memcache.go:265] \"Unhandled Error\" err=\"couldn't get current server API group list: Get \\\"http://localhost:8080/api?timeout=32s\\\": dial tcp 127.0.0.1:8080: connect: connection refused\"\nE0404 08:05:42.427228   35848 memcache.go:265] \"Unhandled Error\" err=\"couldn't get current server API group list: Get \\\"http://localhost:8080/api?timeout=32s\\\": dial tcp 127.0.0.1:8080: connect: connection refused\"\nE0404 08:05:42.428434   35848 memcache.go:265] \"Unhandled Error\" err=\"couldn't get current server API group list: Get \\\"http://localhost:8080/api?timeout=32s\\\": dial tcp 127.0.0.1:8080: connect: connection refused\"\nE0404 08:05:42.429604   35848 memcache.go:265] \"Unhandled Error\" err=\"couldn't get current server API group list: Get \\\"http://localhost:8080/api?timeout=32s\\\": dial tcp 127.0.0.1:8080: connect: connection refused\"\nThe connection to the server localhost:8080 was refused - did you specify the right host or port?", "stderr_lines": ["E0404 08:05:42.423966   35848 memcache.go:265] \"Unhandled Error\" err=\"couldn't get current server API group list: Get \\\"http://localhost:8080/api?timeout=32s\\\": dial tcp 127.0.0.1:8080: connect: connection refused\"", "E0404 08:05:42.425474   35848 memcache.go:265] \"Unhandled Error\" err=\"couldn't get current server API group list: Get \\\"http://localhost:8080/api?timeout=32s\\\": dial tcp 127.0.0.1:8080: connect: connection refused\"", "E0404 08:05:42.427228   35848 memcache.go:265] \"Unhandled Error\" err=\"couldn't get current server API group list: Get \\\"http://localhost:8080/api?timeout=32s\\\": dial tcp 127.0.0.1:8080: connect: connection refused\"", "E0404 08:05:42.428434   35848 memcache.go:265] \"Unhandled Error\" err=\"couldn't get current server API group list: Get \\\"http://localhost:8080/api?timeout=32s\\\": dial tcp 127.0.0.1:8080: connect: connection refused\"", "E0404 08:05:42.429604   35848 memcache.go:265] \"Unhandled Error\" err=\"couldn't get current server API group list: Get \\\"http://localhost:8080/api?timeout=32s\\\": dial tcp 127.0.0.1:8080: connect: connection refused\"", "The connection to the server localhost:8080 was refused - did you specify the right host or port?"], "stdout": "", "stdout_lines": []}
-# ...ignoring
-
-# Another one:
-# TASK [kubernetes/kubeadm : Join to cluster if needed] ***************************************************************************************************************************************
-# fatal: [node2]: FAILED! => {"changed": true, "cmd": ["timeout", "-k", "120s", "120s", "/usr/local/bin/kubeadm", "join", "--config", "/etc/kubernetes/kubeadm-client.conf", "--ignore-preflight-errors=DirAvailable--etc-kubernetes-manifests", "--skip-phases="], "delta": "0:01:00.063023", "end": "2025-04-04 08:08:20.938515", "msg": "non-zero return code", "rc": 1, "start": "2025-04-04 08:07:20.875492", "stderr": "error execution phase preflight: couldn't validate the identity of the API Server: failed to request the cluster-info ConfigMap: Get \"https://10.30.6.111:6443/api/v1/namespaces/kube-public/configmaps/cluster-info?timeout=10s\": context deadline exceeded\nTo see the stack trace of this error execute with --v=5 or higher", "stderr_lines": ["error execution phase preflight: couldn't validate the identity of the API Server: failed to request the cluster-info ConfigMap: Get \"https://10.30.6.111:6443/api/v1/namespaces/kube-public/configmaps/cluster-info?timeout=10s\": context deadline exceeded", "To see the stack trace of this error execute with --v=5 or higher"], "stdout": "[preflight] Running pre-flight checks", "stdout_lines": ["[preflight] Running pre-flight checks"]}
-# fatal: [node3]: FAILED! => {"changed": true, "cmd": ["timeout", "-k", "120s", "120s", "/usr/local/bin/kubeadm", "join", "--config", "/etc/kubernetes/kubeadm-client.conf", "--ignore-preflight-errors=DirAvailable--etc-kubernetes-manifests", "--skip-phases="], "delta": "0:01:00.063133", "end": "2025-04-04 08:08:20.958289", "msg": "non-zero return code", "rc": 1, "start": "2025-04-04 08:07:20.895156", "stderr": "error execution phase preflight: couldn't validate the identity of the API Server: failed to request the cluster-info ConfigMap: Get \"https://10.30.6.111:6443/api/v1/namespaces/kube-public/configmaps/cluster-info?timeout=10s\": context deadline exceeded\nTo see the stack trace of this error execute with --v=5 or higher", "stderr_lines": ["error execution phase preflight: couldn't validate the identity of the API Server: failed to request the cluster-info ConfigMap: Get \"https://10.30.6.111:6443/api/v1/namespaces/kube-public/configmaps/cluster-info?timeout=10s\": context deadline exceeded", "To see the stack trace of this error execute with --v=5 or higher"], "stdout": "[preflight] Running pre-flight checks", "stdout_lines": ["[preflight] Running pre-flight checks"]}
+# TODO: now it works mostly, only error now:
+TASK [etcd : Configure | Ensure etcd is running] ********************************************************************************************************************************************
+fatal: [node1]: FAILED! => {"changed": false, "msg": "Unable to start service etcd: Job for etcd.service failed because the control process exited with error code.\nSee \"systemctl status etcd.service\" and \"journalctl -xe\" for details.\n"}
 ```
+
+#### Troubleshooting
+etcd problems:
+```sh
+# SSH into the control plane using the SSH command from earlier for node1
+
+# Show status
+sudo systemctl status etcd.service
+# Show last 50 log lines
+sudo journalctl -u etcd.service -n 50 --no-pager
+# These logs can be used for further debugging
+# You can use this command to see some configurations for example:
+sudo cat /etc/systemd/system/etcd.service
+
+# Examples:
+{"level":"warn","ts":"2025-04-04T09:31:28.416172Z","caller":"etcdmain/etcd.go:75","msg":"failed to verify flags","error":"invalid value \"https://2001:610:2d0:fabc:f816:3eff:fe65:a464:2380\" for ETCD_LISTEN_PEER_URLS: URL address does not have the form \"host:port\": https://2001:610:2d0:fabc:f816:3eff:fe65:a464:2380"}
+# Fix: add TODO
+```
+

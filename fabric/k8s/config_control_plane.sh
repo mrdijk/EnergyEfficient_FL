@@ -8,8 +8,8 @@ echo "==== Starting post-install script for Kubespray cluster ===="
 echo "Setting up kubeconfig..." 
 # Creates the .kube folder where kubectl looks for config by default
 mkdir -p $HOME/.kube
-# Copies the admin kubeconfig to your user folder
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+# Copies the admin kubeconfig to your user folder (use -f to force overwrite potential existing files)
+sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 # Gives your user permission to read it (this is a very important step, otherwise it cannot be read!)
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
