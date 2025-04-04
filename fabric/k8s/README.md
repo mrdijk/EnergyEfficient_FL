@@ -18,7 +18,7 @@ ubuntu@Node2:~$ sudo whoami
 root
 ``` 
 
-## Configure Kubernetes environment
+## Configure Kubernetes cluster/environment
 ### Preparing Kubespary
 In a Linux terminal (e.g. WSL), execute the following commands to prepare Kubespray for usage:
 ```sh
@@ -61,10 +61,10 @@ information see https://docs.ansible.com/ansible/devel/reference_appendices/conf
 # Use username ubuntu (-u), this is the same as the local ssh command used to log into the VM
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu
 # TODO: now the connection works and the cluster.yml is executing, still need to test if it now does everything correctly after executing
+# TODO: then run next step to check the nodes with the script
 
 TODO: Update: now used ip address with local SSH and that also times out and does not work. So, now tried to mimic SSH command with IPv6 for ansible_host, such as:
 node1 ansible_host=2001:610:2d0:fabc:f816:3eff:fe65:a464 ip=10.30.6.111 etcd_member_name=etcd1
-TODO: check nodes 
 TODO: Did get these fatal errors in the process, but it continued, might not be that important:
 # TASK [kubernetes/node : Modprobe conntrack module] ******************************************************************************************************************************************
 # changed: [node3] => (item=nf_conntrack) => {"ansible_loop_var": "item", "changed": true, "item": "nf_conntrack", "name": "nf_conntrack", "params": "", "state": "present"}
