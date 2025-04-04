@@ -77,11 +77,10 @@ ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --
 # Next, you can follow the subsequent step in the k8s_setup.ipynb notebook
 
 # You can run the above command with some modifications to test variables, such as:
-# This command is used to test if a variable is loaded from the group_vars in the inventory file (change node1 to something else, such as etcd) 
-ansible -i inventory/dynamos-cluster/inventory.ini node1 \
-  -m debug -a "var=etcd_listen_client_urls" \
+# This command is used to test if a variable is loaded from the group_vars in the inventory file (you can change all to a more specific one such as node1) 
+ansible -i inventory/dynamos-cluster/inventory.ini all \
+  -m debug -a "var=ntp_enabled" \
   --private-key=~/.ssh/slice_key
-# TODO: test
 
 # If things fail and you need to fix that in between, use the reset.yml to reset the cluster first before trying again the above command
 # This is because if some things failed mid-deploy, such as etcd, it might conflict/skip important files, etc.
@@ -109,13 +108,7 @@ sudo cat /etc/systemd/system/etcd.service
 
 # Examples:
 {"level":"warn","ts":"2025-04-04T09:31:28.416172Z","caller":"etcdmain/etcd.go:75","msg":"failed to verify flags","error":"invalid value \"https://2001:610:2d0:fabc:f816:3eff:fe65:a464:2380\" for ETCD_LISTEN_PEER_URLS: URL address does not have the form \"host:port\": https://2001:610:2d0:fabc:f816:3eff:fe65:a464:2380"}
-# Fix: added to kubespray/inventory/dynamos-cluster/group_vars//etcd/k8s-cluster.yml some additions to allow correct read of IPv6 address:
-# In FABRIC, we use IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464
-# So the IP has to be enclosed in [], using the ip address value from the .ini file, otherwise it will cause errors for etcd
-etcd_listen_client_urls: "https://[{{ ip }}]:2379"
-etcd_advertise_client_urls: "https://[{{ ip }}]:2379"
-etcd_listen_peer_urls: "https://[{{ ip }}]:2380"
-etcd_initial_advertise_peer_urls: "https://[{{ ip }}]:2380"
-# TODO: did that work?
+# This was due to IPv6 addresses having a specific format. In FABRIC, we use IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464
+# So, the IP should be enclosed in [] to make that work. However, more broad problems with using IPv6 was discovered, so a different solution was done, which is now the current setup.
 ```
 

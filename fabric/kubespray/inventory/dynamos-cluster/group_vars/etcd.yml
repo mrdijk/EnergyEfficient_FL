@@ -1,15 +1,4 @@
 ---
-# Test debug marker to see if it can be read:
-etcd_debug_marker_test_var: "etcd vars loaded correctly"
-# See the README.md file in fabric/k8s for specifics
-
-# In FABRIC, we use IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464
-# So the IP has to be enclosed in [], using the ip address value from the .ini file, otherwise it will cause errors for etcd
-etcd_listen_client_urls: "https://[{{ ip }}]:2379"
-etcd_advertise_client_urls: "https://[{{ ip }}]:2379"
-etcd_listen_peer_urls: "https://[{{ ip }}]:2380"
-etcd_initial_advertise_peer_urls: "https://[{{ ip }}]:2380"
-
 ## Etcd auto compaction retention for mvcc key value store in hour
 # etcd_compaction_retention: 0
 
