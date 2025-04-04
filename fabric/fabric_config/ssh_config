@@ -1,3 +1,7 @@
+UserKnownHostsFile /dev/null
+StrictHostKeyChecking no
+ServerAliveInterval 120
+
 # Bastion host config
 Host bastion.fabric-testbed.net
     User collinpoetoehena_0000217992
@@ -5,13 +9,12 @@ Host bastion.fabric-testbed.net
     IdentityFile ~/.ssh/fabric_bastion_key
     IdentitiesOnly yes
 
-# All other hosts EXCEPT the bastion 
 # IdentiftyFile here is the key for actual node access
+# Match all remote nodes explicitly (you can also use for example Host 2001:* if you want to match by IP)
+# Using "* !bastion.fabric-testbed.net" is not supported by ansible ssh for now, so use the hosts explicitely
+# TODO: that still correct?
 Host * !bastion.fabric-testbed.net
     ProxyJump collinpoetoehena_0000217992@bastion.fabric-testbed.net:22
-    IdentityFile ~/.ssh/slice_key
-    IdentitiesOnly yes
-    User ubuntu
 
 # Old with hard copy from FABRIC Jupyter Hub and changed IdentityFile path:
 # UserKnownHostsFile /dev/null

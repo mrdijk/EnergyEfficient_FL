@@ -56,9 +56,16 @@ information see https://docs.ansible.com/ansible/devel/reference_appendices/conf
 # Then execute the playbook to configure the cluster, this takes a while to execute, the more nodes the longer it takes
 # -b: Tells Ansible to use become (i.e., use sudo) for privilege escalation on remote machines
 # -v: Runs in verbose mode, showing more output (you can add more vs for even more detail, like -vv or -vvv)
+# --private-key=<path-to-private-key> is not necessary here as it will override the ssh_config used in ansible.cfg, which is not what we want
+# TODO: update documentation here
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/slice_key
+# TODO: try with fabric bastion key and slice key
 # TODO: problem is that Ansible now does not use a bastion correctly yet, that is the difference when I connect with SSH from a command line and executing the above Ansible script.
 # TODO: add that in explanation.
 # TODO: now added the ssh_config, but it still does not see that bastion.
+
+TODO: Update: now used ip address with local SSH and that also times out and does not work. So, now tried to mimic SSH command with IPv6 for ansible_host, such as:
+node1 ansible_host=2001:610:2d0:fabc:f816:3eff:fe65:a464 ip=10.30.6.111 etcd_member_name=etcd1
+
 
 ```
