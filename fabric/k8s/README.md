@@ -62,7 +62,7 @@ ping ping 10.145.5.3
 After these steps, you can move to the next step below.
 
 
-### Uploading kubespray to the control plane node
+### Uploading kubespray to the control plane node & Configure Control plane node
 Execute the following steps to upload kubespray to the remote VM:
 ```sh
 # Go to the correct directory:
@@ -71,24 +71,15 @@ cd fabric/k8s
 ./upload_to_remote.sh ../kubespray ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
 
 # In the future you can also only now replace specific files to avoid having to reupload the whole directory
-./upload_to_remote.sh ../kubespray/inventory/dynamos-cluster/inventory.ini ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config "~/kubespray/inventory/dynamos-cluster"
-# Or another example:
 ./upload_to_remote.sh ../kubespray/ansible.cfg ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config "~/kubespray"
 # Note: "" around ~ is used to avoid resolving the ~ to the local user's home directory (see explanation in the script)
 # You can verify the files by going to the remote host and using cat to view the file for example, such as:
 # SSH into the VM and go to the correct path, such as:
 cd /home/ubuntu/kubespray
-cat inventory/dynamos-cluster/inventory.ini
-# Or another example:
 cat ansible.cfg
 ```
 
-### Using Kubespray
-Make sure you followed the above steps.
-
-TODO: add scripts to execute the kubespray things
-
-In a Linux terminal (e.g. WSL), execute the following commands to configure kubespray on the remote host:
+Then you can configure the control plane node:
 ```sh
 # SSH into the control plane node, such as:
 ssh -i ~/.ssh/slice_key -F ssh_config ubuntu@2001:610:2d0:fabc:f816:3eff:fe65:a464
@@ -105,34 +96,33 @@ pip3 install -r requirements.txt
 export PATH=$HOME/.local/bin:$PATH
 # Test installation, such as:
 ansible version
+
+# Add SSH slice key to connect between the nodes in FABRIC:
+mkdir -p ~/.ssh
+# Copy the files from your local directory to the remote host
+./upload_to_remote.sh ~/.ssh/slice_key ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config "~/.ssh"
+
+TODO: if that does not work, also test with bastion key
 ```
 
-Then you can execute kubespray to configure the kubernetes cluster from the remote host after following the above steps:
+### Using Kubespray
+Make sure you followed the above steps.
+
+TODO: add scripts to execute the kubespray things maybe?
+
+In a Linux terminal (e.g. WSL), configure the kubernetes cluster from the remote host after following the above steps
 ```sh
-# TODO: No need to use the ssh_config, since this is now executed from the nodes already 
-# TODO: use slice_key?
-ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v -u ubuntu
-
-```
-
-
-```sh
-# Configure the Ansible config file (by default it does not allow it in the working directory: https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir)
-# For example:
-export ANSIBLE_CONFIG=/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/fabric/kubespray/ansible.cfg
-# Otherwise, it will give the warning: 
-[WARNING]: Ansible is being run in a world writable directory
-(/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/fabric/kubespray), ignoring it as an ansible.cfg source. For more
-information see https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir
-# Resulting in ERROR! the role 'kubespray-defaults' was not found
-
+# TODO: No need to use the ssh_config, since this is now executed from the nodes already, so no bastion needed to connect to the FABRIC nodes 
+# TODO: do need to use slice_key, I think so yes, because without I get permission denied
 # Then execute the playbook to configure the cluster, this takes a while to execute, the more nodes the longer it takes
 # -b: Tells Ansible to use become (i.e., use sudo) for privilege escalation on remote machines
 # -v: Runs in verbose mode, showing more output (you can add more vs for even more detail, like -vv or -vvv)
 # Use the slice key here as the private key to connect to the nodes from the slice in FABRIC
 # Use username ubuntu (-u), this is the same as the local ssh command used to log into the VM
-ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v -u ubuntu
+ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v -u ubuntu --private-key=~/.ssh/slice_key
 # Next, you can follow the subsequent step in the k8s_setup.ipynb notebook
+TODO: left off here, continue further
+
 
 # You can run the above command with some modifications to test variables, such as:
 # This command is used to test if a variable is loaded from the group_vars in the inventory file (you can change all to a more specific one such as node1) 
@@ -145,9 +135,6 @@ ansible -i inventory/dynamos-cluster/inventory.ini all \
 # This automatically prompts yes to continue without manual intervention required
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini reset.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu -e reset_confirmation=yes
 
-# TODO: now it works mostly, only error now:
-TASK [etcd : Configure | Ensure etcd is running] ********************************************************************************************************************************************
-fatal: [node1]: FAILED! => {"changed": false, "msg": "Unable to start service etcd: Job for etcd.service failed because the control process exited with error code.\nSee \"systemctl status etcd.service\" and \"journalctl -xe\" for details.\n"}
 ```
 
 ### Troubleshooting
