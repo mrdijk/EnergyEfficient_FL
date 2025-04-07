@@ -3,8 +3,6 @@ This file explains how to setup Kubernetes in FABRIC.
 
 Note: this guide used WSL for the underlying testing and validation.
 
-TODO: explain here how to do that.
-
 ## SSH 
 You can configure SSH to access the VMs by following the steps in the k8s-setup.ipynb notebook file. 
 
@@ -26,7 +24,7 @@ In a Linux terminal (e.g. WSL), execute the following commands to prepare Kubesp
 cd fabric
 
 # Use custom script to prepare kubespray, fetching the code from GitHub and cleaning up unnecessary files
-./k8s/prepare_kubespray.sh
+./k8s/cluster-setup/prepare_kubespray.sh
 ```
 Now, when you want a new Kubespray version you can follow these steps again, but keep in mind that the local changes might get lost, so make a copy of those before doing this script.  Also, keep in mind that the script is specific for a version of Kubespray, files may be renamed or added, etc., so the script section removing files may need to be slightly altered when updating versions.
 
@@ -66,7 +64,7 @@ After these steps, you can move to the next step below.
 Execute the following steps to upload kubespray to the remote VM:
 ```sh
 # Go to the correct directory:
-cd fabric/k8s
+cd fabric/scripts
 # Execute the script, such as:
 ./upload_to_remote.sh ../kubespray ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
 
@@ -101,41 +99,35 @@ ansible version
 mkdir -p ~/.ssh
 # Copy the files from your local directory to the remote host
 ./upload_to_remote.sh ~/.ssh/slice_key ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config "~/.ssh"
-
-TODO: if that does not work, also test with bastion key
 ```
 
 ### Using Kubespray
 Make sure you followed the above steps.
 
-TODO: add scripts to execute the kubespray things maybe?
-
 In a Linux terminal (e.g. WSL), configure the kubernetes cluster from the remote host after following the above steps
 ```sh
-# TODO: No need to use the ssh_config, since this is now executed from the nodes already, so no bastion needed to connect to the FABRIC nodes 
-# TODO: do need to use slice_key, I think so yes, because without I get permission denied
+# No need to use the ssh_config, since this is now executed from the nodes already, so no bastion needed to connect to the FABRIC nodes 
+# However, we do need to use slice_key, because without it you get permission denied from accessing the nodes
 # Then execute the playbook to configure the cluster, this takes a while to execute, the more nodes the longer it takes
 # -b: Tells Ansible to use become (i.e., use sudo) for privilege escalation on remote machines
 # -v: Runs in verbose mode, showing more output (you can add more vs for even more detail, like -vv or -vvv)
 # Use the slice key here as the private key to connect to the nodes from the slice in FABRIC
 # Use username ubuntu (-u), this is the same as the local ssh command used to log into the VM
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v -u ubuntu --private-key=~/.ssh/slice_key
-# Next, you can follow the subsequent step in the k8s_setup.ipynb notebook
-TODO: left off here, continue further, now execution is fully working
-TODO: change folder structure to k8s-setup and dynamos-setup, then add scripts and retest this a bit
 
+# If things fail and you need to fix that in between, use the reset.yml to reset the cluster first before trying again the above command
+# This is because if some things failed mid-deploy, such as etcd, it might conflict/skip important files, etc.
+# This automatically prompts yes to continue without manual intervention required
+ansible-playbook -i inventory/dynamos-cluster/inventory.ini reset.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu -e reset_confirmation=yes
 
 # You can run the above command with some modifications to test variables, such as:
 # This command is used to test if a variable is loaded from the group_vars in the inventory file (you can change all to a more specific one such as node1) 
 ansible -i inventory/dynamos-cluster/inventory.ini all \
   -m debug -a "var=ntp_enabled" \
   --private-key=~/.ssh/slice_key
-
-# If things fail and you need to fix that in between, use the reset.yml to reset the cluster first before trying again the above command
-# This is because if some things failed mid-deploy, such as etcd, it might conflict/skip important files, etc.
-# This automatically prompts yes to continue without manual intervention required
-ansible-playbook -i inventory/dynamos-cluster/inventory.ini reset.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu -e reset_confirmation=yes
 ```
+After exeucting kubespray to configure the cluster, you can follow the next steps in the k8s_setup.ipynb notebook.
+
 
 ### Troubleshooting
 #### etcd problems:
