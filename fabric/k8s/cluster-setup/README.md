@@ -121,7 +121,8 @@ In a Linux terminal (e.g. WSL), configure the kubernetes cluster from the remote
 # Use username ubuntu (-u), this is the same as the local ssh command used to log into the VM
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v -u ubuntu --private-key=~/.ssh/slice_key
 # Next, you can follow the subsequent step in the k8s_setup.ipynb notebook
-TODO: left off here, continue further
+TODO: left off here, continue further, now execution is fully working
+TODO: change folder structure to k8s-setup and dynamos-setup, then add scripts and retest this a bit
 
 
 # You can run the above command with some modifications to test variables, such as:
@@ -134,7 +135,6 @@ ansible -i inventory/dynamos-cluster/inventory.ini all \
 # This is because if some things failed mid-deploy, such as etcd, it might conflict/skip important files, etc.
 # This automatically prompts yes to continue without manual intervention required
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini reset.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu -e reset_confirmation=yes
-
 ```
 
 ### Troubleshooting
