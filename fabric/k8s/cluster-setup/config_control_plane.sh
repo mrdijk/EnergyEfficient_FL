@@ -45,6 +45,16 @@ kubectl get pods -A -o wide | awk 'NR>1 {print $8}' | sort | uniq -c | sort -nr 
 # === Brew on Linux installation (used for easier installation of other packages) ===
 echo "Checking for Homebrew..."
 
+# Manually add brew to PATH and environment for this script run
+# This is necessary because this is a non-interactive terminal in Jupyter Hub when running this script on the FABRIC node, so it will not see 
+# the brew installation otherwise. And you cannot do "source ~/.bashrc" as well here because of the non-interactive mode.
+if [ -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  echo "Loading Homebrew environment..."
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+# Debug print
+brew --version || echo "brew not found"
+
 if ! command -v brew >/dev/null 2>&1; then
   echo "Installing Homebrew on Linux..."
   # "</dev/null" here tells the script to not ask for input (otherwise will ask for root password). This is necessary because here root access on FABRIC nodes is

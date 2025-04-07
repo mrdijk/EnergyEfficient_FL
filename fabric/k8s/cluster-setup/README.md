@@ -130,6 +130,21 @@ After exeucting kubespray to configure the cluster, you can follow the next step
 
 
 ### Troubleshooting
+TODO: now at cannot reach, fix that: TODO: see chatgpt suggestion, already retried with now iptables as kube_proxy_mode
+ubuntu@node1:~$ kubectl run testpod --rm -it --restart=Never --image=busybox -- /bin/sh
+If you don't see a command prompt, try pressing enter.
+/ #
+/ # whoami
+root
+/ # wget --spider https://10.233.0.1:443
+Connecting to 10.233.0.1:443 (10.233.0.1:443)
+wget: can't connect to remote host (10.233.0.1): No route to host
+
+#### Calico-kube-controllers not working
+││ 2025-04-07 10:28:26.127 [ERROR][1] kube-controllers/client.go 320: Error getting cluster information config ClusterInformation="default" error=Get "https://10.233.0.1:443/apis/crd.projectcalico.org/v1/clus ││ terinformations/default": dial tcp 10.233.0.1:443: connect: no route to host                                                                                                                                  ││ 2025-04-07 10:28:26.127 [INFO][1] kube-controllers/client.go 248: Unable to initialize ClusterInformation error=Get "https://10.233.0.1:443/apis/crd.projectcalico.org/v1/clusterinformations/default": dial  ││ tcp 10.233.0.1:443: connect: no route to host                    
+kube-system/calico-kube-controllers-74b6df894b-nbws2:calico-kube-controllers
+
+
 #### etcd problems:
 If you encounter problems with etcd, such as during kubespray cluster configuration, these steps might help:
 ```sh
