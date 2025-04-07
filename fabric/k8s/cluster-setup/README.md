@@ -52,7 +52,7 @@ Then verify a few steps before doing the following steps:
 ssh -i ~/.ssh/slice_key -F ssh_config ubuntu@2001:610:2d0:fabc:f816:3eff:fe65:a464
 
 # Inside each node, test if they can reach the other two nodes with the IP address, such as:
-ping ping 10.145.5.3
+ping 10.145.5.3
 # It works if you receive results, such as "64 bytes from 2001:610:2d0:fabc:f816:3eff:fe95:d90f: icmp_seq=1 ttl=64 time=0.402 ms" 
 # You can use ctrl+c to exit
 # If it does not work, it shows nothing and maybe times out eventually
@@ -95,7 +95,7 @@ export PATH=$HOME/.local/bin:$PATH
 # Test installation, such as:
 ansible version
 
-# Add SSH slice key to connect between the nodes in FABRIC:
+# Add SSH slice key to connect between the nodes in FABRIC (make sure you followed the SSH config steps from the k8s_setup.ipynb notebook):
 mkdir -p ~/.ssh
 # Copy the files from your local directory to the remote host
 ./upload_to_remote.sh ~/.ssh/slice_key ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config "~/.ssh"

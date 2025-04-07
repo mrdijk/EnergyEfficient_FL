@@ -66,15 +66,6 @@ python3 -m grpc_tools.protoc --version
 Follow this guide on how to enable Kubernetes in Docker Desktop: https://docs.docker.com/desktop/features/kubernetes/
 Specifically, also use kubectl with it, and set the context to docker-desktop, like explained in the guide.
 
-
-## Install Helm (package manager for Kubernetes)
-Install the package manager for Kubernetes: https://helm.sh/docs/intro/install/#from-script
-
-Then restart all terminals and verify the installation by running:
-```sh
-helm version
-```
-
 ## Install Linkerd
 Follow this guide: https://linkerd.io/2.15/getting-started/#step-1-install-the-cli
 
@@ -93,6 +84,17 @@ At the time of making this it was the following command (but see the guide for t
 # After installing it, follow the next steps shown in the terminal
 # Verify installation 
 brew install hello
+```
+
+## Install Helm (package manager for Kubernetes)
+Install the package manager for Kubernetes: https://helm.sh/docs/intro/install
+
+Then restart all terminals and verify the installation by running:
+```sh
+# Use Homebrew on Linux as the easiest step:
+brew install helm
+# Verify installation:
+helm version
 ```
 
 ## Install k9s for WSL (optional)
