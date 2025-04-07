@@ -67,9 +67,13 @@ Execute the following steps to upload kubespray to the remote VM:
 ```sh
 # Go to the correct directory:
 cd fabric/k8s
-# Execute the script, such as (Note: this might take some time):
-./upload_kubespray.sh ../kubespray ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
+# Execute the script, such as:
+./upload_to_remote.sh ../kubespray ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
 # In the future you can also only now replace specific files to avoid having to reupload the whole directory
+./upload_to_remote.sh ../kubespray/dynamos-cluster/inventory.ini ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
+
+# TODO: now add in K8s setup notebook the rest, so adding the execute script, etc.
+# TODO: add adding a file and then execute, also update examples in the script
 ```
 
 
