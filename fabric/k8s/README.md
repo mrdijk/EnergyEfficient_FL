@@ -70,11 +70,10 @@ cd fabric/k8s
 # Execute the script, such as:
 ./upload_to_remote.sh ../kubespray ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
 # In the future you can also only now replace specific files to avoid having to reupload the whole directory
-./upload_to_remote.sh ../kubespray/dynamos-cluster/inventory.ini ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
-
-# TODO: now add in K8s setup notebook the rest, so adding the execute script, etc.
-# TODO: add adding a file and then execute, also update examples in the script
+./upload_to_remote.sh ../kubespray/inventory/dynamos-cluster/inventory.ini ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
 ```
+
+TODO: now install dependencies (with a script) and execute kubespray.
 
 
 ### Using Kubespray
