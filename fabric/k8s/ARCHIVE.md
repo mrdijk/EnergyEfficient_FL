@@ -1,23 +1,7 @@
-# Setup Kubernetes
-This file explains how to setup Kubernetes in FABRIC.
+# Archive: old versions
 
-Note: this guide used WSL for the underlying testing and validation.
 
-TODO: explain here how to do that.
-
-## SSH 
-You can configure SSH to access the VMs by following the steps in the k8s-setup.ipynb notebook file. 
-
-### Test root access
-To test root access, run the following commands:
-```sh
-# After SSH access into the VM, run:
-sudo whoami
-# If it returns the following for example it means you have root access, meaning the ubuntu VM has passwordless sudo working correctly on the node:
-ubuntu@Node2:~$ sudo whoami
-root
-``` 
-
+# Old Kubernetes cluster setup with Kubespray from local machine:
 ## Configure Kubernetes cluster/environment
 ### Preparing Kubespary
 In a Linux terminal (e.g. WSL), execute the following commands to prepare Kubespray for usage:
@@ -32,40 +16,7 @@ Now, when you want a new Kubespray version you can follow these steps again, but
 
 This seutp allows for easily configuring Kubespray with only the necessary files and saving changes in this GitHub repository for this project without interference or more manual steps to set it up in the future, etc.
 
-### Create the DYNAMOS cluster inventory for Kubespray
-In a Linux terminal (e.g. WSL), execute the following commands to use Kubespray to setup the Kubernetes cluster:
-```sh
-# Go into the kubespray directory
-cd fabric/kubespray
-
-# Set up your inventory for your cluster (will create files in fabric/kubespray/inventory/x)
-cp -rfp inventory/sample inventory/dynamos-cluster
-```
-Then add the inventory.ini file in the created dynamos-cluster folder. The k8s_setup.ipynb notebook gets the necessary information you can use for this.
-
-TODO: update with correct information.
-
-It is important to use the correct IPs: the IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464, since it is not reachable with the IPv4 in FABRIC.
-
-
-### Uploading Kubespray files to FABRIC Jupyter Hub
-Kubespray is managed in GitHub as well, just as the notebook files, and needs to be uploaded to Jupyter Hub.
-
-Unfortunately, you cannot manually add folders to Jupyter Hub. So, to upload the Kubespray files to FABRIC Jupyter Hub, you need to follow these steps:
-1. On your local file system, create a zip of only the kubspray folder.
-2. Upload that zip to Jupyter Hub as a file (and avoid adding that to GitHub, so move it to local Downloads for example).
-3. Unzip it by opening a terminal in Jupyter Hub and running: 
-```sh
-# Unzip the kubespray.zip file to the current destination (-d .)
-unzip kubespray.zip -d .
-```
-4. Delete the zip afterwards from Jupyter Hub.
-5. Now you can use kubespray, and in future updates, you can for example only upload the changed files, such as replacing the inventory.ini, etc.
-
 ### Using Kubespray
-TODO: change below to new setup.
-
-
 Make sure to first follow the steps from the k8s_setup.ipynb notebook, specifically the SSH setup steps to connect to the VMs.
 
 Then verify a few steps before doing the following steps:
@@ -76,7 +27,7 @@ ssh -i ~/.ssh/slice_key -F ssh_config ubuntu@2001:610:2d0:fabc:f816:3eff:fe65:a4
 ping 2001:610:2d0:fabc:f816:3eff:fe65:a464
 # It works if you receive results, such as "64 bytes from 2001:610:2d0:fabc:f816:3eff:fe95:d90f: icmp_seq=1 ttl=64 time=0.402 ms" 
 # You can use ctrl+c to exit
-# Note: IPv4 will probably not work in FABRIC, such as:
+# Note: IPv4 will probably not work in FABRIC by default, such as:
 ping 10.30.6.107
 # This will likely give nothing back and timeout eventually
 ```
@@ -90,7 +41,7 @@ cd fabric/kubespray
 # Set up your inventory for your cluster (will create files in fabric/kubespray/inventory/x)
 cp -rfp inventory/sample inventory/dynamos-cluster
 # Then add the inventory.ini file in the created dynamos-cluster folder. The k8s_setup.ipynb notebook gets the necessary information
-# It is important to use the correct IPs: the IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464, since it is not reachable with the IPv4 in FABRIC.
+# It is important to use the correct IPs: the IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464, since it is not reachable with the IPv4 in FABRIC by default.
 
 # Configure the Ansible config file (by default it does not allow it in the working directory: https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir)
 # For example:
@@ -120,7 +71,7 @@ ansible -i inventory/dynamos-cluster/inventory.ini all \
 # This automatically prompts yes to continue without manual intervention required
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini reset.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu -e reset_confirmation=yes
 
-# TODO: now it works mostly, only error now:
+# now it works mostly, only error now, so need to come up with something else:
 TASK [etcd : Configure | Ensure etcd is running] ********************************************************************************************************************************************
 fatal: [node1]: FAILED! => {"changed": false, "msg": "Unable to start service etcd: Job for etcd.service failed because the control process exited with error code.\nSee \"systemctl status etcd.service\" and \"journalctl -xe\" for details.\n"}
 ```
@@ -144,4 +95,3 @@ sudo cat /etc/systemd/system/etcd.service
 # This was due to IPv6 addresses having a specific format. In FABRIC, we use IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464
 # So, the IP should be enclosed in [] to make that work. However, more broad problems with using IPv6 was discovered, so a different solution was done, which is now the current setup.
 ```
-
