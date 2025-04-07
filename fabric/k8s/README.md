@@ -32,8 +32,11 @@ Now, when you want a new Kubespray version you can follow these steps again, but
 
 This seutp allows for easily configuring Kubespray with only the necessary files and saving changes in this GitHub repository for this project without interference or more manual steps to set it up in the future, etc.
 
-### Create the DYNAMOS cluster inventory for Kubespray
-In a Linux terminal (e.g. WSL), execute the following commands to use Kubespray to setup the Kubernetes cluster:
+
+### Create the DYNAMOS cluster inventory for Kubespray & Verify connections
+Make sure you followed the steps to configure the network from the k8s_setup.ipynb notebook, specifically the network setup to add the IP addresses. These IP addresses can be used in the inventory file for kubespray.
+
+In a Linux terminal (e.g. WSL), execute the following commands:
 ```sh
 # Go into the kubespray directory
 cd fabric/kubespray
@@ -41,11 +44,22 @@ cd fabric/kubespray
 # Set up your inventory for your cluster (will create files in fabric/kubespray/inventory/x)
 cp -rfp inventory/sample inventory/dynamos-cluster
 ```
-Then add the inventory.ini file in the created dynamos-cluster folder. The k8s_setup.ipynb notebook gets the necessary information you can use for this.
+Then add the IP addresses to the inventory.ini file in the created dynamos-cluster folder. The k8s_setup.ipynb notebook gets the necessary information you can use for this.
 
-TODO: update with correct information.
+Then run the SSH commands described in the k8s_setup.ipynb notebook, specifically specifically the SSH setup steps to connect to the VMs. This is used to test the connection to the nodes from IPv4.
 
-It is important to use the correct IPs: the IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464, since it is not reachable with the IPv4 in FABRIC.
+Then verify a few steps before doing the following steps:
+```sh
+# Verify you can ssh into all the nodes (or a subset is also enough), using the commands provided from the Notebook step (see steps in notebook), such as:
+ssh -i ~/.ssh/slice_key -F ssh_config ubuntu@2001:610:2d0:fabc:f816:3eff:fe65:a464
+
+# Inside each node, test if they can reach the other two nodes with the IP address, such as:
+ping ping 10.145.5.3
+# It works if you receive results, such as "64 bytes from 2001:610:2d0:fabc:f816:3eff:fe95:d90f: icmp_seq=1 ttl=64 time=0.402 ms" 
+# You can use ctrl+c to exit
+# If it does not work, it shows nothing and maybe times out eventually
+```
+After these steps, you can move to the next step below.
 
 
 ### Uploading Kubespray files to FABRIC Jupyter Hub
@@ -61,6 +75,7 @@ unzip kubespray.zip -d .
 ```
 4. Delete the zip afterwards from Jupyter Hub.
 5. Now you can use kubespray, and in future updates, you can for example only upload the changed files, such as replacing the inventory.ini, etc.
+
 
 ### Using Kubespray
 TODO: change below to new setup.
