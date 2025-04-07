@@ -108,6 +108,3 @@ datasets/*.csv
 
 *.drawio.bkp
 *.drawio.dtmp
-
-# Old FABRIC setup, not required for this but handy for setup here:
-FABRIC Indis SC24 Material
