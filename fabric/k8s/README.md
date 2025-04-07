@@ -69,19 +69,53 @@ Execute the following steps to upload kubespray to the remote VM:
 cd fabric/k8s
 # Execute the script, such as:
 ./upload_to_remote.sh ../kubespray ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
+
 # In the future you can also only now replace specific files to avoid having to reupload the whole directory
-./upload_to_remote.sh ../kubespray/inventory/dynamos-cluster/inventory.ini ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
+./upload_to_remote.sh ../kubespray/inventory/dynamos-cluster/inventory.ini ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config "~/kubespray/inventory/dynamos-cluster"
+# Or another example:
+./upload_to_remote.sh ../kubespray/ansible.cfg ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config "~/kubespray"
+# Note: "" around ~ is used to avoid resolving the ~ to the local user's home directory (see explanation in the script)
+# You can verify the files by going to the remote host and using cat to view the file for example, such as:
+# SSH into the VM and go to the correct path, such as:
+cd /home/ubuntu/kubespray
+cat inventory/dynamos-cluster/inventory.ini
+# Or another example:
+cat ansible.cfg
 ```
-
-TODO: now install dependencies (with a script) and execute kubespray.
-
 
 ### Using Kubespray
 Make sure you followed the above steps.
 
 TODO: add scripts to execute the kubespray things
 
-In a Linux terminal (e.g. WSL), execute the following commands to use Kubespray to setup the Kubernetes cluster:
+In a Linux terminal (e.g. WSL), execute the following commands to configure kubespray on the remote host:
+```sh
+# SSH into the control plane node, such as:
+ssh -i ~/.ssh/slice_key -F ssh_config ubuntu@2001:610:2d0:fabc:f816:3eff:fe65:a464
+# Go to the kubespray directory, generally:
+cd /home/ubuntu/kubespray
+# Install dependencies on the VM (only has to be done once)
+sudo apt update
+# Install pip
+sudo apt install -y python3-pip
+# Install requirements of kubespray
+pip3 install -r requirements.txt
+
+# Export the path to the directory where pip installs it
+export PATH=$HOME/.local/bin:$PATH
+# Test installation, such as:
+ansible version
+```
+
+Then you can execute kubespray to configure the kubernetes cluster from the remote host after following the above steps:
+```sh
+# TODO: No need to use the ssh_config, since this is now executed from the nodes already 
+# TODO: use slice_key?
+ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v -u ubuntu
+
+```
+
+
 ```sh
 # Configure the Ansible config file (by default it does not allow it in the working directory: https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir)
 # For example:
@@ -97,7 +131,7 @@ information see https://docs.ansible.com/ansible/devel/reference_appendices/conf
 # -v: Runs in verbose mode, showing more output (you can add more vs for even more detail, like -vv or -vvv)
 # Use the slice key here as the private key to connect to the nodes from the slice in FABRIC
 # Use username ubuntu (-u), this is the same as the local ssh command used to log into the VM
-ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu
+ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v -u ubuntu
 # Next, you can follow the subsequent step in the k8s_setup.ipynb notebook
 
 # You can run the above command with some modifications to test variables, such as:
