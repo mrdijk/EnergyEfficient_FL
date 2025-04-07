@@ -51,7 +51,6 @@ if ! command -v brew >/dev/null 2>&1; then
   # already allowed, so not necessary here. This also avoids problems with input, because the root password is not known to public in FABRIC by default
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" </dev/null
 
-  # TODO: further steps, such as adding to path?
   # Configuration steps (displayed after running the above command):
   echo >> /home/ubuntu/.bashrc
   echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/ubuntu/.bashrc
@@ -99,6 +98,7 @@ else
 fi
 
 echo "Kubespray control plane post-setup complete."
+echo "Make sure to run "source ~/.bashrc" in any SSH session you have open to reload the PATH variables to be able to use the installations."
 
 # Everything inside this block (stdout and stderr) will be piped and logged
 # The line below does the following:
