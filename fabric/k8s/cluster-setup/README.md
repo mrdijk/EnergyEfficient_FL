@@ -65,16 +65,20 @@ Execute the following steps to upload kubespray to the remote VM:
 ```sh
 # Go to the correct directory:
 cd fabric/scripts
-# Execute the script, such as:
+# Execute the script, such as (replace IP of course):
 ./upload_to_remote.sh ../kubespray ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
 
-# In the future you can also only now replace specific files to avoid having to reupload the whole directory
+# In the future you can also only now replace specific files to avoid having to reupload the whole directory, such as (replace IP of course):
 ./upload_to_remote.sh ../kubespray/ansible.cfg ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config "~/kubespray"
+# Or:
+./upload_to_remote.sh ../kubespray/inventory/dynamos-cluster/inventory.ini ubuntu 2001:610:2d0:fabc:f816:3eff:fe0f:e479 ~/.ssh/slice_key ../fabric_config/ssh_config "~/kubespray/inventory/dynamos-cluster"
 # Note: "" around ~ is used to avoid resolving the ~ to the local user's home directory (see explanation in the script)
 # You can verify the files by going to the remote host and using cat to view the file for example, such as:
 # SSH into the VM and go to the correct path, such as:
 cd /home/ubuntu/kubespray
 cat ansible.cfg
+# Or:
+cat inventory/dynamos-cluster/inventory.ini
 ```
 
 Then you can configure the control plane node:
@@ -89,6 +93,7 @@ sudo apt update
 sudo apt install -y python3-pip
 # Install requirements of kubespray
 pip3 install -r requirements.txt
+# When asked to restart services just press Enter to restart all of them.
 
 # Export the path to the directory where pip installs it
 export PATH=$HOME/.local/bin:$PATH
@@ -97,7 +102,7 @@ ansible version
 
 # Add SSH slice key to connect between the nodes in FABRIC (make sure you followed the SSH config steps from the k8s_setup.ipynb notebook):
 mkdir -p ~/.ssh
-# Copy the files from your local directory to the remote host
+# Copy the files from your local directory to the remote host, such as (replace IP of course):
 ./upload_to_remote.sh ~/.ssh/slice_key ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config "~/.ssh"
 ```
 
@@ -117,13 +122,14 @@ ansible-playbook -i inventory/dynamos-cluster/inventory.ini cluster.yml -b -v -u
 
 # If things fail and you need to fix that in between, use the reset.yml to reset the cluster first before trying again the above command
 # This is because if some things failed mid-deploy, such as etcd, it might conflict/skip important files, etc.
+# Note: this is not always necessary, for some minor changes you can maybe just rerun the cluster command above and restart the pods with k9s for example
 # This automatically prompts yes to continue without manual intervention required
 ansible-playbook -i inventory/dynamos-cluster/inventory.ini reset.yml -b -v --private-key=~/.ssh/slice_key -u ubuntu -e reset_confirmation=yes
 
 # You can run the above command with some modifications to test variables, such as:
 # This command is used to test if a variable is loaded from the group_vars in the inventory file (you can change all to a more specific one such as node1) 
 ansible -i inventory/dynamos-cluster/inventory.ini all \
-  -m debug -a "var=ntp_enabled" \
+  -m debug -a "var=enable_dual_stack_networks" \
   --private-key=~/.ssh/slice_key
 ```
 After exeucting kubespray to configure the cluster, you can follow the next steps in the k8s_setup.ipynb notebook.
@@ -143,6 +149,40 @@ wget: can't connect to remote host (10.233.0.1): No route to host
 #### Calico-kube-controllers not working
 ││ 2025-04-07 10:28:26.127 [ERROR][1] kube-controllers/client.go 320: Error getting cluster information config ClusterInformation="default" error=Get "https://10.233.0.1:443/apis/crd.projectcalico.org/v1/clus ││ terinformations/default": dial tcp 10.233.0.1:443: connect: no route to host                                                                                                                                  ││ 2025-04-07 10:28:26.127 [INFO][1] kube-controllers/client.go 248: Unable to initialize ClusterInformation error=Get "https://10.233.0.1:443/apis/crd.projectcalico.org/v1/clusterinformations/default": dial  ││ tcp 10.233.0.1:443: connect: no route to host                    
 kube-system/calico-kube-controllers-74b6df894b-nbws2:calico-kube-controllers
+TODO: this did not work:
+# Kube-proxy proxyMode configuration.
+# Can be ipvs, iptables
+# Use iptables for FABRIC specifically
+kube_proxy_mode: iptables
+
+```sh
+# Run a test pod to execute commands in it in the control plane node (node1)
+kubectl run testpod --rm -it --restart=Never --image=busybox -- /bin/sh
+# Check if it can reach something
+wget --spider https://10.233.0.1:443
+
+# The kube_proxy_mode to iptables was not changing with only running cluster.yml or reset.yml and then cluster.yml. So, what I did was 
+# delete and recreate slice and then run every step again, then it changed to the correct mode in the config map (see below for how to get config map).
+
+# TODO: check with below of speciic interface for calico to see if that does something.
+# Got:
+TASK [network_plugin/calico : Wait for calico kubeconfig to be created] *****************************************************************************************************************************************
+fatal: [node2]: FAILED! => {"changed": false, "elapsed": 300, "msg": "Timeout when waiting for file /etc/cni/net.d/calico-kubeconfig"}
+fatal: [node3]: FAILED! => {"changed": false, "elapsed": 300, "msg": "Timeout when waiting for file /etc/cni/net.d/calico-kubeconfig"}
+# TODO: run again?
+
+# Manual steps to change a config map (not recommended, use the cluster deploy and change variables before running the cluster.yml)
+# ConfigMap of pods named kube-proxy
+kubectl -n kube-system get configmap kube-proxy -o yaml
+# Edit manually:
+kubectl -n kube-system edit configmap kube-proxy
+# Press i to enter insert mode and make changed. Press Esc to exit instert mode and type :wq and Enter to write (=save) and quit
+# Restart pods
+kubectl -n kube-system delete pods -l k8s-app=kube-proxy
+```
+TODO: can use this in k8s-net-calico.yml to ensure it uses the correct one, but not necessary yet:
+calico_ip_auto_method: "interface=enp7s0"
+TODO: try this when others fail.
 
 
 #### etcd problems:

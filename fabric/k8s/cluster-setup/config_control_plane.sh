@@ -108,7 +108,8 @@ else
 fi
 
 echo "Kubespray control plane post-setup complete."
-echo "Make sure to run "source ~/.bashrc" in any SSH session you have open to reload the PATH variables to be able to use the installations."
+# Use "" around ~ to avoid it resolving to the current home directory
+echo "Make sure to run "source "~/.bashrc"" in any SSH session you have open to reload the PATH variables to be able to use the installations."
 
 # Everything inside this block (stdout and stderr) will be piped and logged
 # The line below does the following:
