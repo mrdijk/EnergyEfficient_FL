@@ -62,51 +62,24 @@ ping ping 10.145.5.3
 After these steps, you can move to the next step below.
 
 
-### Uploading Kubespray files to FABRIC Jupyter Hub
-Kubespray is managed in GitHub as well, just as the notebook files, and needs to be uploaded to Jupyter Hub.
-
-Unfortunately, you cannot manually add folders to Jupyter Hub. So, to upload the Kubespray files to FABRIC Jupyter Hub, you need to follow these steps:
-1. On your local file system, create a zip of only the kubspray folder.
-2. Upload that zip to Jupyter Hub as a file (and avoid adding that to GitHub, so move it to local Downloads for example).
-3. Unzip it by opening a terminal in Jupyter Hub and running: 
+### Uploading kubespray to the control plane node
+Execute the following steps to upload kubespray to the remote VM:
 ```sh
-# Unzip the kubespray.zip file to the current destination (-d .)
-unzip kubespray.zip -d .
+# Go to the correct directory:
+cd fabric/k8s
+# Execute the script, such as (Note: this might take some time):
+./upload_kubespray.sh ../kubespray ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
+# In the future you can also only now replace specific files to avoid having to reupload the whole directory
 ```
-4. Delete the zip afterwards from Jupyter Hub.
-5. Now you can use kubespray, and in future updates, you can for example only upload the changed files, such as replacing the inventory.ini, etc.
 
 
 ### Using Kubespray
-TODO: change below to new setup.
+Make sure you followed the above steps.
 
-
-Make sure to first follow the steps from the k8s_setup.ipynb notebook, specifically the SSH setup steps to connect to the VMs.
-
-Then verify a few steps before doing the following steps:
-```sh
-# Verify you can ssh into all the nodes (or a subset is also enough), using the commands provided from the Notebook step (see steps in notebook), such as:
-ssh -i ~/.ssh/slice_key -F ssh_config ubuntu@2001:610:2d0:fabc:f816:3eff:fe65:a464
-# Inside each node, test if they can reach the other two nodes with the IP address, such as:
-ping 2001:610:2d0:fabc:f816:3eff:fe65:a464
-# It works if you receive results, such as "64 bytes from 2001:610:2d0:fabc:f816:3eff:fe95:d90f: icmp_seq=1 ttl=64 time=0.402 ms" 
-# You can use ctrl+c to exit
-# Note: IPv4 will probably not work in FABRIC, such as:
-ping 10.30.6.107
-# This will likely give nothing back and timeout eventually
-```
-After these steps, you can move to the next step below.
+TODO: add scripts to execute the kubespray things
 
 In a Linux terminal (e.g. WSL), execute the following commands to use Kubespray to setup the Kubernetes cluster:
 ```sh
-# Go into the kubespray directory
-cd fabric/kubespray
-
-# Set up your inventory for your cluster (will create files in fabric/kubespray/inventory/x)
-cp -rfp inventory/sample inventory/dynamos-cluster
-# Then add the inventory.ini file in the created dynamos-cluster folder. The k8s_setup.ipynb notebook gets the necessary information
-# It is important to use the correct IPs: the IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464, since it is not reachable with the IPv4 in FABRIC.
-
 # Configure the Ansible config file (by default it does not allow it in the working directory: https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir)
 # For example:
 export ANSIBLE_CONFIG=/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS/fabric/kubespray/ansible.cfg

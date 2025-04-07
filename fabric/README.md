@@ -14,3 +14,17 @@ TODO: add here the sequence of notebooks:
 2. Create a slice with the nodes to be used: [create_slice.ipynb](./create_slice.ipynb)
 3. TODO: specific Kubernetes notebook to setup the cluster, including DYNAMOS setup and energy efficiency setups, etc.
 TODO: next is probably to configure the nodes in other notebooks.
+
+
+## Additional explanation
+### Uploading multiple folders to FABRIC Jupyter Hub
+Unfortunately, you cannot manually add folders to Jupyter Hub. So, to upload the folder to FABRIC Jupyter Hub, you need to follow these steps:
+1. On your local file system, create a zip of only the folder.
+2. Upload that zip to Jupyter Hub as a file (and avoid adding that to GitHub, so move it to local Downloads for example).
+3. Unzip it by opening a terminal in Jupyter Hub and running: 
+```sh
+# Unzip the kubespray.zip file to the current destination (-d .), such as:
+unzip kubespray.zip -d .
+```
+4. Delete the zip afterwards from Jupyter Hub.
+5. Now you can use this file, and in future updates, you can for example only upload the changed files, such as changing a single file, etc.
