@@ -108,9 +108,10 @@ In a Linux terminal (e.g. WSL), configure the kubernetes cluster from the remote
 # Before running these commands, make sure you SSH into the control plane node (see above commands for examples).
 # Then go to the kubespray directory and source the virtual python environment:
 cd kubespray
-source ./venv/bin/activate
+# First activate the venv to have dependencies such as ansible available (this is not present in the kubespray directory for specific reasons, see configure_remote_kubespray.sh). This loads it from the kubespray directory.
+source ../kubespray-venv/bin/activate
 # Then you can execute the following commands:
-# TODO: maybe add venv outside of kubespray in the script, so that i can avoid having to rerun that after uploading new kubespray setup
+# TODO: test uploading kubespray again and then test with new script to run ansible.
 
 # No need to use the ssh_config, since this is now executed from the nodes already, so no bastion needed to connect to the FABRIC nodes 
 # However, we do need to use slice_key, because without it you get permission denied from accessing the nodes
@@ -140,44 +141,43 @@ After exeucting kubespray to configure the cluster, you can follow the next step
 Note: do not forget to upload the kubespray changes to the remote host controle plane (in this case node1)! Otherwise, the changes will not apply. For example, reupload the whole kubespray file with several files changed, and only a file when only one file changed, etc.
 
 
-#### Calico-kube-controllers not working
-TODO: now at cannot reach, fix that: TODO: see chatgpt suggestion, already retried with now iptables as kube_proxy_mode
-ubuntu@node1:~$ kubectl run testpod --rm -it --restart=Never --image=busybox -- /bin/sh
-If you don't see a command prompt, try pressing enter.
-/ #
-/ # whoami
-root
-/ # wget --spider https://10.233.0.1:443
-Connecting to 10.233.0.1:443 (10.233.0.1:443)
-wget: can't connect to remote host (10.233.0.1): No route to host
+#### Calico-kube-controllers not working/kube-proxy problems
+The inital error for calico-kube-controllers pod was:
+```sh
+│ 2025-04-08 09:22:49.914 [ERROR][1] kube-controllers/client.go 320: Error getting cluster information config ClusterInformation="default" error=Get "http ││ s://10.233.0.1:443/apis/crd.projectcalico.org/v1/clusterinformations/default": dial tcp 10.233.0.1:443: connect: no route to host 
+```
+This was likely caused due to no route available, which could be caused by the kube-apiserver not reachable for example.
 
-││ 2025-04-07 10:28:26.127 [ERROR][1] kube-controllers/client.go 320: Error getting cluster information config ClusterInformation="default" error=Get "https://10.233.0.1:443/apis/crd.projectcalico.org/v1/clus ││ terinformations/default": dial tcp 10.233.0.1:443: connect: no route to host                                                                                                                                  ││ 2025-04-07 10:28:26.127 [INFO][1] kube-controllers/client.go 248: Unable to initialize ClusterInformation error=Get "https://10.233.0.1:443/apis/crd.projectcalico.org/v1/clusterinformations/default": dial  ││ tcp 10.233.0.1:443: connect: no route to host                    
-kube-system/calico-kube-controllers-74b6df894b-nbws2:calico-kube-controllers
-TODO: this did not work:
-# Kube-proxy proxyMode configuration.
-# Can be ipvs, iptables
-# Use iptables for FABRIC specifically
-kube_proxy_mode: iptables
+When looking at kube-proxy, I found this (even though kube-proxy pods were running and ready):
+```sh
+││ "Failed to execute iptables-restore" err=< 
+││     exit status 2: Warning: Extension MARK revision 0 not supported, missing kernel module?                                                              
+││     ip6tables-restore v1.8.9 (nf_tables): unknown option "--xor-mark"
+││     Error occurred at line: 11
+││     Try ip6tables-restore -h' or 'ip6tables-restore --help' for more information
+││  > ipFamily="IPv6" rules="*nat\n:KUBE-SERVICES - [0:0]\n:KUBE-POSTROUTING - [0:0]\n:KUBE-NODE-PORT - [0:0]\n:KUBE-LOAD-BALANCER - [0:0]\n:KUBE-MARK-MASQ
+```
+This was likely the main issue, since the routes were not correctly available.
 
+I tried several things, such as changing from kube_proxy_mode "ipvs" to "iptables", but that did nothing and was not the issue, so staying on the default "ipvs" for kubespray was best here. The kube_proxy_mode to iptables was not changing with only running cluster.yml, so I had to do reset.yml and then cluster.yml. Delete and recreate slice and then run every step again, also applied the changes. Also, running in dual-stack mode for kube-proxy is the default and is also fine (also checked this on localhost setup with Docker Desktop and that also uses dual-stack mode for IPv4 and IPv6, so that is also fine).
+
+Eventually, I changed from default_ubuntu_22 image to default_ubuntu_24 image for the VM. This fixed the ip6tables issue, likely because this newer image has support for that and is better compatible with the version of kubespray I use, which is also relatively new and close to 2024. However, then a different issue arose that likely still caused the calico problem above:
+```sh
+E0408 09:11:02.206520       1 server.go:466] "Unhandled Error" err="starting metrics server failed: listen tcp 127.0.0.1:10249: bind: address already in ││  use" logger="UnhandledError"
+```
+
+TODO: explain further what the issue was and how we solvd it.
+TODO: can use this in k8s-net-calico.yml to ensure it uses the correct one, but not necessary yet:
+calico_ip_auto_method: "interface=enp7s0"
+TODO: try this when others fail.
+
+
+Additional helpful commands:
 ```sh
 # Run a test pod to execute commands in it in the control plane node (node1)
 kubectl run testpod --rm -it --restart=Never --image=busybox -- /bin/sh
 # Check if it can reach something
 wget --spider https://10.233.0.1:443
-
-# The kube_proxy_mode to iptables was not changing with only running cluster.yml, so I had to do reset.yml and then cluster.yml. Delete and recreate slice and then run every step again, also applied the changes.
-# TODO: forgot to upload the kubespray folder, so that is why the changes were not applied. Did need to run reset and then cluster.yml here, but don't know if that works.
-# TODO: now should go to ipvs, and then maybe try 24 image?
-
-# TODO: check with below of speciic interface for calico to see if that does something.
-# Got:
-TASK [network_plugin/calico : Wait for calico kubeconfig to be created] *****************************************************************************************************************************************
-fatal: [node2]: FAILED! => {"changed": false, "elapsed": 300, "msg": "Timeout when waiting for file /etc/cni/net.d/calico-kubeconfig"}
-fatal: [node3]: FAILED! => {"changed": false, "elapsed": 300, "msg": "Timeout when waiting for file /etc/cni/net.d/calico-kubeconfig"}
-# TODO: run again? 
-# TODO: now used ipvs as default and using ubuntu 24.
-
-# TODO: add here: kube-proxy running in dual-stack mode is fine, this is also in localhost setup with Kubernetes for DYNAMOS. Also, ipvs is probably also fine, since this is better and more supported, and the default.
 
 # Manual steps to change a config map (not recommended, use the cluster deploy and change variables before running the cluster.yml)
 # ConfigMap of pods named kube-proxy
@@ -188,9 +188,6 @@ kubectl -n kube-system edit configmap kube-proxy
 # Restart pods
 kubectl -n kube-system delete pods -l k8s-app=kube-proxy
 ```
-TODO: can use this in k8s-net-calico.yml to ensure it uses the correct one, but not necessary yet:
-calico_ip_auto_method: "interface=enp7s0"
-TODO: try this when others fail.
 
 
 #### etcd problems:

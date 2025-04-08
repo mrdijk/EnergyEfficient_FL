@@ -5,9 +5,10 @@
 
 set -e  # Exit on any error
 
-# Ensure that you uploaded kubespray to the remote host before executing this script.
-# Navigate to the kubespray directory
-cd kubespray
+# Define the path for the persistent virtual environment
+# This creates it oustide of the kubespray directory to avoid it being overridden when new kubespray files are uploaded
+# after changes with the upload_to_remote.sh script, removing the venv if it was located inside the kubespray directory.
+VENV_PATH="$HOME/kubespray-venv"
 
 # Ensure python3-venv is installed
 if ! dpkg -l | grep -q python3-venv; then
@@ -16,9 +17,17 @@ if ! dpkg -l | grep -q python3-venv; then
     sudo apt install -y python3-venv
 fi
 
-# Create and activate virtual python environment
-python3 -m venv venv
-source ./venv/bin/activate
+# Create the virtual environment if it doesn't already exist
+if [ ! -d "$VENV_PATH" ]; then
+    echo "Creating virtual environment at $VENV_PATH..."
+    python3 -m venv "$VENV_PATH"
+fi
+
+# Activate the virtual environment
+source "$VENV_PATH/bin/activate"
+
+# Navigate to the kubespray directory
+cd kubespray
 
 # Install requirements in the virtual environment
 # This cannot be done differently, since it will otherwise error with 
