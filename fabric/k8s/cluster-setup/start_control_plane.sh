@@ -36,4 +36,6 @@ kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 # Print nodes
 kubectl get nodes
 
+echo "Start control plane node complete."
+
 }  2>&1 | tee -a start_control_plane.log
