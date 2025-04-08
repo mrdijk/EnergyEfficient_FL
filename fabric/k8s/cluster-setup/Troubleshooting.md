@@ -24,11 +24,7 @@ When looking at kube-proxy, I found this (even though kube-proxy pods were runni
 ```
 This was likely the main issue, since the routes were not correctly available.
 
-I tried several things, such as changing from kube_proxy_mode "ipvs" to "iptables", but that did nothing and was not the issue, so staying on the default "ipvs" for kubespray was best here. The kube_proxy_mode to iptables was not changing with only running cluster.yml, so I had to do reset.yml and then cluster.yml. Delete and recreate slice and then run every step again, also applied the changes. Also, running in dual-stack mode for kube-proxy is the default and is also fine (also checked this on localhost setup with Docker Desktop and that also uses dual-stack mode for IPv4 and IPv6, so that is also fine).
-TODO: it only worked with recreating slice and then running it, then it changed to:
-TASK [network_plugin/calico : Wait for calico kubeconfig to be created] ************************************************************************************
-fatal: [node3]: FAILED! => {"changed": false, "elapsed": 300, "msg": "Timeout when waiting for file /etc/cni/net.d/calico-kubeconfig"}
-fatal: [node2]: FAILED! => {"changed": false, "elapsed": 300, "msg": "Timeout when waiting for file /etc/cni/net.d/calico-kubeconfig"}
+I tried several things, such as changing from kube_proxy_mode "ipvs" to "iptables", but that did not work and cause more issues (such as the calico-nodes-x pods not starting at all now, which did start with ipvs mode for example) and was not the issue, so staying on the default "ipvs" for kubespray was best here. The kube_proxy_mode to iptables was not changing with only running cluster.yml, and also with reset.yml and then cluster.yml. Delete and recreate slice and then run every step again, did apply the changes. Also, running in dual-stack mode for kube-proxy is the default and is fine (also checked this on localhost setup with Docker Desktop and that also uses dual-stack mode for IPv4 and IPv6, so that is also fine).
 
 Eventually, I changed from default_ubuntu_22 image to default_ubuntu_24 image for the VM. This fixed the ip6tables issue, likely because this newer image has support for that and is better compatible with the version of kubespray I use, which is also relatively new and close to 2024. 
 
