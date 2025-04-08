@@ -1,5 +1,7 @@
 # Archive: old versions
+This folder describes old versions we had that we spend time on and therefore kept in this repository.
 
+Below are old documentations, while the rest of this folder contains old solutions, such as an old kubespray solution.
 
 # Old Kubernetes cluster setup with Kubespray from local machine:
 ## Configure Kubernetes cluster/environment

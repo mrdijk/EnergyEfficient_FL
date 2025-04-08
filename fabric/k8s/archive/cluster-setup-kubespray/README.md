@@ -16,9 +16,6 @@ ubuntu@Node2:~$ sudo whoami
 root
 ``` 
 
-TODO: change below to Kubeadm.
-
-
 ## Configure Kubernetes cluster/environment
 ### Preparing Kubespary
 In a Linux terminal (e.g. WSL), execute the following commands to prepare Kubespray for usage:
