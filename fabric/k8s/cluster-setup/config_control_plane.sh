@@ -66,7 +66,9 @@ if ! command -v brew >/dev/null 2>&1; then
   echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/ubuntu/.bashrc
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
   # Recommended steps:
-  sudo apt-get install build-essential
+  # Use -y to ensure it does yes when prompted
+  sudo apt update -y
+  sudo apt-get install -y build-essential
   brew install gcc
 
   echo "Homebrew installed and configured."
