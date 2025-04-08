@@ -26,7 +26,8 @@ kube_version_min_required: v1.29.0
 ## Kube Proxy mode One of ['iptables', 'ipvs']
 # Use iptables for FABRIC to avoid problems (ipvs caused some problems)
 # Do the same in inventory/dynamos-cluster/group_vars/k8s_cluster/k8s-cluster.yml (otherwise overrides it)
-kube_proxy_mode: iptables
+kube_proxy_mode: ipvs
+# TODO: change to correct versoin and update docs here, can just be ipvs likely.
 
 # Kubeadm config api version
 # If kube_version is v1.31 or higher, it will be v1beta4, otherwise it will be v1beta3.

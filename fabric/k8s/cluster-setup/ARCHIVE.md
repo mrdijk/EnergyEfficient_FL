@@ -95,3 +95,50 @@ sudo cat /etc/systemd/system/etcd.service
 # This was due to IPv6 addresses having a specific format. In FABRIC, we use IPv6, such as: 2001:610:2d0:fabc:f816:3eff:fe65:a464
 # So, the IP should be enclosed in [] to make that work. However, more broad problems with using IPv6 was discovered, so a different solution was done, which is now the current setup.
 ```
+
+# Old Kubespray configure with Ubuntu 22 image on FABRIC:
+### Uploading kubespray to the control plane node & Configure Control plane node
+Execute the following steps to upload kubespray to the remote VM:
+```sh
+# Go to the correct directory:
+cd fabric/scripts
+# Execute the script, such as (replace IP of course):
+./upload_to_remote.sh ../kubespray ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config
+
+# In the future you can also only now replace specific files to avoid having to reupload the whole directory, such as (replace IP of course):
+./upload_to_remote.sh ../kubespray/ansible.cfg ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config "~/kubespray"
+# Or:
+./upload_to_remote.sh ../kubespray/inventory/dynamos-cluster/inventory.ini ubuntu 2001:610:2d0:fabc:f816:3eff:fe0f:e479 ~/.ssh/slice_key ../fabric_config/ssh_config "~/kubespray/inventory/dynamos-cluster"
+# Note: "" around ~ is used to avoid resolving the ~ to the local user's home directory (see explanation in the script)
+# You can verify the files by going to the remote host and using cat to view the file for example, such as:
+# SSH into the VM and go to the correct path, such as:
+cd /home/ubuntu/kubespray
+cat ansible.cfg
+# Or:
+cat inventory/dynamos-cluster/inventory.ini
+```
+
+Then you can configure the control plane node:
+```sh
+# SSH into the control plane node, such as (replace IP of course):
+ssh -i ~/.ssh/slice_key -F ssh_config ubuntu@2001:610:2d0:fabc:f816:3eff:fe65:a464
+# Go to the kubespray directory, generally:
+cd /home/ubuntu/kubespray
+# Install dependencies on the VM (only has to be done once)
+sudo apt update
+# Install pip
+sudo apt install -y python3-pip
+# Install requirements of kubespray
+pip3 install -r requirements.txt
+# When asked to restart services just press Enter to restart all of them.
+
+# Export the path to the directory where pip installs it
+export PATH=$HOME/.local/bin:$PATH
+# Test installation, such as:
+ansible version
+
+# Add SSH slice key to connect between the nodes in FABRIC (make sure you followed the SSH config steps from the k8s_setup.ipynb notebook):
+mkdir -p ~/.ssh
+# Copy the files from your local directory to the remote host, such as (replace IP of course):
+./upload_to_remote.sh ~/.ssh/slice_key ubuntu 2001:610:2d0:fabc:f816:3eff:feba:b846 ~/.ssh/slice_key ../fabric_config/ssh_config "~/.ssh"
+```
