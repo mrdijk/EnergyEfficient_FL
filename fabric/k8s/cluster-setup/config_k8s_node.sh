@@ -9,6 +9,7 @@ KUBERNETES_VERSION=v1.31
 echo "================================================ Starting config script for Kubernetes cluster node ================================================"
 
 # ================================================ Prepare apt package manager ================================================
+echo "================================================ Preparing apt package manager ================================================"
 # Update the apt package index and install packages needed to use the Kubernetes apt repository
 sudo apt-get update -y
 # apt-transport-https may be a dummy package; if so, you can skip that package
@@ -34,8 +35,8 @@ echo \
   $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update -y
-# Install latest version:
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+# Install latest version (added noninteractive and -y to use for specific mode here to avoid problems with prompts in the automatic script):
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 # Test installation:
 sudo docker run hello-world
 
@@ -55,9 +56,9 @@ ARCH="amd64"
 # This needs to be the exact name of the releases page
 CRI_DOCKERD_PACKAGE="cri-dockerd-${VERSION}.${ARCH}"
 # Download cri-dockerd
-wget https://github.com/Mirantis/cri-dockerd/releases/download/v${VERSION}/${CRI_DOCKERD_PACKAGE}.tar.gz
+wget https://github.com/Mirantis/cri-dockerd/releases/download/v${VERSION}/${CRI_DOCKERD_PACKAGE}.tgz
 # Unzip and move to correct folder
-tar xvf ${CRI_DOCKERD_PACKAGE}.tar.gz
+tar xvf ${CRI_DOCKERD_PACKAGE}.tgz
 sudo mv ./cri-dockerd /usr/local/bin/
 # Verify installation:
 cri-dockerd --help
@@ -69,11 +70,12 @@ wget https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/sys
 sudo mv cri-docker.socket cri-docker.service /etc/systemd/system/
 sudo sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
 # Start the service with cri-dockerd enabled
-systemctl daemon-reload
-systemctl enable cri-docker.service
-systemctl enable --now cri-docker.socket
+sudo systemctl daemon-reload
+sudo systemctl enable cri-docker.service
+sudo systemctl enable --now cri-docker.socket
 # Verify service is running
-systemctl status cri-docker.socket
+sudo systemctl status cri-docker.socket
+sudo systemctl status cri-docker.service
 
 # ================================================ Install and Setup Kubernetes ================================================
 echo "================================================ Installing and Setting up Kubernetes ================================================"
