@@ -2,7 +2,7 @@
 
 subnet=$1
 ip=$2
-calicoInterface=$3
+interfaceDevice=$3
 
 {
 
@@ -13,7 +13,7 @@ echo "================================================ Starting start script for
 # TODO: remove subnet?
 echo "Subnet: ${subnet}"
 echo "IP: ${ip}"
-echo "Interface: ${calicoInterface}"
+echo "Interface: ${interfaceDevice}"
 
 # Use the cri socket created in the previous step for Docker Engine with cri-dockerd:
 # https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-runtime
@@ -26,15 +26,15 @@ POD_NETWORK_CIDR=192.168.0.0/16
 # TODO: use specific pod network cidr, add explanation here, such as not taken by anything, SSH into a node and run:
 
 
-# TODO: add explanation why this
+# Reset the node with kubeadm before applying to avoid potential previous installations conflicting
 # https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down
 # Use specific CRI socket, see above explanation for variable used
 yes | sudo kubeadm reset -f --cri-socket=$K8S_CRI_SOCKET
 # This does not remove some aspects, as output by the above command, you may want to do that manually if needed, such as:
-# # Remove directory:
-# sudo rm -rf /etc/cni/net.d
-# # Remove iptables (with root access for all commands):
-# sudo bash -c 'iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X'
+# Remove directory:
+sudo rm -rf /etc/cni/net.d
+# Remove iptables (with root access for all commands):
+sudo bash -c 'iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X'
 
 
 # ================================================ Creating configuration file ================================================
@@ -88,11 +88,10 @@ cat kubeadm-kubelet-extraargs.yaml
 echo "Validating config file with kubeadm config validate..."
 # Verify with kubeadm: https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-config/#cmd-config-validate
 kubeadm config validate --config kubeadm-kubelet-extraargs.yaml
-# See the defaults to view the format with these commands:
+# Verify the actual config file at the end of this script
+# See the defaults to view the format with these commands for instpiration and more possible options:
 # kubeadm config print init-defaults
 # kubeadm config print init-defaults --component-configs KubeletConfiguration
-# TODO: how to view configuration afterwards.
-
 
 # ================================================ Initialize kubernetes cluster ================================================
 echo "================= Initializing cluster with Kubeadm =================" 
@@ -103,7 +102,7 @@ echo "================= Initializing cluster with Kubeadm ================="
 # sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket=$K8S_CRI_SOCKET --apiserver-advertise-address=${ip}
 # Ignore specific error for ipv6 forwarding, not necessary here and will otherwise cancel operations
 sudo kubeadm init --config kubeadm-kubelet-extraargs.yaml --ignore-preflight-errors=FileContent--proc-sys-net-ipv6-conf-default-forwarding
-# 
+# TODO: cleanup
 # TODO: with join, you need the token and hash from this command output: kubeadm token create --print-join-command
 # TODO: maybe do need to use subnet like in kubernetes simple example, but then with calico specific settings.
 # TODO: use specific ip like here with this command for worker as well, like here with control-plane so that it does it correctly, verify in kube-proxy pod logs for node.
@@ -139,9 +138,9 @@ CALICO_VERSION=v3.29.3
 # Use the tigera operator (use create because due to the large size of the CRD bundle kubectl apply might exceed request limits)
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml
 # Configurating specifics for Calico: https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/config-options
+# Specifically for this custom resource file to install calico, use this reference: https://docs.tigera.io/calico/latest/reference/installation/api
 # This can be done with a custom resource (with correct version): https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/custom-resources.yaml
 # This is the file content but then specific for this cluster in FABRIC:
-# For example, it uses custom IP pools: https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/config-options#configure-the-pod-ip-range
 cat <<EOF > calico-custom-resources.yaml
 # This section includes base Calico installation configuration.
 # For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.Installation
@@ -157,7 +156,7 @@ spec:
         cidr: 198.51.100.0/24
     # Auto detection for IPv4 of FABRIC specific nodes network
     nodeAddressAutodetectionV4:
-      - interface: "$calicoInterface"
+      interface: "$interfaceDevice"
 ---
 # This section configures the Calico API server.
 # For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.APIServer
@@ -171,8 +170,9 @@ EOF
 cat calico-custom-resources.yaml
 # Create with the custom resources, TODO: explain what this does
 kubectl create -f calico-custom-resources.yaml
-# TODO
+# TODO: left off here, this does nothing yet with applying
 
+# TODO: below for calico can probably be removed
 # # Download calico manifest 
 # # Currently using version 3.29 for compatability with Kubernetes
 # curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml -O
