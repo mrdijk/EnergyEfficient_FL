@@ -52,6 +52,8 @@ echo "================= Creating config file... ================="
 #
 # === Init configuration (for node ip and cri socket) specific: ===
 # Use specific CRI socket, see above explanation for variable used for CRI socket.
+# Also, add localAPIEndpoint to ensure kubectl uses the correct api-server address without detecting IPv6 or other addresses automatically, which caused problems before.
+#
 # Also, set INTERNAL-IP to correct IP for the node of the custom network added over IPv4. By default it would use a different interface, since that is the main one
 # on the FABRIC node, such as with the IP: 10.30.6.111. But we want the IP from the network we created since the nodes can communicate with each other in this network:
 # See https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/kubelet-integration/#configure-kubelets-using-kubeadm
@@ -70,6 +72,8 @@ apiServer:
 ---
 apiVersion: kubeadm.k8s.io/v1beta4
 kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: "$ip"
 nodeRegistration:
   criSocket: "$K8S_CRI_SOCKET"
   kubeletExtraArgs:
@@ -128,9 +132,9 @@ echo "kubeconfig is valid."
 # sleep 10
 # # Download calico manifest with specific version for compatability (see: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements)
 # # Currently using version 3.29 for compatability with Kubernetes
-# curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml -O
-# # Apply manifest
-# kubectl apply -f calico.yaml
+curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml -O
+# Apply manifest
+kubectl apply -f calico.yaml
 # TODO: add here from guide: https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
 # TODOs:
 # Use specific interface and set ips, just like with kube-proxy specific
@@ -149,6 +153,12 @@ sudo cat /var/lib/kubelet/kubeadm-flags.env
 # Verify Node internal IP afterwards
 echo "Verify node internal IP, should now be the custom created network with IPv4/passed ip address to this script"
 sudo kubectl get nodes -o wide
+
+# With problems, verify the kubeconfig, such as the server endpoint used for the default api address:
+# cat $HOME/.kube/config
+# Get server from kubeconfig
+echo "Api server endpoint from kubelet:"
+cat $HOME/.kube/config | grep server
 
 # TODO: print nodes not necessary I think, since right after apply of calico it will be NotReady anyway.
 # # Print nodes
