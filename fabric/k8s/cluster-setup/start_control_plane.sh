@@ -32,7 +32,16 @@ fi
 echo "kubeconfig is valid."
 
 # === Calico for Networking ===
-kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+# Wait shortly to ensure initialization is complete
+sleep 10
+# Apply Calico 
+echo "Applying Calico CNI plugin..."
+# Download calico manifest with specific version for compatability (see: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements)
+# Currently using version 3.29 for compatability with Kubernetes
+curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml -O
+# Apply manifest
+kubectl apply -f calico.yaml
+
 # Print nodes
 kubectl get nodes
 
