@@ -19,7 +19,7 @@ sudo apt-get update -qq -y
 sudo apt-get install -qq -y apt-transport-https ca-certificates curl gpg
 
 # ================================================ Install and Setup Docker as Container Runtime ================================================
-echo "================================================ Installing and Setting up Docker for Container Runtime ================================================"
+echo "================= Installing and Setting up Docker for Container Runtime ================="
 # Setup Container Runtime with Docker: https://v1-31.docs.kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
 
 # ==== Docker Engine ====
@@ -109,7 +109,7 @@ sudo systemctl status cri-docker.socket
 # sudo systemctl status cri-docker.service
 
 # ================================================ Install and Setup Kubernetes ================================================
-echo "================================================ Installing and Setting up Kubernetes ================================================"
+echo "================= Installing and Setting up Kubernetes ================="
 # Download the public signing key for the Kubernetes package repositories. 
 # The same signing key is used for all repositories so you can disregard the version in the URL
 # Note: In releases older than Debian 12 and Ubuntu 22.04, directory /etc/apt/keyrings does not exist by default, and it should be created before the curl command
@@ -138,7 +138,7 @@ sudo swapoff -a
 sudo systemctl enable --now kubelet
 
 # ================================================ Verify Cgroup drivers ================================================
-echo "================================================ Verify Cgroup drivers ================================================"
+echo "================= Verify Cgroup drivers ================="
 # See: https://v1-31.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/configure-cgroup-driver/
 # Recommended with kubernetes v1.31 is to use the stystemd cgroup driver, which is the default from kubernetes v1.22 and later:
 # https://v1-31.docs.kubernetes.io/docs/setup/production-environment/container-runtimes/#systemd-cgroup-driver 
@@ -147,7 +147,8 @@ echo "================================================ Verify Cgroup drivers ===
 # Docker Container Runtime, this is the most important, probably kubeadm will detect it automatically from this container runtime
 echo "Docker (container runtime) cgroup driver: "
 sudo docker info | grep -i cgroup
-# TODO: verify cgroup driver for kubeadm after init in next script?
+
+echo "Configuration for this node complete."
 
 # Everything inside this block (stdout and stderr) will be piped and logged
 # The line below does the following:
