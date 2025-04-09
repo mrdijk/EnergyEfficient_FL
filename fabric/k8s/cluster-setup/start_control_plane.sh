@@ -12,15 +12,29 @@ echo "================================================ Starting start script for
 echo "Subnet: ${subnet}"
 echo "IP: ${ip}"
 
+# Use the cri socket created in the previous step for Docker Engine with cri-dockerd:
+# https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-runtime
+# You can verify this with SSH into the node and running "cd /var/run" and then "ls" to see the socket file.
+# This is important, since it may otherwise use a different CRI than desired
+K8S_CRI_SOCKET=unix:///var/run/cri-dockerd.sock
+
 # TODO: add explanation why this
-yes | sudo kubeadm reset
+# https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down
+# Use specific CRI socket, see above explanation for variable used
+yes | sudo kubeadm reset -f --cri-socket=$K8S_CRI_SOCKET
+# This does not remove some aspects, as output by the above command, you may want to do that manually if needed, such as:
+# Remove directory:
+# sudo rm -rf /etc/cni/net.d
+# Remove iptables (with root access for all commands):
+# sudo bash -c 'iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X'
 
 # ================================================ Initialize kubernetes cluster ================================================
 echo "================= Initializing cluster with Kubeadm =================" 
-# Initialize the cluster with the subnet and current ip. Also use the cri socket created in the previous step for Docker Engine with cri-dockerd:
-# https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-runtime
-# You can verify this with SSH into the node and running "cd /var/run" and then "ls" to see the socket file.
-sudo kubeadm init --pod-network-cidr=${subnet} --apiserver-advertise-address=${ip} --cri-socket=unix:///var/run/cri-dockerd.sock
+# Initialize the cluster with the subnet and current ip. 
+# sudo kubeadm init --pod-network-cidr=${subnet} --apiserver-advertise-address=${ip} --cri-socket=unix:///var/run/cri-dockerd.sock
+sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=${ip} --cri-socket=$K8S_CRI_SOCKET
+# TODO: use specific pod network cidr, add explanation here, such as not taken by anything, SSH into a node and run:
+# "ip a" and "ip route" to get real subnets you can use to avoid conflicts
 # TODO: with join, you need the token and hash from this command output.
 
 # === KUBECONFIG Setup ===
