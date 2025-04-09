@@ -30,12 +30,17 @@ yes | sudo kubeadm reset -f --cri-socket=$K8S_CRI_SOCKET
 
 # ================================================ Initialize kubernetes cluster ================================================
 echo "================= Initializing cluster with Kubeadm =================" 
-# Initialize the cluster with the subnet and current ip. 
+# Initialize the cluster, see reference: https://v1-31.docs.kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
+# TODO: explain using ip, control-plane ip for 
 # sudo kubeadm init --pod-network-cidr=${subnet} --apiserver-advertise-address=${ip} --cri-socket=unix:///var/run/cri-dockerd.sock
-sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=${ip} --cri-socket=$K8S_CRI_SOCKET
+sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket=$K8S_CRI_SOCKET --apiserver-advertise-address=${ip}
 # TODO: use specific pod network cidr, add explanation here, such as not taken by anything, SSH into a node and run:
-# "ip a" and "ip route" to get real subnets you can use to avoid conflicts
-# TODO: with join, you need the token and hash from this command output.
+# "ip a" and "ip route" to get real subnets you can use to avoid conflicts. This is the same CIDR used in the example for Calico: 
+# https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart#create-a-single-host-kubernetes-cluster
+# TODO: with join, you need the token and hash from this command output: kubeadm token create --print-join-command
+# TODO: maybe do need to use subnet like in kubernetes simple example, but then with calico specific settings.
+# TODO: use specific ip like here with this command for worker as well, like here with control-plane so that it does it correctly, verify in kube-proxy pod logs for node.
+
 
 # === KUBECONFIG Setup ===
 # Set up kubeconfig for the current user to use kubectl
@@ -54,15 +59,30 @@ if ! kubectl version >/dev/null 2>&1; then
 fi
 echo "kubeconfig is valid."
 
+# TODO: set INTERNAL-IP to correct IP for the node of the custom network added over IPv4. By default it would use a different interface, since that is the main one
+# on the FABRIC node, such as with the IP: 10.30.6.111. But we want the IP from the network we created since the nodes can communicate with each other in this network:
+# See https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/kubelet-integration/#configure-kubelets-using-kubeadm
+# And specifically: https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/kubelet-integration/#workflow-when-using-kubeadm-init
+# $ip
+
+# See reference, specifically node-ip: https://v1-31.docs.kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
+# Verify node, should use correct IP now:
+kubectl get nodes -o wide
+# TODO: maybe:https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/control-plane-flags/#customizing-kube-proxy
+
+
 # ================================================ Calico for Networking ================================================
-echo "================= Applying Calico CNI plugin =================" 
-# Wait shortly to ensure initialization is complete
-sleep 10
-# Download calico manifest with specific version for compatability (see: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements)
-# Currently using version 3.29 for compatability with Kubernetes
-curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml -O
-# Apply manifest
-kubectl apply -f calico.yaml
+# echo "================= Applying Calico CNI plugin =================" 
+# # Wait shortly to ensure initialization is complete
+# sleep 10
+# # Download calico manifest with specific version for compatability (see: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements)
+# # Currently using version 3.29 for compatability with Kubernetes
+# curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml -O
+# # Apply manifest
+# kubectl apply -f calico.yaml
+# TODO: add here from guide: https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
+# TODOs:
+# Use specific interface and set ips, just like with kube-proxy specific
 
 # ================================================ Verification ================================================
 # TODO: verify cgroup driver for kubeadm after init in next script?
