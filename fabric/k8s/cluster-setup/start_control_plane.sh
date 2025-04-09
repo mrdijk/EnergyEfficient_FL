@@ -2,6 +2,7 @@
 
 subnet=$1
 ip=$2
+calicoInterface=$3
 
 {
 
@@ -9,8 +10,10 @@ ip=$2
 
 echo "================================================ Starting start script for Kubernetes cluster control plane node ================================================"
 
+# TODO: remove subnet?
 echo "Subnet: ${subnet}"
 echo "IP: ${ip}"
+echo "Interface: ${calicoInterface}"
 
 # Use the cri socket created in the previous step for Docker Engine with cri-dockerd:
 # https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-runtime
@@ -128,14 +131,54 @@ echo "kubeconfig is valid."
 
 # ================================================ Calico for Networking ================================================
 # echo "================= Applying Calico CNI plugin =================" 
-# # Wait shortly to ensure initialization is complete
-# sleep 10
-# # Download calico manifest with specific version for compatability (see: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements)
+# Wait shortly to ensure initialization is complete
+sleep 5
+# See for a full guide: https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
+# Use Calico with specific version for compatability with kubernetes (see: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements)
+CALICO_VERSION=v3.29.3
+# Use the tigera operator (use create because due to the large size of the CRD bundle kubectl apply might exceed request limits)
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml
+# Configurating specifics for Calico: https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/config-options
+# This can be done with a custom resource (with correct version): https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/custom-resources.yaml
+# This is the file content but then specific for this cluster in FABRIC:
+# For example, it uses custom IP pools: https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/config-options#configure-the-pod-ip-range
+cat <<EOF > calico-custom-resources.yaml
+# This section includes base Calico installation configuration.
+# For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.Installation
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+spec:
+  # Configures Calico networking: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io%2fv1.CalicoNetworkSpec
+  calicoNetwork:
+    ipPools:
+      - name: default-ipv4-ippool
+        cidr: 198.51.100.0/24
+    # Auto detection for IPv4 of FABRIC specific nodes network
+    nodeAddressAutodetectionV4:
+      - interface: "$calicoInterface"
+---
+# This section configures the Calico API server.
+# For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.APIServer
+apiVersion: operator.tigera.io/v1
+kind: APIServer
+metadata:
+  name: default
+spec: {}
+EOF
+# Verify created file content:
+cat calico-custom-resources.yaml
+# Create with the custom resources, TODO: explain what this does
+kubectl create -f calico-custom-resources.yaml
+# TODO
+
+# # Download calico manifest 
 # # Currently using version 3.29 for compatability with Kubernetes
-curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml -O
-# Apply manifest
-kubectl apply -f calico.yaml
-# TODO: add here from guide: https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
+# curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml -O
+# # Apply manifest
+# kubectl apply -f calico.yaml
+# TODO: add here from guide: 
 # TODOs:
 # Use specific interface and set ips, just like with kube-proxy specific
 
@@ -150,7 +193,7 @@ kubectl -n kube-system get cm kubeadm-config -o yaml
 # It explains it creates a file /var/lib/kubelet/kubeadm-flags.env, which we can verify the contents with this command:
 echo "Verify kubeadm flags, should now include --node-ip" 
 sudo cat /var/lib/kubelet/kubeadm-flags.env
-# Verify Node internal IP afterwards
+# Verify Node internal IP afterwards. This will likely still show status NotReady, since it takes a while before Calico to apply.
 echo "Verify node internal IP, should now be the custom created network with IPv4/passed ip address to this script"
 kubectl get nodes -o wide
 
