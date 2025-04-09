@@ -152,7 +152,7 @@ echo "Verify kubeadm flags, should now include --node-ip"
 sudo cat /var/lib/kubelet/kubeadm-flags.env
 # Verify Node internal IP afterwards
 echo "Verify node internal IP, should now be the custom created network with IPv4/passed ip address to this script"
-sudo kubectl get nodes -o wide
+kubectl get nodes -o wide
 
 # With problems, verify the kubeconfig, such as the server endpoint used for the default api address:
 # cat $HOME/.kube/config
