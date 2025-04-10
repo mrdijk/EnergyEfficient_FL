@@ -26,7 +26,8 @@ POD_NETWORK_CIDR=192.168.0.0/16
 # TODO: use specific pod network cidr, add explanation here, such as not taken by anything, SSH into a node and run:
 
 
-# Reset the node with kubeadm before applying to avoid potential previous installations conflicting
+# Reset the node with kubeadm before applying to avoid potential previous installations conflicting, allowing to rerun this script without having to completely 
+# recreate nodes/VMs before retrying the script.
 # https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down
 # Use specific CRI socket, see above explanation for variable used
 yes | sudo kubeadm reset -f --cri-socket=$K8S_CRI_SOCKET
@@ -36,6 +37,41 @@ sudo rm -rf /etc/cni/net.d
 # Remove iptables (with root access for all commands):
 sudo bash -c 'iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X'
 
+
+# TODO: additional settings here, such as ip forwarding:
+# See ip forwarding setting:
+# sysctl net.ipv4.ip_forward
+# See firewall, should be inactive (since the slice is already isolated, it is not really required here)
+# sudo ufw status verbose
+# Can disable if needed with:
+# sudo ufw disable
+# See iptables (normal and NAT related)
+# sudo iptables -L -n -v
+# sudo iptables -t nat -L -n -v
+# TODO: after this it worked:
+sudo sysctl -w net.ipv4.ip_forward=1
+sudo ip route add 10.96.0.0/12 dev enp7s0
+sudo iptables -P FORWARD ACCEPT
+sudo iptables -P INPUT ACCEPT
+sudo iptables -P OUTPUT ACCEPT
+kubectl delete pod -n kube-system -l k8s-app=calico-kube-controllers
+kubectl delete pod -n kube-system -l k8s-app=calico-node
+# TODO: only ip route add also did it with tigera-operator, after restarting pod:
+sudo ip route add 10.96.0.0/12 dev enp7s0  # Service CIDR
+sudo ip route add 192.168.0.0/16 dev enp7s0  # Pod CIDR used by Calico
+# TODO: pod subnet also necessary?
+kubectl delete pod -n tigera-operator -l k8s-app=tigera-operator
+# TODO: ip for pod subnet is not needed, since this causes issues.
+# TODO: try this and then retry with k8s:
+# iptables --flush
+# iptables -t nat --flush
+sudo systemctl stop kubelet
+sudo systemctl stop docker
+sudo iptables --flush
+sudo iptables -tnat --flush
+sudo systemctl start kubelet
+sudo systemctl start docker
+# TODO: even after 
 
 # ================================================ Creating configuration file ================================================
 echo "================= Creating config file... =================" 
@@ -87,7 +123,7 @@ EOF
 cat kubeadm-kubelet-extraargs.yaml
 echo "Validating config file with kubeadm config validate..."
 # Verify with kubeadm: https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-config/#cmd-config-validate
-kubeadm config validate --config kubeadm-kubelet-extraargs.yaml
+sudo kubeadm config validate --config kubeadm-kubelet-extraargs.yaml
 # Verify the actual config file at the end of this script
 # See the defaults to view the format with these commands for instpiration and more possible options:
 # kubeadm config print init-defaults
@@ -153,7 +189,7 @@ spec:
   calicoNetwork:
     ipPools:
       - name: default-ipv4-ippool
-        cidr: 198.51.100.0/24
+        cidr: "$POD_NETWORK_CIDR"
     # Auto detection for IPv4 of FABRIC specific nodes network
     nodeAddressAutodetectionV4:
       interface: "$interfaceDevice"
@@ -168,8 +204,9 @@ spec: {}
 EOF
 # Verify created file content:
 cat calico-custom-resources.yaml
+# Note: if nothing changes and you do not see calico-node-x pods created, then it is likely the tigera-operator encountered errors (even though it is running, see logs).
 # Create with the custom resources, TODO: explain what this does
-kubectl create -f calico-custom-resources.yaml
+# kubectl create -f calico-custom-resources.yaml
 # TODO: left off here, this does nothing yet with applying
 
 # TODO: below for calico can probably be removed
@@ -178,6 +215,8 @@ kubectl create -f calico-custom-resources.yaml
 # curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml -O
 # # Apply manifest
 # kubectl apply -f calico.yaml
+# Or:
+# kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml
 # TODO: add here from guide: 
 # TODOs:
 # Use specific interface and set ips, just like with kube-proxy specific
@@ -196,6 +235,7 @@ sudo cat /var/lib/kubelet/kubeadm-flags.env
 # Verify Node internal IP afterwards. This will likely still show status NotReady, since it takes a while before Calico to apply.
 echo "Verify node internal IP, should now be the custom created network with IPv4/passed ip address to this script"
 kubectl get nodes -o wide
+kubectl get pods --all-namespaces
 
 # With problems, verify the kubeconfig, such as the server endpoint used for the default api address:
 # cat $HOME/.kube/config
