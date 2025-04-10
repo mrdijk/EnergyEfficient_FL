@@ -21,9 +21,11 @@ echo "Interface: ${interfaceDevice}"
 # This is important, since it may otherwise use a different CRI than desired. 
 K8S_CRI_SOCKET=unix:///var/run/cri-dockerd.sock
 # Subnet used for pods in the kubernetes cluster. Run in a node after SSH into it "ip a" and "ip route" to get real subnets you can use to avoid conflicts. 
-# This is the same CIDR used in the example for Calico: https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart#create-a-single-host-kubernetes-cluster
+# This is the same pods CIDR used in the example for Calico: https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart#create-a-single-host-kubernetes-cluster
 POD_NETWORK_CIDR=192.168.0.0/16
-# TODO: use specific pod network cidr, add explanation here, such as not taken by anything, SSH into a node and run:
+# Do the same for the services, below is the default (see result of "kubeadm config print init-defaults")
+SERVICE_NETWORK_CIDR=10.96.0.0/12
+
 
 
 # Reset the node with kubeadm before applying to avoid potential previous installations conflicting, allowing to rerun this script without having to completely 
@@ -49,29 +51,34 @@ sudo bash -c 'iptables -F && iptables -t nat -F && iptables -t mangle -F && ipta
 # sudo iptables -L -n -v
 # sudo iptables -t nat -L -n -v
 # TODO: after this it worked:
-sudo sysctl -w net.ipv4.ip_forward=1
+# sudo sysctl -w net.ipv4.ip_forward=1
+# sudo ip route add 10.96.0.0/12 dev enp7s0
+# sudo iptables -P FORWARD ACCEPT
+# sudo iptables -P INPUT ACCEPT
+# sudo iptables -P OUTPUT ACCEPT
+# kubectl delete pod -n kube-system -l k8s-app=calico-kube-controllers
+# kubectl delete pod -n kube-system -l k8s-app=calico-node
+# # TODO: only ip route add also did it with tigera-operator, after restarting pod:
+# sudo ip route add 10.96.0.0/12 dev enp7s0  # Service CIDR
+# sudo ip route add 192.168.0.0/16 dev enp7s0  # Pod CIDR used by Calico
+# # TODO: pod subnet also necessary?
+# kubectl delete pod -n tigera-operator -l k8s-app=tigera-operator
+# # TODO: ip for pod subnet is not needed, since this causes issues.
+# # TODO: try this and then retry with k8s:
+# # iptables --flush
+# # iptables -t nat --flush
+# sudo systemctl stop kubelet
+# sudo systemctl stop docker
+# sudo iptables --flush
+# sudo iptables -tnat --flush
+# sudo systemctl start kubelet
+# sudo systemctl start docker
+# TODO: even after that it does not work.
+
+# TODO: what does work to run tigera-operator:
 sudo ip route add 10.96.0.0/12 dev enp7s0
-sudo iptables -P FORWARD ACCEPT
-sudo iptables -P INPUT ACCEPT
-sudo iptables -P OUTPUT ACCEPT
-kubectl delete pod -n kube-system -l k8s-app=calico-kube-controllers
-kubectl delete pod -n kube-system -l k8s-app=calico-node
-# TODO: only ip route add also did it with tigera-operator, after restarting pod:
-sudo ip route add 10.96.0.0/12 dev enp7s0  # Service CIDR
-sudo ip route add 192.168.0.0/16 dev enp7s0  # Pod CIDR used by Calico
-# TODO: pod subnet also necessary?
-kubectl delete pod -n tigera-operator -l k8s-app=tigera-operator
-# TODO: ip for pod subnet is not needed, since this causes issues.
-# TODO: try this and then retry with k8s:
-# iptables --flush
-# iptables -t nat --flush
-sudo systemctl stop kubelet
-sudo systemctl stop docker
-sudo iptables --flush
-sudo iptables -tnat --flush
-sudo systemctl start kubelet
-sudo systemctl start docker
-# TODO: even after 
+# TODO: do need to add pod subnet as well?
+# kubectl delete pod -n tigera-operator -l k8s-app=tigera-operator
 
 # ================================================ Creating configuration file ================================================
 echo "================= Creating config file... =================" 
@@ -81,6 +88,9 @@ echo "================= Creating config file... ================="
 # Also see: https://v1-31.docs.kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/
 # Use the above specific version with the apiVersion, this is the corresponding reference!
 # If some configuration types are not provided, or provided only partially, kubeadm will use default values. So, only specify absolutely required args here.
+# See the defaults to view the format with these commands for instpiration and more possible options:
+# kubeadm config print init-defaults
+# kubeadm config print init-defaults --component-configs KubeletConfiguration
 #
 # === Cluster configuration specific: ===
 # Pod subnet is the --pod-network-cidr option, used for internal pod networking, see explanation above where the variable is created.
@@ -104,6 +114,7 @@ apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 networking:
   podSubnet: "$POD_NETWORK_CIDR"
+  serviceSubnet: "$SERVICE_NETWORK_CIDR"
 apiServer:
   extraArgs:
   - name: "advertise-address"
@@ -125,9 +136,6 @@ echo "Validating config file with kubeadm config validate..."
 # Verify with kubeadm: https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-config/#cmd-config-validate
 sudo kubeadm config validate --config kubeadm-kubelet-extraargs.yaml
 # Verify the actual config file at the end of this script
-# See the defaults to view the format with these commands for instpiration and more possible options:
-# kubeadm config print init-defaults
-# kubeadm config print init-defaults --component-configs KubeletConfiguration
 
 # ================================================ Initialize kubernetes cluster ================================================
 echo "================= Initializing cluster with Kubeadm =================" 
@@ -165,6 +173,7 @@ echo "kubeconfig is valid."
 
 
 # ================================================ Calico for Networking ================================================
+# Read the documentation to understand what needs to be done for kubernetes: https://docs.tigera.io/calico/latest/about/kubernetes-training/
 # echo "================= Applying Calico CNI plugin =================" 
 # Wait shortly to ensure initialization is complete
 sleep 5
@@ -175,6 +184,7 @@ CALICO_VERSION=v3.29.3
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml
 # Configurating specifics for Calico: https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/config-options
 # Specifically for this custom resource file to install calico, use this reference: https://docs.tigera.io/calico/latest/reference/installation/api
+# See for choosing the network option: https://docs.tigera.io/calico/latest/networking/determine-best-networking, specifically: https://docs.tigera.io/calico/latest/networking/determine-best-networking#networking-options
 # This can be done with a custom resource (with correct version): https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/custom-resources.yaml
 # This is the file content but then specific for this cluster in FABRIC:
 cat <<EOF > calico-custom-resources.yaml
@@ -187,9 +197,17 @@ metadata:
 spec:
   # Configures Calico networking: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io%2fv1.CalicoNetworkSpec
   calicoNetwork:
+    # Disable BGP, since FABRIC nodes do not support it by default
+    bgp: Disabled
+    # See: https://docs.tigera.io/calico/latest/reference/resources/ippool
     ipPools:
       - name: default-ipv4-ippool
         cidr: "$POD_NETWORK_CIDR"
+        # Use VXLAN since FABRIC nodes do not support BGP by default
+        encapsulation: VXLAN
+        nodeSelector: all()
+    # Allow IP forwarding, similar to 
+    containerIPForwarding: Enabled
     # Auto detection for IPv4 of FABRIC specific nodes network
     nodeAddressAutodetectionV4:
       interface: "$interfaceDevice"
@@ -242,6 +260,8 @@ kubectl get pods --all-namespaces
 # Get server from kubeconfig
 echo "Api server endpoint from kubelet:"
 cat $HOME/.kube/config | grep server
+# Display cluster information
+kubectl cluster-info
 
 # TODO: print nodes not necessary I think, since right after apply of calico it will be NotReady anyway.
 # # Print nodes

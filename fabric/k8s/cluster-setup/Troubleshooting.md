@@ -9,25 +9,73 @@ See for more information: https://kubernetes.io/docs/tasks/debug/
 ## Calico-kube-controllers not working/kube-proxy problems
 Problem:
 ```sh
-calico-node 2025-04-10 06:23:30.692 [INFO][9] startup/startup.go 459: Hit error connecting to datastore - retry error=Get "https://10.96.0.1:443/api/v1/nodes/foo": dial tcp 10.96.0.1:443: connect: network is unreachable
+W0410 12:09:08.788591       1 reflector.go:535] pkg/mod/k8s.io/client-go@v0.28.15/tools/cache/reflector.go:229: failed to list *v1.ConfigMap: Get "https://10.96.0.1:443/api/v1/namespaces/calico-system/conf ││ igmaps?fieldSelector=metadata.name%3Dactive-operator&limit=500&resourceVersion=0": dial tcp 10.96.0.1:443: connect: network is unreachable
 ```
 This was fixed by manually running on the node in SSH:
 ```sh
 sudo sysctl -w net.ipv4.ip_forward=1
+# Add the service subnet to the ip routes
 sudo ip route add 10.96.0.0/12 dev enp7s0
-sudo iptables -P FORWARD ACCEPT
-kubectl delete pod -n kube-system -l k8s-app=calico-kube-controllers
-kubectl delete pod -n calico-system -l k8s-app=calico-node
+# Restart pod for calico tigera-operator
+kubectl delete pod -n tigera-operator -l k8s-app=tigera-operator
 ```
-TODO: what exactly did it?
-
-Second problem after that:
+However, we later found out that this fix causes more problems later, since the route of the services in Kubernetes are now routed through the physical interface (enp7s0) we created in FABRIC, causing the following error, since this interface does not know any route in the subnet: 10.96.0.0/12:
 ```sh
 2025-04-10 06:49:10.689 [ERROR][1] kube-controllers/client.go 320: Error getting cluster information config ClusterInformation="default" error=Get "https://10.96.0.1:443/apis/crd.projectcalico.org/v1/clust ││ erinformations/default": dial tcp 10.96.0.1:443: connect: no route to host
 ```
 
+TODO: what is the real fix?
+What we did to fix it on FABRIC:
+```sh
+# Debugging:
+# On control plane, allow scheduling for debugging
+kubectl taint nodes node1 node-role.kubernetes.io/control-plane-
+# Test connection inside the Kubernetes cluster
+# Run a test pod to execute commands in it in the control plane node (node1)
+kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
+# Here you can test connectivity from a pod and other things from a pod for example
+
+# Show all, including local:
+ip route show table all
+# Add interface for service subnet, is the result of local, in the above case it was:
+# local 127.0.0.1 dev lo table local proto kernel scope host src 127.0.0.1
+# So, the corresponding route to add on the node:
+sudo ip route add 10.96.0.0/12 via 127.0.0.1 dev lo
+# You can delete with this if you want, such as to test if it is working without:
+sudo ip route delete 10.96.0.0/12 via 127.0.0.1 dev lo
+# Test connection, should not say "Couldn't connect to server", even 403 Forbidden is good since it can reach it in that case:
+curl -k https://10.96.0.1:443
+# TODO: above does not work, below maybe:
+# 1. Create a dummy interface
+sudo ip link add kube-dummy0 type dummy
+# 2. Assign the API service IP to it
+sudo ip addr add 10.96.0.1/32 dev kube-dummy0
+# 3. Bring it up
+sudo ip link set kube-dummy0 up
+
+
+
+# TODO: old, can be removed
+# Ensure the ip routes for the pod subnet and service subnet in kubernetes are added:
+sudo ip route add 10.96.0.0/12 dev enp7s0  # Service CIDR
+sudo ip route add 192.168.0.0/16 dev enp7s0  # Pod CIDR used by Calico
+# Ensure it goes to the correct interface, should print the above specified one, such as:
+ubuntu@Node1:~$ ip route get 10.96.0.1
+# TODO: that did not do anything now.
+# TODO: this is not good.
+
+
+# SSH into the node and execute something from a calico pod (replace with actual pod name), such as:
+kubectl exec -it -n calico-system calico-node-6c62k -- bash
+```
+TODO: finish this with eventual solution.
+
+TODO: this below can be left at the bottom:
 A lot of guides said:
 ```sh
+# Ensure ip forwarding is allowed, should be 1 for enabled:
+sudo sysctl net.ipv4.ip_forward
+
 # Stop kubelet and docker in SSH in the node:
 sudo systemctl stop kubelet
 sudo systemctl stop docker
@@ -59,20 +107,6 @@ sudo systemctl start docker
 # However, for FABRIC this did not work unfortunately.
 ```
 This article was helpful here: https://www.baeldung.com/ops/kubernetes-error-no-route-to-host. However, it did not work in this case, meaning something else was the issue.
-
-What we did to fix it on FABRIC:
-```sh
-# Ensure the ip routes for the pod subnet and service subnet in kubernetes are added:
-sudo ip route add 10.96.0.0/12 dev enp7s0  # Service CIDR
-sudo ip route add 192.168.0.0/16 dev enp7s0  # Pod CIDR used by Calico
-# Ensure it goes to the correct interface, should print the above specified one, such as:
-ubuntu@Node1:~$ ip route get 10.96.0.1
-# TODO: that did not do anything now.
-
-# SSH into the node and execute something from a calico pod (replace with actual pod name), such as:
-kubectl exec -it -n calico-system calico-node-6c62k -- bash
-```
-TODO: finish this with eventual solution.
 
 
 ### Additional helpful commands found during the process
