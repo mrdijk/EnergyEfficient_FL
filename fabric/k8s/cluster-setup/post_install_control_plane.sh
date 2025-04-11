@@ -33,6 +33,7 @@ if [ -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
 fi
 # Debug print
 brew --version || echo "brew not found"
+# Note: to test this script, you can uninstall brew entirely with this command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall.sh)"
 
 if ! command -v brew >/dev/null 2>&1; then
   echo "Installing Homebrew on Linux..."
@@ -46,9 +47,11 @@ if ! command -v brew >/dev/null 2>&1; then
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
   # Recommended steps:
   # Use -y to ensure it does yes when prompted
-  sudo apt update -y
-  sudo apt-get install -y build-essential
-  brew install gcc
+  # -qq suppresses all output except errors to avoid much outputs in the logs for clarity. -y prompts yes for any inputs
+  sudo apt update -y -qq
+  sudo apt-get install -y -qq build-essential
+  # Use -q for quiet mode, only showing errors
+  brew install -q gcc
 
   echo "Homebrew installed and configured."
 
@@ -62,8 +65,8 @@ fi
 # === K9s Installation ===
 echo "Installing k9s..."
 if ! command -v k9s >/dev/null 2>&1; then
-  # Use brew to install k9s
-  brew install derailed/k9s/k9s
+  # Use brew to install k9s. Use -q for quiet mode, only showing errors
+  brew install -q derailed/k9s/k9s
   echo "k9s installed."
 else
   echo "k9s is already installed, skipping..."
@@ -72,8 +75,8 @@ fi
 # === Etcd Installation ===
 echo "Installing Etcd..."
 if ! command -v etcd >/dev/null 2>&1; then
-  # Use brew to install k9s
-  brew install etcd
+  # Use brew to install etcd. Use -q for quiet mode, only showing errors
+  brew install -q etcd
   echo "etcd installed."
 else
   echo "etcd is already installed, skipping..."
@@ -82,7 +85,8 @@ fi
 # === Helm Installation ===
 echo "Installing Helm (Kubernetes package manager)..."
 if ! command -v helm >/dev/null 2>&1; then
-  brew install helm
+  # Use -q for quiet mode, only showing errors
+  brew install -q helm
   echo "Helm installed."
 else
   echo "Helm is already installed, skipping..."

@@ -177,6 +177,7 @@ echo "================= Setting up network plugin for Kubernetes cluster =======
 # https://v1-31.docs.kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy
 # Specific plugin used here (Flannel): https://github.com/flannel-io/flannel
 # Wait shortly to ensure initialization is complete
+echo "Waiting briefly for cluster to stabilize..."
 sleep 5
 # Make sure envsubst is present:
 echo "Making sure envsubst is present..."
@@ -220,6 +221,9 @@ echo "Cluster information:"
 kubectl cluster-info
 
 # === Print join command so it can be captured by orchestration script ===
+# Wait shortly to ensure initialization is complete
+echo "Waiting briefly for cluster to stabilize..."
+sleep 5
 echo "=====BEGIN_JOIN_COMMAND====="
 sudo kubeadm token create --print-join-command
 echo "=====END_JOIN_COMMAND====="
