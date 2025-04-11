@@ -28,7 +28,7 @@ TODO: what is the real fix?
 What we did to fix it on FABRIC:
 ```sh
 # Debugging:
-# On control plane, allow scheduling for debugging
+# On control plane, allow scheduling for debugging: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm#control-plane-node-isolation
 kubectl taint nodes node1 node-role.kubernetes.io/control-plane-
 # Test connection inside the Kubernetes cluster
 # Run a test pod to execute commands in it in the control plane node (node1)
@@ -53,6 +53,7 @@ sudo ip addr add 10.96.0.1/32 dev kube-dummy0
 # 3. Bring it up
 sudo ip link set kube-dummy0 up
 
+# TODO: if Flannel works, without encapsulation like VXLAN, then maybe that also works with Calico to disable that and allow host networking!?!?
 
 
 # TODO: old, can be removed

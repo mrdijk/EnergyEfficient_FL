@@ -40,6 +40,38 @@ sudo rm -rf /etc/cni/net.d
 sudo bash -c 'iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X'
 
 
+# TODO: add here explaining preparing the host for the network plugin: https://github.com/flannel-io/flannel?tab=readme-ov-file#deploying-flannel-manually
+# Ensure bridge and ip forward are enabled and make it persistent 
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+EOF
+sudo sysctl --system
+# Ensure the required CNI Network Plugin is installed: https://github.com/containernetworking/plugins
+ARCH=$(uname -m)
+  case $ARCH in
+    armv7*) ARCH="arm";;
+    aarch64) ARCH="arm64";;
+    x86_64) ARCH="amd64";;
+  esac
+mkdir -p /opt/cni/bin
+# Check if CNI plugins are already present
+if [ ! -f /opt/cni/bin/bridge ] || [ ! -f /opt/cni/bin/host-local ]; then
+  echo "CNI plugins not found — downloading and extracting..."
+  curl -O -L https://github.com/containernetworking/plugins/releases/download/v1.6.2/cni-plugins-linux-$ARCH-v1.6.2.tgz
+tar -C /opt/cni/bin -xzf cni-plugins-linux-$ARCH-v1.6.2.tgz
+else
+  echo "CNI plugins already exist — skipping download and extraction."
+fi
+# Make sure br_netfilter is loaded (required for Flannel)
+sudo modprobe br_netfilter
+# Check:
+lsmod | grep br_netfilter
+
+
+
+
 # TODO: additional settings here, such as ip forwarding:
 # See ip forwarding setting:
 # sysctl net.ipv4.ip_forward
@@ -76,7 +108,7 @@ sudo bash -c 'iptables -F && iptables -t nat -F && iptables -t mangle -F && ipta
 # TODO: even after that it does not work.
 
 # TODO: what does work to run tigera-operator:
-sudo ip route add 10.96.0.0/12 dev enp7s0
+# sudo ip route add 10.96.0.0/12 dev enp7s0
 # TODO: do need to add pod subnet as well?
 # kubectl delete pod -n tigera-operator -l k8s-app=tigera-operator
 
@@ -173,6 +205,26 @@ echo "kubeconfig is valid."
 
 
 # ================================================ Calico for Networking ================================================
+# Make sure envsubst is present:
+envsubst --help
+# Set variables for the environment
+export FLANNEL_IFACE="$interfaceDevice"
+export FLANNEL_NETWORK="$POD_NETWORK_CIDR"
+# TODO: maybe this:
+# ip route add $SUBNET via $PUBLIC_IP
+# This replaces variables like ${FLANNEL_IFACE} with their current values from the environment, and saves the result to a new file
+envsubst < kube-flannel.yaml > kube-flannel-edited.yaml
+# View file, should have replaced variables
+cat kube-flannel-edited.yaml
+# Apply the custom kube-flannel, original can be found here: https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+kubectl apply -f kube-flannel-edited.yaml
+# TODO: do need to specify interface, but try without first
+# TODO: see DirectRouting option, maybe this is good since they are on the same subnet: https://github.com/flannel-io/flannel/blob/master/Documentation/backends.md
+
+
+
+
+# TODO: save this to old and commented at the bottom of this script if it works with Flannel
 # Read the documentation to understand what needs to be done for kubernetes: https://docs.tigera.io/calico/latest/about/kubernetes-training/
 # echo "================= Applying Calico CNI plugin =================" 
 # Wait shortly to ensure initialization is complete
@@ -181,7 +233,7 @@ sleep 5
 # Use Calico with specific version for compatability with kubernetes (see: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements)
 CALICO_VERSION=v3.29.3
 # Use the tigera operator (use create because due to the large size of the CRD bundle kubectl apply might exceed request limits)
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml
+# kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml
 # Configurating specifics for Calico: https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/config-options
 # Specifically for this custom resource file to install calico, use this reference: https://docs.tigera.io/calico/latest/reference/installation/api
 # See for choosing the network option: https://docs.tigera.io/calico/latest/networking/determine-best-networking, specifically: https://docs.tigera.io/calico/latest/networking/determine-best-networking#networking-options
