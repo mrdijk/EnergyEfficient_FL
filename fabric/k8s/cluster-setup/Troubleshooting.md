@@ -177,7 +177,10 @@ sudo systemctl stop kubelet
 sudo systemctl stop docker
 
 # Disable firewall temporarily (not recommended for production, just test it and then see if it works. If it works, you need to edit the firewall settings):
-systemctl stop kubelet
+# Can be a different one depending on setup of Linux OS:
+sudo ufw disable
+# Verify:
+sudo ufw status verbose
 # Allow IP forwarding:
 sudo sysctl -w net.ipv4.ip_forward=1
 

@@ -1,8 +1,7 @@
 #!/bin/bash
 
-subnet=$1
-ip=$2
-interfaceDevice=$3
+ip=$1
+interfaceDevice=$2
 
 {
 
@@ -10,11 +9,11 @@ interfaceDevice=$3
 
 echo "================================================ Starting start script for Kubernetes cluster control plane node ================================================"
 
-# TODO: remove subnet?
-echo "Subnet: ${subnet}"
 echo "IP: ${ip}"
 echo "Interface: ${interfaceDevice}"
 
+# ================================================ Set variables ================================================
+echo "================= Setting variables... =================" 
 # Use the cri socket created in the previous step for Docker Engine with cri-dockerd:
 # https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-runtime
 # You can verify this with SSH into the node and running "cd /var/run" and then "ls" to see the socket file.
@@ -28,8 +27,8 @@ SERVICE_NETWORK_CIDR=10.96.0.0/12
 # Use default api bind port, but set explicitely for clarity in the config file for kubeadm: https://v1-31.docs.kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/#kubeadm-k8s-io-v1beta4-APIEndpoint
 API_BIND_PORT=6443
 
-
-
+# ================================================ Reset Kubeadm to avoid interference of previous setups ================================================
+echo "================= Resetting Kubeadm... =================" 
 # Reset the node with kubeadm before applying to avoid potential previous installations conflicting, allowing to rerun this script without having to completely 
 # recreate nodes/VMs before retrying the script.
 # https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down
@@ -41,17 +40,19 @@ sudo rm -rf /etc/cni/net.d
 # Remove iptables (with root access for all commands):
 sudo bash -c 'iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X'
 
-
-# TODO: add here explaining preparing the host for the network plugin: https://github.com/flannel-io/flannel?tab=readme-ov-file#deploying-flannel-manually
+# ================================================ Prepare Networking plugin ================================================
+echo "================= Preparing settings for networking plugin... =================" 
+# Prepare the host for the network plugin: https://github.com/flannel-io/flannel?tab=readme-ov-file#deploying-flannel-manually
 # Ensure bridge and ip forward are enabled and make it persistent 
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-iptables  = 1
-net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
 net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv6.conf.default.forwarding = 1
 EOF
-# TODO: this might be something as well, as it may need to be 1:
-# sysctl net.ipv4.conf.all.rp_filter
+# Apply changes to make it persistent
 sudo sysctl --system
+# === CNI Plugins ===
 # Ensure the required CNI Network Plugin is installed: https://github.com/containernetworking/plugins
 ARCH=$(uname -m)
   case $ARCH in
@@ -72,9 +73,9 @@ fi
 sudo modprobe br_netfilter
 # Check:
 lsmod | grep br_netfilter
-# TODO: add fixes from previous here as well, such as:
-# Fix for issue with network connectivity in FABRIC: add the ip route manually for the kubernetes service subnet:
-# If it says something like File Exists, the route already exists and this can be skipped.
+# === FABRIC Network Issue fix ===
+# Fix for issue with network connectivity in FABRIC: add the ip route manually for the kubernetes service subnet (see Troubleshooting.md 
+# in this folder for more explanation). If it says something like File Exists, the route already exists and this can be skipped.
 echo "SERVICE_NETWORK_CIDR is $SERVICE_NETWORK_CIDR"
 echo "interfaceDevice is $interfaceDevice"
 if [[ -n "$SERVICE_NETWORK_CIDR" && -n "$interfaceDevice" ]]; then
@@ -82,53 +83,12 @@ if [[ -n "$SERVICE_NETWORK_CIDR" && -n "$interfaceDevice" ]]; then
 else
   echo "ERROR: SERVICE_NETWORK_CIDR or interfaceDevice is unset."
 fi
-# List ip routes
+# List ip routes to verify
 sudo ip route
 
 
-
-# TODO: additional settings here, such as ip forwarding:
-# See ip forwarding setting:
-# sysctl net.ipv4.ip_forward
-# See firewall, should be inactive (since the slice is already isolated, it is not really required here)
-# sudo ufw status verbose
-# Can disable if needed with:
-# sudo ufw disable
-# See iptables (normal and NAT related)
-# sudo iptables -L -n -v
-# sudo iptables -t nat -L -n -v
-# TODO: after this it worked:
-# sudo sysctl -w net.ipv4.ip_forward=1
-# sudo ip route add 10.96.0.0/12 dev enp7s0
-# sudo iptables -P FORWARD ACCEPT
-# sudo iptables -P INPUT ACCEPT
-# sudo iptables -P OUTPUT ACCEPT
-# kubectl delete pod -n kube-system -l k8s-app=calico-kube-controllers
-# kubectl delete pod -n kube-system -l k8s-app=calico-node
-# # TODO: only ip route add also did it with tigera-operator, after restarting pod:
-# sudo ip route add 10.96.0.0/12 dev enp7s0  # Service CIDR
-# sudo ip route add 192.168.0.0/16 dev enp7s0  # Pod CIDR used by Calico
-# # TODO: pod subnet also necessary?
-# kubectl delete pod -n tigera-operator -l k8s-app=tigera-operator
-# # TODO: ip for pod subnet is not needed, since this causes issues.
-# # TODO: try this and then retry with k8s:
-# # iptables --flush
-# # iptables -t nat --flush
-# sudo systemctl stop kubelet
-# sudo systemctl stop docker
-# sudo iptables --flush
-# sudo iptables -tnat --flush
-# sudo systemctl start kubelet
-# sudo systemctl start docker
-# TODO: even after that it does not work.
-
-# TODO: what does work to run tigera-operator:
-# sudo ip route add 10.96.0.0/12 dev enp7s0
-# TODO: do need to add pod subnet as well?
-# kubectl delete pod -n tigera-operator -l k8s-app=tigera-operator
-
-# ================================================ Creating configuration file ================================================
-echo "================= Creating config file... =================" 
+# ================================================ Creating configuration file for Kubeadm ================================================
+echo "================= Creating config file for Kubeadm... =================" 
 # === General: ===
 # Create the file manually with the configuration.
 # Customizing components: https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/control-plane-flags/
@@ -157,7 +117,7 @@ echo "================= Creating config file... ================="
 # And specifically: https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/kubelet-integration/#workflow-when-using-kubeadm-init
 # See reference for possible args (without -- part), specifically node-ip: https://v1-31.docs.kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
 echo "Creating kubeadm config file..."
-cat <<EOF > kubeadm-kubelet-extraargs.yaml
+cat <<EOF > kubeadm-custom-init-config.yaml
 apiVersion: kubeadm.k8s.io/v1beta4
 # https://v1-31.docs.kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/#kubeadm-k8s-io-v1beta4-ClusterConfiguration
 kind: ClusterConfiguration
@@ -181,27 +141,18 @@ nodeRegistration:
     - name: node-ip
       value: "$ip"
 EOF
-# TODO: rename file to better one
 # Verify created file content:
-cat kubeadm-kubelet-extraargs.yaml
+cat kubeadm-custom-init-config.yaml
 echo "Validating config file with kubeadm config validate..."
 # Verify with kubeadm: https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-config/#cmd-config-validate
-sudo kubeadm config validate --config kubeadm-kubelet-extraargs.yaml
+sudo kubeadm config validate --config kubeadm-custom-init-config.yaml
 # Verify the actual config file at the end of this script
 
 # ================================================ Initialize kubernetes cluster ================================================
 echo "================= Initializing cluster with Kubeadm =================" 
 # Initialize the cluster with kubeadm. Kubeadm init reference: https://v1-31.docs.kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
-# Execute init to initialize the cluster with kubeadm
-# TODO: explain using config file to add node-ip, like explained above to get correct ip for the node
-# sudo kubeadm init --pod-network-cidr=${subnet} --apiserver-advertise-address=${ip} --cri-socket=unix:///var/run/cri-dockerd.sock
-# sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket=$K8S_CRI_SOCKET --apiserver-advertise-address=${ip}
-# Ignore specific error for ipv6 forwarding, not necessary here and will otherwise cancel operations
-sudo kubeadm init --config kubeadm-kubelet-extraargs.yaml --ignore-preflight-errors=FileContent--proc-sys-net-ipv6-conf-default-forwarding
-# TODO: cleanup
-# TODO: with join, you need the token and hash from this command output: kubeadm token create --print-join-command
-# TODO: maybe do need to use subnet like in kubernetes simple example, but then with calico specific settings.
-# TODO: use specific ip like here with this command for worker as well, like here with control-plane so that it does it correctly, verify in kube-proxy pod logs for node.
+# This uses the specific configuration file above, such as setting node specific IP, etc. These settings are required to make it work in this setup with FABRIC.
+sudo kubeadm init --config kubeadm-custom-init-config.yaml
 
 # === KUBECONFIG Setup ===
 # Set up kubeconfig for the current user to use kubectl
@@ -220,16 +171,14 @@ if ! kubectl version >/dev/null 2>&1; then
 fi
 echo "kubeconfig is valid."
 
-
-# TODO: maybe:https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/control-plane-flags/#customizing-kube-proxy
-
-
 # # ================================================ Networking plugin for Kubernetes ================================================
+echo "================= Setting up network plugin for Kubernetes cluster =================" 
 # https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
 # https://v1-31.docs.kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy
 # # Wait shortly to ensure initialization is complete
 sleep 5
 # Make sure envsubst is present:
+echo "Making sure envsubst is present..."
 envsubst --help
 # Set variables for the environment
 export FLANNEL_IFACE="$interfaceDevice"
@@ -240,10 +189,8 @@ envsubst < kube-flannel.yml > kube-flannel-edited.yml
 cat kube-flannel-edited.yml
 # Apply the custom kube-flannel, original can be found here: https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
 kubectl apply -f kube-flannel-edited.yml
-# # TODO: this made it work: sudo ip route add 10.96.0.0/12 dev enp7s0
 
 # ================================================ Verification ================================================
-# TODO: verify cgroup driver for kubeadm after init in next script?
 # === Verify Config used by kubeadm ===
 echo "Verify config used by kubeadm correctly contains the custom created config variables, and applied default values correctly"
 # Old command, did the same: kubectl get configmap kubeadm-config -n kube-system -o yaml
@@ -257,18 +204,24 @@ sudo cat /var/lib/kubelet/kubeadm-flags.env
 echo "Verify node internal IP, should now be the custom created network with IPv4/passed ip address to this script"
 kubectl get nodes -o wide
 kubectl get pods --all-namespaces
-
+# === Verify Cgroup driver ===
+echo "Verify cgroup driver, should be systemd"
+sudo cat /var/lib/kubelet/config.yaml | grep cgroup
+# === API Server ===
 # With problems, verify the kubeconfig, such as the server endpoint used for the default api address:
 # cat $HOME/.kube/config
 # Get server from kubeconfig
 echo "Api server endpoint from kubelet:"
 cat $HOME/.kube/config | grep server
+# === Cluster information ===
 # Display cluster information
+echo "Cluster information:"
 kubectl cluster-info
 
-# TODO: print nodes not necessary I think, since right after apply of calico it will be NotReady anyway.
-# # Print nodes
-# kubectl get nodes\\
+# === Print join command so it can be captured by orchestration script ===
+echo "=====BEGIN_JOIN_COMMAND====="
+sudo kubeadm token create --print-join-command
+echo "=====END_JOIN_COMMAND====="
 
 echo "Start control plane node complete."
 

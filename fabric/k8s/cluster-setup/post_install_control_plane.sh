@@ -21,10 +21,6 @@ kubectl get pods -n kube-system -o wide
 echo "Listing all pods across all namespaces..."
 kubectl get pods --all-namespaces -o wide
 
-# === Pods per Node Summary ===
-echo "Pods per node:"
-kubectl get pods -A -o wide | awk 'NR>1 {print $8}' | sort | uniq -c | sort -nr | awk '{print "Node " $2 ": " $1 " pods"}'
-
 # === Brew on Linux installation (used for easier installation of other packages) ===
 echo "Checking for Homebrew..."
 
