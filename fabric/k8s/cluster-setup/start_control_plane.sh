@@ -47,6 +47,8 @@ net.bridge.bridge-nf-call-iptables  = 1
 net.ipv4.ip_forward                 = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 EOF
+# TODO: this might be something as well, as it may need to be 1:
+# sysctl net.ipv4.conf.all.rp_filter
 sudo sysctl --system
 # Ensure the required CNI Network Plugin is installed: https://github.com/containernetworking/plugins
 ARCH=$(uname -m)
@@ -205,6 +207,8 @@ echo "kubeconfig is valid."
 
 
 # ================================================ Calico for Networking ================================================
+# Wait shortly to ensure initialization is complete
+sleep 5
 # Make sure envsubst is present:
 envsubst --help
 # Set variables for the environment
@@ -213,11 +217,11 @@ export FLANNEL_NETWORK="$POD_NETWORK_CIDR"
 # TODO: maybe this:
 # ip route add $SUBNET via $PUBLIC_IP
 # This replaces variables like ${FLANNEL_IFACE} with their current values from the environment, and saves the result to a new file
-envsubst < kube-flannel.yaml > kube-flannel-edited.yaml
+envsubst < kube-flannel.yml > kube-flannel-edited.yml
 # View file, should have replaced variables
-cat kube-flannel-edited.yaml
+cat kube-flannel-edited.yml
 # Apply the custom kube-flannel, original can be found here: https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
-kubectl apply -f kube-flannel-edited.yaml
+kubectl apply -f kube-flannel-edited.yml
 # TODO: do need to specify interface, but try without first
 # TODO: see DirectRouting option, maybe this is good since they are on the same subnet: https://github.com/flannel-io/flannel/blob/master/Documentation/backends.md
 

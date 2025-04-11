@@ -84,7 +84,7 @@ data:
       "Network": "${FLANNEL_NETWORK}",
       "EnableNFTables": false,
       "Backend": {
-        "Type": "vxlan"
+        "Type": "host-gw"
       }
     }
 kind: ConfigMap
