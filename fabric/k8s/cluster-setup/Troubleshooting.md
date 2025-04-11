@@ -27,6 +27,10 @@ However, we later found out that this fix causes more problems later, since the 
 TODO: what is the real fix?
 What we did to fix it on FABRIC:
 ```sh
+# Show all, including local, useful for seeing all the routes on a node:
+ip route show table all
+# Only show the important ones, this is usually enough:
+ip route
 # Debugging:
 # On control plane, allow scheduling for debugging: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm#control-plane-node-isolation
 kubectl taint nodes node1 node-role.kubernetes.io/control-plane-
@@ -35,8 +39,37 @@ kubectl taint nodes node1 node-role.kubernetes.io/control-plane-
 kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
 # Here you can test connectivity from a pod and other things from a pod for example
 
-# Show all, including local:
-ip route show table all
+# Eventual fix:
+# Add the route for the Kubernetes service subnet, otherwise, it cannot reach that:
+sudo ip route add 10.96.0.0/12 dev enp7s0
+# This fix essentially says: Please send traffic to that subnet out through enp7s0 directly, and trust the network 
+# or NAT/iptables to handle it from there. And the iptables are correctly created with kube-proxy, which is why it works from there.
+# However, kube-proxy sets up NAT, but assumes network basics (like reachable paths) are in place, which might not be the case in FABRIC here.
+# Tests afterwards (make sure the debugging is enabled to taint the node to allow pods to be scheduled):
+# Check if some pods get assigned an IP from the pod subnet (not all have it, such as most kube-system pods will have the node IP probably)
+# Note: the pod subnet is not necessary to add here since this is added by the network plugin, in this example Flannel, but that network plugin 
+# requires access to the service subnet before being able to do that, which was the problem here.
+kubectl get pods -o wide -A
+# Test if pods can reach each other:
+kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
+# Ping another pod with this command, such as (see result of get pods for an ip from the pod subnet CIDR):
+ping 192.168.0.6
+exit
+# Test service access:
+kubectl create deployment nginx --image=nginx
+kubectl expose deployment nginx --port=80 --target-port=80
+# Create test pod again:
+kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
+# Inside it, run this command to test connection to the service:
+wget -O- nginx.default.svc.cluster.local
+# Should return an HTML page or something similar
+# Finally, execute into a flannel pod (or other network addon) and list the ip routes, should include the service and pod subnet now, such as:
+kubectl -n kube-flannel exec -it kube-flannel-ds-hzg86 -- sh
+ip route
+
+
+
+# TODO: this is not necessary anymore, can be removed likely
 # Add interface for service subnet, is the result of local, in the above case it was:
 # local 127.0.0.1 dev lo table local proto kernel scope host src 127.0.0.1
 # So, the corresponding route to add on the node:

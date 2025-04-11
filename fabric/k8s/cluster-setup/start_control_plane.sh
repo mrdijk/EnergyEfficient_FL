@@ -224,6 +224,7 @@ cat kube-flannel-edited.yml
 kubectl apply -f kube-flannel-edited.yml
 # TODO: do need to specify interface, but try without first
 # TODO: see DirectRouting option, maybe this is good since they are on the same subnet: https://github.com/flannel-io/flannel/blob/master/Documentation/backends.md
+# TODO: this made it work: sudo ip route add 10.96.0.0/12 dev enp7s0
 
 
 
