@@ -3,7 +3,9 @@ This file explains how to setup Kubernetes in FABRIC.
 
 Note: this guide used WSL for the underlying testing and validation.
 
-Below are some additional things that might be helpful. Most documentation is made inside the files itself, such as the scripts to configure the kubernetes cluster. 
+Below are some additional things that might be helpful. Most documentation is made inside the files itself, such as the scripts to configure the kubernetes cluster.
+
+Currently, we use Kubeadm for the cluster setup, however, before we tried kubespray, which is present in the archive folder with an explanation of why we switched.
 
 ## SSH 
 You can configure SSH to access the VMs by following the steps in the k8s-setup.ipynb notebook file. 

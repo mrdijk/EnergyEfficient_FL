@@ -3,7 +3,7 @@ This folder describes old versions we had that we spend time on and therefore ke
 
 Below are old documentations, while the rest of this folder contains old solutions, such as an old kubespray solution.
 
-# Old Kubernetes cluster setup with Kubespray from local machine:
+# Old Kubernetes cluster setup with Kubespray from local machine (before executing it on the control plane node with SSH):
 ## Configure Kubernetes cluster/environment
 ### Preparing Kubespary
 In a Linux terminal (e.g. WSL), execute the following commands to prepare Kubespray for usage:

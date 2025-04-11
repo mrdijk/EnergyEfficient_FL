@@ -3,6 +3,9 @@ This file explains how to setup Kubernetes in FABRIC.
 
 Note: this guide used WSL for the underlying testing and validation.
 
+## Switch to newer version: Kubeadm
+Now switched to Kubeadm to try it with that since this allows for much more control and understandability without all the automation steps. Kubespray is most suited for VMs that are similar to the cloud with minimal custom setups, however, we noticed that FABRIC has a lot of custom setups and configurations that caused unexpected behaviour and issues. In the end we ended up at a not working Kubernetes environment with issues we could not understand and spend a lot of time debugging without making any real progress over several days. In short, kubespray provided a lot of automation that did not work for our setup with FABRIC and caused a lot of issues which we could not fully understand. Therefore, we decided to use Kubeadm. This is because, while it does require a lot more manual steps, it allows for a more flexible and understandable approach, which might be better suited for FABRIC VMs in this case. Furthermore, this is maintained by Kubernetes themselves and might have better support and documentation, etc. See the current setup in fabric/k8s/cluster-setup for the current solution.
+
 ## SSH 
 You can configure SSH to access the VMs by following the steps in the k8s-setup.ipynb notebook file. 
 
