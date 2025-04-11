@@ -72,7 +72,18 @@ fi
 sudo modprobe br_netfilter
 # Check:
 lsmod | grep br_netfilter
-
+# TODO: add fixes from previous here as well, such as:
+# Fix for issue with network connectivity in FABRIC: add the ip route manually for the kubernetes service subnet:
+# If it says something like File Exists, the route already exists and this can be skipped.
+echo "SERVICE_NETWORK_CIDR is $SERVICE_NETWORK_CIDR"
+echo "interfaceDevice is $interfaceDevice"
+if [[ -n "$SERVICE_NETWORK_CIDR" && -n "$interfaceDevice" ]]; then
+  sudo ip route add "$SERVICE_NETWORK_CIDR" dev "$interfaceDevice"
+else
+  echo "ERROR: SERVICE_NETWORK_CIDR or interfaceDevice is unset."
+fi
+# List ip routes
+sudo ip route
 
 
 
@@ -163,7 +174,7 @@ apiVersion: kubeadm.k8s.io/v1beta4
 kind: InitConfiguration
 localAPIEndpoint:
   advertiseAddress: "$ip"
-  bindPort: "$API_BIND_PORT"
+  bindPort: $API_BIND_PORT
 nodeRegistration:
   criSocket: "$K8S_CRI_SOCKET"
   kubeletExtraArgs:
@@ -213,95 +224,23 @@ echo "kubeconfig is valid."
 # TODO: maybe:https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/control-plane-flags/#customizing-kube-proxy
 
 
-# ================================================ Calico for Networking ================================================
-# Wait shortly to ensure initialization is complete
+# # ================================================ Networking plugin for Kubernetes ================================================
+# https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
+# https://v1-31.docs.kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy
+# # Wait shortly to ensure initialization is complete
 sleep 5
 # Make sure envsubst is present:
 envsubst --help
 # Set variables for the environment
 export FLANNEL_IFACE="$interfaceDevice"
 export FLANNEL_NETWORK="$POD_NETWORK_CIDR"
-# TODO: maybe this:
-# ip route add $SUBNET via $PUBLIC_IP
 # This replaces variables like ${FLANNEL_IFACE} with their current values from the environment, and saves the result to a new file
 envsubst < kube-flannel.yml > kube-flannel-edited.yml
 # View file, should have replaced variables
 cat kube-flannel-edited.yml
 # Apply the custom kube-flannel, original can be found here: https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
 kubectl apply -f kube-flannel-edited.yml
-# TODO: do need to specify interface, but try without first
-# TODO: see DirectRouting option, maybe this is good since they are on the same subnet: https://github.com/flannel-io/flannel/blob/master/Documentation/backends.md
-# TODO: this made it work: sudo ip route add 10.96.0.0/12 dev enp7s0
-
-
-
-
-# TODO: save this to old and commented at the bottom of this script if it works with Flannel
-# Read the documentation to understand what needs to be done for kubernetes: https://docs.tigera.io/calico/latest/about/kubernetes-training/
-# echo "================= Applying Calico CNI plugin =================" 
-# Wait shortly to ensure initialization is complete
-sleep 5
-# See for a full guide: https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
-# Use Calico with specific version for compatability with kubernetes (see: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements)
-CALICO_VERSION=v3.29.3
-# Use the tigera operator (use create because due to the large size of the CRD bundle kubectl apply might exceed request limits)
-# kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml
-# Configurating specifics for Calico: https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/config-options
-# Specifically for this custom resource file to install calico, use this reference: https://docs.tigera.io/calico/latest/reference/installation/api
-# See for choosing the network option: https://docs.tigera.io/calico/latest/networking/determine-best-networking, specifically: https://docs.tigera.io/calico/latest/networking/determine-best-networking#networking-options
-# This can be done with a custom resource (with correct version): https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/custom-resources.yaml
-# This is the file content but then specific for this cluster in FABRIC:
-cat <<EOF > calico-custom-resources.yaml
-# This section includes base Calico installation configuration.
-# For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.Installation
-apiVersion: operator.tigera.io/v1
-kind: Installation
-metadata:
-  name: default
-spec:
-  # Configures Calico networking: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io%2fv1.CalicoNetworkSpec
-  calicoNetwork:
-    # Disable BGP, since FABRIC nodes do not support it by default
-    bgp: Disabled
-    # See: https://docs.tigera.io/calico/latest/reference/resources/ippool
-    ipPools:
-      - name: default-ipv4-ippool
-        cidr: "$POD_NETWORK_CIDR"
-        # Use VXLAN since FABRIC nodes do not support BGP by default
-        encapsulation: VXLAN
-        nodeSelector: all()
-    # Allow IP forwarding, similar to 
-    containerIPForwarding: Enabled
-    # Auto detection for IPv4 of FABRIC specific nodes network
-    nodeAddressAutodetectionV4:
-      interface: "$interfaceDevice"
----
-# This section configures the Calico API server.
-# For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.APIServer
-apiVersion: operator.tigera.io/v1
-kind: APIServer
-metadata:
-  name: default
-spec: {}
-EOF
-# Verify created file content:
-cat calico-custom-resources.yaml
-# Note: if nothing changes and you do not see calico-node-x pods created, then it is likely the tigera-operator encountered errors (even though it is running, see logs).
-# Create with the custom resources, TODO: explain what this does
-# kubectl create -f calico-custom-resources.yaml
-# TODO: left off here, this does nothing yet with applying
-
-# TODO: below for calico can probably be removed
-# # Download calico manifest 
-# # Currently using version 3.29 for compatability with Kubernetes
-# curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml -O
-# # Apply manifest
-# kubectl apply -f calico.yaml
-# Or:
-# kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml
-# TODO: add here from guide: 
-# TODOs:
-# Use specific interface and set ips, just like with kube-proxy specific
+# # TODO: this made it work: sudo ip route add 10.96.0.0/12 dev enp7s0
 
 # ================================================ Verification ================================================
 # TODO: verify cgroup driver for kubeadm after init in next script?
@@ -331,8 +270,66 @@ kubectl cluster-info
 # # Print nodes
 # kubectl get nodes\\
 
-# TODO: maybe do something with cluster dns, depending on DYNAMOS local setup, such as cluster.local?
-
 echo "Start control plane node complete."
 
 }  2>&1 | tee -a start_control_plane.log
+
+
+# ================================================ Old code ================================================
+# Old: Calico network plugin, but not working due to specifics of FABRIC VMs, see Troubleshooting.md in this folder for more explanation. 
+# This is kept here since it could work in other settings and much time has been spend on this before, so if ever needed, it is listed below:
+# # ================================================ Calico for Networking ================================================
+# # Read the documentation to understand what needs to be done for kubernetes: https://docs.tigera.io/calico/latest/about/kubernetes-training/
+# # echo "================= Applying Calico CNI plugin =================" 
+# # Wait shortly to ensure initialization is complete
+# sleep 5
+# # See for a full guide: https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
+# # Use Calico with specific version for compatability with kubernetes (see: https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements)
+# CALICO_VERSION=v3.29.3
+# # Use the tigera operator (use create because due to the large size of the CRD bundle kubectl apply might exceed request limits)
+# kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml
+# # Configurating specifics for Calico: https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/config-options
+# # Specifically for this custom resource file to install calico, use this reference: https://docs.tigera.io/calico/latest/reference/installation/api
+# # See for choosing the network option: https://docs.tigera.io/calico/latest/networking/determine-best-networking, specifically: https://docs.tigera.io/calico/latest/networking/determine-best-networking#networking-options
+# # This can be done with a custom resource (with correct version): https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/custom-resources.yaml
+# # This is the file content but then specific for this cluster in FABRIC:
+# cat <<EOF > calico-custom-resources.yaml
+# # This section includes base Calico installation configuration.
+# # For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.Installation
+# apiVersion: operator.tigera.io/v1
+# kind: Installation
+# metadata:
+#   name: default
+# spec:
+#   # Configures Calico networking: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io%2fv1.CalicoNetworkSpec
+#   calicoNetwork:
+#     # Disable BGP, since FABRIC nodes do not support it by default
+#     bgp: Disabled
+#     # See: https://docs.tigera.io/calico/latest/reference/resources/ippool
+#     ipPools:
+#       - name: default-ipv4-ippool
+#         cidr: "$POD_NETWORK_CIDR"
+#         # Use VXLAN since FABRIC nodes do not support BGP by default
+#         encapsulation: VXLAN
+#         nodeSelector: all()
+#     # Allow IP forwarding, similar to many fixes found on the internet to make sure ip forwarding is enabled
+#     containerIPForwarding: Enabled
+#     # Auto detection for IPv4 of FABRIC specific nodes network
+#     nodeAddressAutodetectionV4:
+#       interface: "$interfaceDevice"
+# ---
+# # This section configures the Calico API server.
+# # For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.APIServer
+# apiVersion: operator.tigera.io/v1
+# kind: APIServer
+# metadata:
+#   name: default
+# spec: {}
+# EOF
+# # Verify created file content:
+# cat calico-custom-resources.yaml
+# # Wait shortly to ensure initialization of tigera-operator is complete
+# sleep 10
+# # Note: if nothing changes and you do not see calico-node-x pods created, then it is likely the tigera-operator encountered errors (even though it is running, see logs).
+# # Create with the custom resources, this installs the necessary things with the tigera-operator and is the actual install into the cluster, using the created file
+# kubectl create -f calico-custom-resources.yaml

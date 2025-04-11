@@ -132,6 +132,7 @@ spec:
         # Use IP masquarading (default) so pod traffic going to outside the cluster will appear to come from the node’s IP, otherwise 
         # the external world has no idea what that is, it’s a private, non-routable IP — and won't know how to respond
         - --ip-masq
+        # Contact the Kubernetes API for subnet assignment instead of etcd, this is the default and recommended approach for kubernetes with Flannel
         - --kube-subnet-mgr
         # Specify the interface that should be used, this is the interface we created in FABRIC
         # This uses a variable that should be added in the script that uses thi
@@ -168,6 +169,7 @@ spec:
           name: flannel-cfg
         - mountPath: /run/xtables.lock
           name: xtables-lock
+      # It should run on the host network, see Troubleshooting.md for an example and explanation of why it otherwise would not work.
       hostNetwork: true
       initContainers:
       - args:

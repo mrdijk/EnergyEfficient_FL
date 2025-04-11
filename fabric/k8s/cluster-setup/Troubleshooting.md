@@ -6,7 +6,7 @@ Note: do not forget to upload the kubespray changes to the remote host controle 
 See for more information: https://kubernetes.io/docs/tasks/debug/
 
 
-## Calico-kube-controllers not working/kube-proxy problems
+## Network connectivity issue with networking plugin for Kubernetes
 Problem:
 ```sh
 W0410 12:09:08.788591       1 reflector.go:535] pkg/mod/k8s.io/client-go@v0.28.15/tools/cache/reflector.go:229: failed to list *v1.ConfigMap: Get "https://10.96.0.1:443/api/v1/namespaces/calico-system/conf ││ igmaps?fieldSelector=metadata.name%3Dactive-operator&limit=500&resourceVersion=0": dial tcp 10.96.0.1:443: connect: network is unreachable
@@ -24,7 +24,7 @@ However, afterwards a new issue arose:
 2025-04-10 06:49:10.689 [ERROR][1] kube-controllers/client.go 320: Error getting cluster information config ClusterInformation="default" error=Get "https://10.96.0.1:443/apis/crd.projectcalico.org/v1/clust ││ erinformations/default": dial tcp 10.96.0.1:443: connect: no route to host
 ```
 
-TODO: add here explanation of trying it again with Calico from scratch.
+The next sections will explain how the issue was fixed and which steps were taken to fix the issue.
 
 First, some additional debugging tips:
 ```sh
@@ -65,15 +65,24 @@ sudo modprobe br_netfilter
 # Check:
 lsmod | grep br_netfilter
 ```
-With Calico this resulted a next issue (the second issue listed above: "dial tcp 10.96.0.1:443: connect: no route to host"). However, with Flannel, after logical reasoning with the specific configuration settings (see kube-flannel.yml), it worked perfectly without problems and the tests all worked (see below full tests explanation).
-
-TODO: also here test with specific for Calico and see if that still works.
+With Calico this resulted a next issue (the second issue listed above: "dial tcp 10.96.0.1:443: connect: no route to host"). However, with Flannel, after logical reasoning with the specific configuration settings (see kube-flannel.yml), it worked perfectly without problems and the tests all worked (see below full tests explanation). See section after this one for explanation on the difference with Calico and the result of testing again.
 
 The main fix here was adding a route for the service subnet of Kubernetes to the node ip routes. This fix with adding the service subnet to the node essentially says: Please send traffic to that subnet out through enp7s0 directly, and trust the network or NAT/iptables to handle it from there. And the iptables are correctly created with kube-proxy, which is why it works from there. However, kube-proxy sets up NAT, but assumes network basics (like reachable paths) are in place, which might not be the case in FABRIC here. 
 
 Note: the pod subnet is not necessary to add here since this is added by the network plugin, in this example Flannel, but that network plugin requires access to the service subnet before being able to do that, which was the problem here.
 
-Tests to verify that it worked:
+Something that was also important was the hostNetwork option set to true, since this says: don’t give this pod an isolated virtual network interface via the CNI plugin. Instead, run it directly on the host's network stack so the pod uses the node's actual network interfaces:
+- It bypasses the CNI plugin entirely for its own networking
+- It can access: The node’s routes, The cluster DNS (if resolvable by the node), The Kubernetes API via 10.96.0.1 if the node has that route
+The Flannel pod can access the Kubernetes API server directly using the node’s routing table now. It doesn’t depend on a CNI plugin being functional before it starts — because it's the thing setting up the CNI. This lets it bootstrap itself cleanly, it's a bootstrap-safe design: Flannel configures the network before CNI is needed by any other pods. This is likely why with the FABRIC specific setup it works after adding the ip route.
+Also, when setting the Flannel hostNetwork to false, it caused a similar issue with Calico, with Flannel in infinite Pending and coredns with error similar to Calico:
+```sh
+[ERROR] plugin/kubernetes: pkg/mod/k8s.io/client-go@v0.29.3/tools/cache/reflector.go:229: Failed to watch *v1.Namespace: failed to list *v1.Namespace: Get "https://10.96.0.1:443/api/v1/namespaces?limit=500 ││ &resourceVersion=0": dial tcp 10.96.0.1:443: connect: no route to host 
+```
+
+However, with Calico, while the initial problem (dial tcp 10.96.0.1:443: connect: network is unreachable) was fixed also with the ip route add, it created the second issue (dial tcp 10.96.0.1:443: connect: no route to host). While Calico did have hostNetwork set to true, it might be something else in the Calico setup that caused the problem, see below section for possibly more explanation. 
+
+Tests to verify that it worked (besides seeing all the pods of the network plugin and coredns running in k9s or with the command to display them):
 ```sh
 # Tests afterwards (make sure the debugging is enabled to taint the node to allow pods to be scheduled):
 # Check if some pods get assigned an IP from the pod subnet (not all have it, such as most kube-system pods will have the node IP probably)
@@ -147,6 +156,15 @@ kubectl delete deployment nginx
 # At the end, do not forget to disable scheduling pods on the control plane node: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm#control-plane-node-isolation
 kubectl taint nodes node1 node-role.kubernetes.io/control-plane=:NoSchedule
 ```
+
+### Calico specific issues
+After trying again with the exact same steps used for Flannel, but switching back to Calico, the same issue occurred again: dial tcp 10.96.0.1:443: connect: no route to host. Uninstalling Calico and reapplying Flannel immediately fixed the issue (without having to recreate the slice and reset the kubernetes cluster, just "kubectl apply/delete -f .." commands). This confirms the issue was specific to Calico or its configuration likely in combination to FABRIC setup specifically. This was just a test, it could be a better option to reset the kubernetes cluster with Kubeadm (and potentially even recreate the slice) for a fresh start, but here it was just a test if it would immediately work with Flannel. So, this was definitely something specific to Calico and possibly its configuration and setup.
+
+While additional fixes for Calico may fix the issue — such as tweaking the kube-proxy configuration (https://v1-31.docs.kubernetes.io/docs/reference/config-api/kube-proxy-config.v1alpha1/) or adding more FABRIC-specific routing, etc. — these were not fully explored due to time constraints, and an already large time spend on this (more than a week).
+
+Importantly, we do not require network policies, which is a key feature of Calico. Therefore, Flannel is a more lightweight and suitable solution for our setup on FABRIC. Flannel’s simplicity makes it more reliable in this custom environment, without the need for additional network policies. Therefore, we concluded that sticking with Flannel provides a stable and functional setup for our needs.
+
+
 
 ### Additional information beyond solution
 A lot of guides said this that did not work for me (but could be useful with similar issues):
