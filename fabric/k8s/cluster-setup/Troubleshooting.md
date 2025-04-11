@@ -24,7 +24,6 @@ However, we later found out that this fix causes more problems later, since the 
 2025-04-10 06:49:10.689 [ERROR][1] kube-controllers/client.go 320: Error getting cluster information config ClusterInformation="default" error=Get "https://10.96.0.1:443/apis/crd.projectcalico.org/v1/clust ││ erinformations/default": dial tcp 10.96.0.1:443: connect: no route to host
 ```
 
-TODO: what is the real fix?
 What we did to fix it on FABRIC:
 ```sh
 # Show all, including local, useful for seeing all the routes on a node:
@@ -55,57 +54,64 @@ kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
 # Ping another pod with this command, such as (see result of get pods for an ip from the pod subnet CIDR):
 ping 192.168.0.6
 exit
-# Test service access:
+# Test service routing:
 kubectl create deployment nginx --image=nginx
 kubectl expose deployment nginx --port=80 --target-port=80
 # Create test pod again:
 kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
-# Inside it, run this command to test connection to the service:
+# Inside it, run this command to test connection to the service, such as (or use curl or ping for example):
 wget -O- nginx.default.svc.cluster.local
+exit
 # Should return an HTML page or something similar
 # Finally, execute into a flannel pod (or other network addon) and list the ip routes, should include the service and pod subnet now, such as:
 kubectl -n kube-flannel exec -it kube-flannel-ds-hzg86 -- sh
 ip route
 
 
+# Next, join a worker node and test the following:
+# All nodes should be Ready:
+kubectl get nodes -o wide
+# Create a pod on the worker node, such as (this overrides the nodeSelector to use node2):
+kubectl run test-on-worker \
+  --rm -it \
+  --image=busybox \
+  --restart=Never \
+  --overrides='{"spec": {"nodeSelector": {"kubernetes.io/hostname": "node2"}}}' \
+  -- sh 
+# Verify the status of the node, such as in k9s from the control plane node or if the above command works without infinite loading or errors, or:
+kubectl get pod test-on-worker -o wide
+# Now test pod-to-pod connectivity from different nodes. First view all pods:
+kubectl get pods -o wide -A
+# Then in the other terminal session opened by the above command for running the test-on-worker pod, run this:
+ping <pod-ip-of-pod-on-different-node>
+# Such as:
+ping 192.168.0.13 # Pod on different node example (verify that the pod is actually on a different node with the previous command that showed all pods)
+ping 10.145.2.2 # Node itself (control plane node)
+exit
+# Now we will test service routing on a different node. First create the services again:
+kubectl create deployment nginx --image=nginx
+kubectl expose deployment nginx --port=80 --target-port=80
+# Create test pod again:
+kubectl run test-on-worker \
+  --rm -it \
+  --image=busybox \
+  --restart=Never \
+  --overrides='{"spec": {"nodeSelector": {"kubernetes.io/hostname": "node2"}}}' \
+  -- sh 
+# Inside it, run this command to test connection to the service, such as (or use curl or ping for example):
+wget -O- nginx.default.svc.cluster.local
+exit
+# Should return an HTML page or something similar
+# Finally, execute into a flannel pod on the worker node (or other network addon) and list the ip routes, should include the service and pod subnet now, such as:
+kubectl -n kube-flannel exec -it kube-flannel-ds-hzg86 -- sh
+ip route
 
-# TODO: this is not necessary anymore, can be removed likely
-# Add interface for service subnet, is the result of local, in the above case it was:
-# local 127.0.0.1 dev lo table local proto kernel scope host src 127.0.0.1
-# So, the corresponding route to add on the node:
-sudo ip route add 10.96.0.0/12 via 127.0.0.1 dev lo
-# You can delete with this if you want, such as to test if it is working without:
-sudo ip route delete 10.96.0.0/12 via 127.0.0.1 dev lo
-# Test connection, should not say "Couldn't connect to server", even 403 Forbidden is good since it can reach it in that case:
-curl -k https://10.96.0.1:443
-# TODO: above does not work, below maybe:
-# 1. Create a dummy interface
-sudo ip link add kube-dummy0 type dummy
-# 2. Assign the API service IP to it
-sudo ip addr add 10.96.0.1/32 dev kube-dummy0
-# 3. Bring it up
-sudo ip link set kube-dummy0 up
-
-# TODO: if Flannel works, without encapsulation like VXLAN, then maybe that also works with Calico to disable that and allow host networking!?!?
-
-
-# TODO: old, can be removed
-# Ensure the ip routes for the pod subnet and service subnet in kubernetes are added:
-sudo ip route add 10.96.0.0/12 dev enp7s0  # Service CIDR
-sudo ip route add 192.168.0.0/16 dev enp7s0  # Pod CIDR used by Calico
-# Ensure it goes to the correct interface, should print the above specified one, such as:
-ubuntu@Node1:~$ ip route get 10.96.0.1
-# TODO: that did not do anything now.
-# TODO: this is not good.
-
-
-# SSH into the node and execute something from a calico pod (replace with actual pod name), such as:
-kubectl exec -it -n calico-system calico-node-6c62k -- bash
+# At the end, do not forget to disable scheduling pods on the control plane node: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm#control-plane-node-isolation
+kubectl taint nodes node1 node-role.kubernetes.io/control-plane=:NoSchedule
 ```
-TODO: finish this with eventual solution.
 
-TODO: this below can be left at the bottom:
-A lot of guides said:
+### Additional information beyond solution
+A lot of guides said this that did not work for me (but could be useful with similar issues):
 ```sh
 # Ensure ip forwarding is allowed, should be 1 for enabled:
 sudo sysctl net.ipv4.ip_forward
@@ -142,8 +148,6 @@ sudo systemctl start docker
 ```
 This article was helpful here: https://www.baeldung.com/ops/kubernetes-error-no-route-to-host. However, it did not work in this case, meaning something else was the issue.
 
-
-### Additional helpful commands found during the process
 Additional helpful commands:
 ```sh
 # Test connection inside the Kubernetes cluster
@@ -161,6 +165,16 @@ wget: bad address 'kubernetes.default.svc.cluster.local'
 wget --spider https://10.233.0.1:443
 # Type this and press enter to exit:
 exit
+
+# Editing configurations:
+# Manual steps to change a config map (not recommended, use the cluster deploy and change variables before running the cluster.yml)
+# ConfigMap of pods named kube-proxy
+kubectl -n kube-system get configmap kube-proxy -o yaml
+# Edit manually:
+kubectl -n kube-system edit configmap kube-proxy
+# Press i to enter insert mode and make changed. Press Esc to exit instert mode and type :wq and Enter to write (=save) and quit
+# Restart pods
+kubectl -n kube-system delete pods -l k8s-app=kube-proxy
 ```
 
 

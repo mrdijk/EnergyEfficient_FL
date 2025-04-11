@@ -25,6 +25,8 @@ K8S_CRI_SOCKET=unix:///var/run/cri-dockerd.sock
 POD_NETWORK_CIDR=192.168.0.0/16
 # Do the same for the services, below is the default (see result of "kubeadm config print init-defaults")
 SERVICE_NETWORK_CIDR=10.96.0.0/12
+# Use default api bind port, but set explicitely for clarity in the config file for kubeadm: https://v1-31.docs.kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/#kubeadm-k8s-io-v1beta4-APIEndpoint
+API_BIND_PORT=6443
 
 
 
@@ -119,7 +121,7 @@ echo "================= Creating config file... ================="
 # === General: ===
 # Create the file manually with the configuration.
 # Customizing components: https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/control-plane-flags/
-# Also see: https://v1-31.docs.kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/
+# Also see the full API reference: https://v1-31.docs.kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/
 # Use the above specific version with the apiVersion, this is the corresponding reference!
 # If some configuration types are not provided, or provided only partially, kubeadm will use default values. So, only specify absolutely required args here.
 # See the defaults to view the format with these commands for instpiration and more possible options:
@@ -136,6 +138,7 @@ echo "================= Creating config file... ================="
 # === Init configuration (for node ip and cri socket) specific: ===
 # Use specific CRI socket, see above explanation for variable used for CRI socket.
 # Also, add localAPIEndpoint to ensure kubectl uses the correct api-server address without detecting IPv6 or other addresses automatically, which caused problems before.
+# The bind port is set to the variable specified earlier.
 #
 # Also, set INTERNAL-IP to correct IP for the node of the custom network added over IPv4. By default it would use a different interface, since that is the main one
 # on the FABRIC node, such as with the IP: 10.30.6.111. But we want the IP from the network we created since the nodes can communicate with each other in this network:
@@ -145,6 +148,7 @@ echo "================= Creating config file... ================="
 echo "Creating kubeadm config file..."
 cat <<EOF > kubeadm-kubelet-extraargs.yaml
 apiVersion: kubeadm.k8s.io/v1beta4
+# https://v1-31.docs.kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/#kubeadm-k8s-io-v1beta4-ClusterConfiguration
 kind: ClusterConfiguration
 networking:
   podSubnet: "$POD_NETWORK_CIDR"
@@ -155,15 +159,18 @@ apiServer:
     value: "$ip"
 ---
 apiVersion: kubeadm.k8s.io/v1beta4
+# https://v1-31.docs.kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/#kubeadm-k8s-io-v1beta4-InitConfiguration
 kind: InitConfiguration
 localAPIEndpoint:
   advertiseAddress: "$ip"
+  bindPort: "$API_BIND_PORT"
 nodeRegistration:
   criSocket: "$K8S_CRI_SOCKET"
   kubeletExtraArgs:
     - name: node-ip
       value: "$ip"
 EOF
+# TODO: rename file to better one
 # Verify created file content:
 cat kubeadm-kubelet-extraargs.yaml
 echo "Validating config file with kubeadm config validate..."
