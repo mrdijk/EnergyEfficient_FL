@@ -19,12 +19,14 @@ sudo ip route add 10.96.0.0/12 dev enp7s0
 # Restart pod for calico tigera-operator
 kubectl delete pod -n tigera-operator -l k8s-app=tigera-operator
 ```
-However, we later found out that this fix causes more problems later, since the route of the services in Kubernetes are now routed through the physical interface (enp7s0) we created in FABRIC, causing the following error, since this interface does not know any route in the subnet: 10.96.0.0/12:
+However, afterwards a new issue arose:
 ```sh
 2025-04-10 06:49:10.689 [ERROR][1] kube-controllers/client.go 320: Error getting cluster information config ClusterInformation="default" error=Get "https://10.96.0.1:443/apis/crd.projectcalico.org/v1/clust ││ erinformations/default": dial tcp 10.96.0.1:443: connect: no route to host
 ```
 
-What we did to fix it on FABRIC:
+TODO: add here explanation of trying it again with Calico from scratch.
+
+First, some additional debugging tips:
 ```sh
 # Show all, including local, useful for seeing all the routes on a node:
 ip route show table all
@@ -37,17 +39,44 @@ kubectl taint nodes node1 node-role.kubernetes.io/control-plane-
 # Run a test pod to execute commands in it in the control plane node (node1)
 kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
 # Here you can test connectivity from a pod and other things from a pod for example
+```
 
+At first, we used Calico as the network plugin, but after more than a week of debugging and trying to understand and fix issues in several different ways without results, the decision was made to move to another network plugin for Kubernetes to try and see if it works with a different tool. Also, this had to goal to possibly understand the issue better since this would have a slightly different setup in our environment.
+
+After some research, it was found that Flannel was one of the first supported network plugins for Kubernetes and is generally the most simple and lightweight one, which made it a suitable choice for debugging purposes without much custom options, etc., that could possibly interfere and cause more issues.
+
+Initially, the first issue was the same with "dial tcp 10.96.0.1:443: connect: network is unreachable". However, we knew how to fix this and did it with the same fix below:
+```sh
 # Eventual fix:
 # Add the route for the Kubernetes service subnet, otherwise, it cannot reach that:
 sudo ip route add 10.96.0.0/12 dev enp7s0
-# This fix essentially says: Please send traffic to that subnet out through enp7s0 directly, and trust the network 
-# or NAT/iptables to handle it from there. And the iptables are correctly created with kube-proxy, which is why it works from there.
-# However, kube-proxy sets up NAT, but assumes network basics (like reachable paths) are in place, which might not be the case in FABRIC here.
+# Additional steps were added in the start_control_plane.sh, such as enabling ip forwarding, etc.:
+# Preparing the host for the network plugin: https://github.com/flannel-io/flannel?tab=readme-ov-file#deploying-flannel-manually
+# Ensure bridge and ip forward are enabled and make it persistent 
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+EOF
+sudo sysctl --system
+# And:
+# Make sure br_netfilter is loaded (required for Flannel)
+sudo modprobe br_netfilter
+# Check:
+lsmod | grep br_netfilter
+```
+With Calico this resulted a next issue (the second issue listed above: "dial tcp 10.96.0.1:443: connect: no route to host"). However, with Flannel, after logical reasoning with the specific configuration settings (see kube-flannel.yml), it worked perfectly without problems and the tests all worked (see below full tests explanation).
+
+TODO: also here test with specific for Calico and see if that still works.
+
+The main fix here was adding a route for the service subnet of Kubernetes to the node ip routes. This fix with adding the service subnet to the node essentially says: Please send traffic to that subnet out through enp7s0 directly, and trust the network or NAT/iptables to handle it from there. And the iptables are correctly created with kube-proxy, which is why it works from there. However, kube-proxy sets up NAT, but assumes network basics (like reachable paths) are in place, which might not be the case in FABRIC here. 
+
+Note: the pod subnet is not necessary to add here since this is added by the network plugin, in this example Flannel, but that network plugin requires access to the service subnet before being able to do that, which was the problem here.
+
+Tests to verify that it worked:
+```sh
 # Tests afterwards (make sure the debugging is enabled to taint the node to allow pods to be scheduled):
 # Check if some pods get assigned an IP from the pod subnet (not all have it, such as most kube-system pods will have the node IP probably)
-# Note: the pod subnet is not necessary to add here since this is added by the network plugin, in this example Flannel, but that network plugin 
-# requires access to the service subnet before being able to do that, which was the problem here.
 kubectl get pods -o wide -A
 # Test if pods can reach each other:
 kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
@@ -66,6 +95,10 @@ exit
 # Finally, execute into a flannel pod (or other network addon) and list the ip routes, should include the service and pod subnet now, such as:
 kubectl -n kube-flannel exec -it kube-flannel-ds-hzg86 -- sh
 ip route
+exit
+# Cleanup:
+kubectl delete svc nginx
+kubectl delete deployment nginx
 
 
 # Next, join a worker node and test the following:
@@ -105,6 +138,11 @@ exit
 # Finally, execute into a flannel pod on the worker node (or other network addon) and list the ip routes, should include the service and pod subnet now, such as:
 kubectl -n kube-flannel exec -it kube-flannel-ds-hzg86 -- sh
 ip route
+exit
+# Cleanup:
+kubectl delete svc nginx
+kubectl delete deployment nginx
+
 
 # At the end, do not forget to disable scheduling pods on the control plane node: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm#control-plane-node-isolation
 kubectl taint nodes node1 node-role.kubernetes.io/control-plane=:NoSchedule
