@@ -175,7 +175,8 @@ echo "kubeconfig is valid."
 echo "================= Setting up network plugin for Kubernetes cluster =================" 
 # https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
 # https://v1-31.docs.kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy
-# # Wait shortly to ensure initialization is complete
+# Specific plugin used here (Flannel): https://github.com/flannel-io/flannel
+# Wait shortly to ensure initialization is complete
 sleep 5
 # Make sure envsubst is present:
 echo "Making sure envsubst is present..."

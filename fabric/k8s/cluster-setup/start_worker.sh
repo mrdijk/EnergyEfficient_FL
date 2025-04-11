@@ -3,6 +3,8 @@
 currentNodeIP=$1
 interfaceDevice=$2
 controlPlaneIP=$3
+joinToken=$4
+caCertHash=$5
 
 {
 
@@ -12,34 +14,31 @@ echo "================================================ Starting start script for
 echo "Current Node IP: ${currentNodeIP}"
 echo "Interface: ${interfaceDevice}"
 echo "Control Plane Node IP: ${controlPlaneIP}"
+echo "Join token: ${joinToken}"
+echo "Ca Cert HASH: ${caCertHash}"
 
+# ================================================ Set variables ================================================
+echo "================= Setting variables... =================" 
 # Same variables as start_controle_plane.sh
 K8S_CRI_SOCKET=unix:///var/run/cri-dockerd.sock
 SERVICE_NETWORK_CIDR=10.96.0.0/12
 # Use bind port set in start_control_plane.sh
 API_BIND_PORT=6443
-# Specific join variables
-# TODO: change to input probably:
-JOIN_TOKEN="wh8zbn.moko0xq6pagjvld3"
-CA_CERT_HASH="sha256:d6e5eb3954c537cd907d868fb154de6583127fe8ae0e08e5f0bd4f8e441e6290"
 
-# Reset the node with kubeadm before applying to avoid potential previous installations conflicting, allowing to rerun this script without having to completely 
-# recreate nodes/VMs before retrying the script.
-# https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down
-# Use specific CRI socket, see above explanation for variable used
+# ================================================ Reset Kubeadm to avoid interference of previous setups ================================================
+echo "================= Resetting Kubeadm... =================" 
+# See start_control_plane.sh for explanation on why and how this is done specifically
 yes | sudo kubeadm reset -f --cri-socket=$K8S_CRI_SOCKET
-# This does not remove some aspects, as output by the above command, you may want to do that manually if needed, such as:
-# Remove directory:
 sudo rm -rf /etc/cni/net.d
-# Remove iptables (with root access for all commands):
 sudo bash -c 'iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X'
 # Note: if you added the node before, you need to delete it from the control plane node, such as:
 # kubectl delete node node2
+# You may need additional steps, such as removing some pods in k9s or see: https://v1-31.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#remove-the-node
 
-# TODO: add things here from start control plane, such as the config, but then for JoinConfiguration instead of InitConfiguration.
-# TODO: also maybe set: JoinConfiguration.controlPlane.localAPIEndpoint
 
-# TODO: add here explaining preparing the host for the network plugin: https://github.com/flannel-io/flannel?tab=readme-ov-file#deploying-flannel-manually
+# ================================================ Prepare Networking plugin (exactly the same as start_control_plane.sh) ================================================
+echo "================= Preparing settings for networking plugin... =================" 
+# Prepare the host for the network plugin: https://github.com/flannel-io/flannel?tab=readme-ov-file#deploying-flannel-manually
 # Ensure bridge and ip forward are enabled and make it persistent 
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-iptables = 1
@@ -47,10 +46,9 @@ net.ipv4.ip_forward = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 net.ipv6.conf.default.forwarding = 1
 EOF
-# TODO: do the same for start_control_plane with the defaults:
-# TODO: this might be something as well, as it may need to be 1:
-# sysctl net.ipv4.conf.all.rp_filter
+# Apply changes to make it persistent
 sudo sysctl --system
+# === CNI Plugins ===
 # Ensure the required CNI Network Plugin is installed: https://github.com/containernetworking/plugins
 ARCH=$(uname -m)
   case $ARCH in
@@ -71,8 +69,9 @@ fi
 sudo modprobe br_netfilter
 # Check:
 lsmod | grep br_netfilter
-# TODO: add fixes from previous here as well, such as:
-# If it says something like File Exists, the route already exists and this can be skipped.
+# === FABRIC Network Issue fix ===
+# Fix for issue with network connectivity in FABRIC: add the ip route manually for the kubernetes service subnet (see Troubleshooting.md 
+# in this folder for more explanation). If it says something like File Exists, the route already exists and this can be skipped.
 echo "SERVICE_NETWORK_CIDR is $SERVICE_NETWORK_CIDR"
 echo "interfaceDevice is $interfaceDevice"
 if [[ -n "$SERVICE_NETWORK_CIDR" && -n "$interfaceDevice" ]]; then
@@ -80,50 +79,58 @@ if [[ -n "$SERVICE_NETWORK_CIDR" && -n "$interfaceDevice" ]]; then
 else
   echo "ERROR: SERVICE_NETWORK_CIDR or interfaceDevice is unset."
 fi
-# List ip routes
+# List ip routes to verify
 sudo ip route
 
-# TODO: add custom join setup here.
 
-
-# ================================================ Creating configuration file ================================================
-echo "================= Creating config file... =================" 
+# ================================================ Creating configuration file for Kubeadm ================================================
+echo "================= Creating config file for Kubeadm... =================" 
 # See start_control_plane.sh for full explanation on creating kubeadm config files. Specifically for this script:
 # Also see the full API reference: https://v1-31.docs.kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/
 # This adds similar settings to the control plane, such as adding the specific node-ip of this node and the CRI Socket. 
 # Discovery is rerquired for the join command, which has token and the hash for a cert.
 # The rest is left to default values, since kubernetes adds them as configured in the control plane and detects others automatically
 echo "Creating kubeadm config file..."
-cat <<EOF > kubeadm-kubelet-extraargs.yaml
+cat <<EOF > kubeadm-custom-init-config.yaml
 apiVersion: kubeadm.k8s.io/v1beta4
 # https://v1-31.docs.kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/#kubeadm-k8s-io-v1beta4-JoinConfiguration
 kind: JoinConfiguration
 discovery:
   # Setting bootstrap token automatically fills the other values, so only this needs to be set: https://v1-31.docs.kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/#kubeadm-k8s-io-v1beta4-Discovery 
   bootstrapToken:
-    token: "$JOIN_TOKEN"
+    token: "$joinToken"
     apiServerEndpoint: "$controlPlaneIP:$API_BIND_PORT"
     caCertHashes:
-      - "$CA_CERT_HASH"
+      - "$caCertHash"
 nodeRegistration:
   criSocket: "$K8S_CRI_SOCKET"
   kubeletExtraArgs:
     - name: node-ip
       value: "$currentNodeIP"
 EOF
-# TODO: rename file to better one
 # Verify created file content:
-cat kubeadm-kubelet-extraargs.yaml
+cat kubeadm-custom-init-config.yaml
 echo "Validating config file with kubeadm config validate..."
 # Verify with kubeadm: https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-config/#cmd-config-validate
-sudo kubeadm config validate --config kubeadm-kubelet-extraargs.yaml
+sudo kubeadm config validate --config kubeadm-custom-init-config.yaml
 # Verify the actual config file at the end of this script
 
+# ================================================ Join kubernetes cluster ================================================
+echo "================= Joining node to cluster with Kubeadm =================" 
 # Join the cluster: https://v1-31.docs.kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-join/
-# TODO: change to variable now for token and hash or entire command with sudo:
-sudo kubeadm join 10.145.2.2:6443 --config kubeadm-kubelet-extraargs.yaml
-# TODO: can run on control plane node: kubeadm token create --print-join-command
+sudo kubeadm join 10.145.2.2:6443 --config kubeadm-custom-init-config.yaml
+
+# ================================================ Verification ================================================
+# === Verify Cgroup driver ===
+echo "Verify cgroup driver, should be systemd"
+sudo cat /var/lib/kubelet/config.yaml | grep cgroup
+# More validation is not necessary, that can be done from the control plane node.
 
 echo "Start worker node complete."
 
+# Everything inside this block (stdout and stderr) will be piped and logged
+# The line below does the following:
+# - 2>&1 : Redirects stderr (2) to stdout (1), combining output and errors
+# - | tee -a : Pipes combined output to both the terminal and the log file
+# - start_worker.log : Appends all logs to this file
 }  2>&1 | tee -a start_worker.log
