@@ -12,8 +12,8 @@ FABRIC recommends using Jupyter Notebook for interacting with FABRIC, which is w
 The following steps explain the sequence of execution for the notebooks:
 1. Configure and validate the FABRIC environment and project to be used: [configure_and_validate.ipynb](./configure_and_validate.ipynb)
 2. Create a slice and configure the network with the nodes to be used: [create_slice.ipynb](./create_slice.ipynb)
-3. Confiure and prepare kubernetes cluster: [Configure Kubernetes](./k8s/cluster-setup/k8s_setup.ipynb)
-4. DYNAMOS setup in Kubernetes: [Configure DYNAMOS for Kubernetes Specifically](./k8s/dynamos/DYNAMOS_k8s_setup.ipynb)
+3. Confiure and prepare kubernetes cluster: [Configure Kubernetes](./k8s-cluster-setup/k8s_setup.ipynb)
+4. DYNAMOS setup in Kubernetes: [Configure DYNAMOS for Kubernetes Specifically](./dynamos/DYNAMOS_setup.ipynb)
 5. Execute energy experiments in FABRIC with the created setup: [Execute Experiments](./experiments/experiments.ipynb)
 TODO: is this all?
 
