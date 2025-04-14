@@ -83,10 +83,10 @@ Note: this uses a different ssh_config file specific for the nodes, otherwise, i
 
 Then upload the actual files for DYNAMOS in FABRIC specifically:
 ```sh
-# Replace the congiguration script in this folder with the FABRIC specific configuration script, such as (replace IP of course in the ssh_config file below if necessary):
-./upload_to_remote.sh ../../charts ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS"
-
 # Upload the charts folder in the DYNAMOS folder, such as (replace IP of course in the ssh_config file below if necessary):
+./upload_to_remote.sh ../dynamos/charts ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS"
+
+# Replace the congiguration script in this folder with the FABRIC specific configuration script, such as (replace IP of course in the ssh_config file below if necessary):
 ./upload_to_remote.sh ../dynamos/dynamos-configuration.sh ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS/configuration"
 
 # Make sure docker is logged in after:
