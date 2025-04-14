@@ -5,6 +5,7 @@ interfaceDevice=$2
 controlPlaneIP=$3
 joinToken=$4
 caCertHash=$5
+nodeName=$6
 
 {
 
@@ -16,6 +17,7 @@ echo "Interface: ${interfaceDevice}"
 echo "Control Plane Node IP: ${controlPlaneIP}"
 echo "Join token: ${joinToken}"
 echo "Ca Cert HASH: ${caCertHash}"
+echo "Node name: ${nodeName}"
 
 # ================================================ Set variables ================================================
 echo "================= Setting variables... =================" 
@@ -103,6 +105,8 @@ discovery:
     caCertHashes:
       - "$caCertHash"
 nodeRegistration:
+  # Name of the node, used in the kubernetes cluster
+  name: "$nodeName"
   criSocket: "$K8S_CRI_SOCKET"
   kubeletExtraArgs:
     - name: node-ip

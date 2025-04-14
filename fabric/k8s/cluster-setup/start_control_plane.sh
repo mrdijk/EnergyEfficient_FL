@@ -2,6 +2,7 @@
 
 ip=$1
 interfaceDevice=$2
+nodeName=$3
 
 {
 
@@ -11,6 +12,7 @@ echo "================================================ Starting start script for
 
 echo "IP: ${ip}"
 echo "Interface: ${interfaceDevice}"
+echo "Node name: ${nodeName}"
 
 # ================================================ Set variables ================================================
 echo "================= Setting variables... =================" 
@@ -136,6 +138,8 @@ localAPIEndpoint:
   advertiseAddress: "$ip"
   bindPort: $API_BIND_PORT
 nodeRegistration:
+  # Name of the node, used in the kubernetes cluster
+  name: "$nodeName"
   criSocket: "$K8S_CRI_SOCKET"
   kubeletExtraArgs:
     - name: node-ip
