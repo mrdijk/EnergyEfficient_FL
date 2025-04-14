@@ -43,7 +43,7 @@ linkerd install \
 linkerd check
 
 # Install Jaeger onto the cluster for observability
-# Install Jaeger on the same node
+# Install Jaeger on the same node (will also show on other nodes, since it is present on every node)
 linkerd jaeger install \
   --set nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
   | kubectl apply -f -
@@ -89,8 +89,11 @@ Then upload the actual files for DYNAMOS in FABRIC specifically:
 # Upload the charts folder in the DYNAMOS folder, such as (replace IP of course in the ssh_config file below if necessary):
 ./upload_to_remote.sh ../dynamos/dynamos-configuration.sh ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS/configuration"
 
-# TODO: then manually start the configuration script. Make sure docker is logged in after:
-docker login
+# Make sure docker is logged in after:
+docker login -u poetoec
+# Enter the password with a PAT, see https://app.docker.com/settings
+# TODO: then manually start the configuration script. Go to the DYNAMOS/configuration folder and execute:
+./dynamos-configuration.sh
 ```
 Note: when making changes, the changed files need to be uploaded to the VM again before executing them.
 

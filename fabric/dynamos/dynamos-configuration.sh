@@ -33,7 +33,7 @@ echo "Generating RabbitMQ password..."
 rabbit_pw=$(openssl rand -hex 16)
 
 # Use the RabbitCtl to make a special hash of that password:
-hashed_pw=$($SUDO docker run --rm rabbitmq:3-management rabbitmqctl hash_password $rabbit_pw)
+hashed_pw=$(sudo docker run --rm rabbitmq:3-management rabbitmqctl hash_password $rabbit_pw)
 actual_hash=$(echo "$hashed_pw" | cut -d $'\n' -f2)
 
 echo "Replacing tokens..."
@@ -61,30 +61,32 @@ echo "Preparing PVC"
     ./fill-rabbit-pvc.sh
 }
 
-echo "Installing NGINX..."
-helm install -f "${core_chart}/ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress -n ingress --version 0.18.0
+# TODO: uncomment below when the above works, doing it step by step.
 
-echo "Installing DYNAMOS core..."
-helm upgrade -i -f ${core_chart}/values.yaml core ${core_chart} --set hostPath=${HOME}
+# echo "Installing NGINX..."
+# helm install -f "${core_chart}/ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress -n ingress --version 0.18.0
 
-sleep 3
-# Install orchestrator layer
-helm upgrade -i -f "${orchestrator_chart}/values.yaml" orchestrator ${orchestrator_chart}
+# echo "Installing DYNAMOS core..."
+# helm upgrade -i -f ${core_chart}/values.yaml core ${core_chart} --set hostPath=${HOME}
 
-sleep 1
+# sleep 3
+# # Install orchestrator layer
+# helm upgrade -i -f "${orchestrator_chart}/values.yaml" orchestrator ${orchestrator_chart}
 
-echo "Installing agents layer"
-helm upgrade -i -f "${agents_chart}/values.yaml" agents ${agents_chart}
+# sleep 1
 
-sleep 1
+# echo "Installing agents layer"
+# helm upgrade -i -f "${agents_chart}/values.yaml" agents ${agents_chart}
 
-echo "Installing thirdparty layer..."
-helm upgrade -i -f "${ttp_chart}/values.yaml" surf ${ttp_chart}
+# sleep 1
 
-sleep 1
+# echo "Installing thirdparty layer..."
+# helm upgrade -i -f "${ttp_chart}/values.yaml" surf ${ttp_chart}
 
-echo "Installing api gateway"
-helm upgrade -i -f "${api_gw_chart}/values.yaml" api-gateway ${api_gw_chart}
+# sleep 1
+
+# echo "Installing api gateway"
+# helm upgrade -i -f "${api_gw_chart}/values.yaml" api-gateway ${api_gw_chart}
 
 echo "Finished setting up DYNAMOS"
 

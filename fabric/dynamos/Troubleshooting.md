@@ -111,3 +111,25 @@ linkerd install --crds | kubectl apply -f -
 kubectl kustomize . | kubectl apply -f -
 ```
 Then it worked and the pods were running without the image pull errors.
+
+### Remaining issues/errors
+There were two main errors that remained, however, this was the same on the local DYNAMOS setup, so these could be ignored.
+
+Error one in linkerd-destination pod:
+```sh
+linkerd-proxy [     0.006425s]  WARN ThreadId(01) dst:controller{addr=localhost:8086}:endpoint{addr=127.0.0.1:8086}: linkerd_reconnect: Failed to connect error=endpoint 127.0.0.1:8086: Connection refused ( ││ os error 111) error.sources=[Connection refused (os error 111)]
+```
+Similar errors where showing in the logs on the local setup of Docker Desktop:
+```sh
+linkerd-proxy [     5.869205s]  WARN ThreadId(01) dst:controller{addr=localhost:8086}:endpoint{addr=127.0.0.1:8086}: linkerd_reconnect: Failed to connect error=endpoint 127.0.0.1:8086: Connection refused ( ││ os error 111) error.sources=[Connection refused (os error 111)] 
+
+# Also some other minor errors, but the above one was the main one, such as:
+policy 2025-04-14T14:36:11.326251Z  INFO httproutes.policy.linkerd.io: kubert::errors: stream failed error=error returned by apiserver during watch: The resourceVersion for the provided watch is too old.:  ││ Expired
+```
+Therefore, this could be ignored and we could move on to the next step, since the same behaviour was locally, and the pods were still running and nothing was broken.
+
+The second error was with the linkerd-heartbeat pods:
+```sh
+time="2025-04-14T14:26:10Z" level=error msg="Prometheus query failed: Post \"http://prometheus.linkerd-viz.svc.cluster.local:9090/api/v1/query\": dial tcp: lookup prometheus.linkerd-viz.svc.cluster.local o ││ n 10.96.0.10:53: no such host"
+```
+But this was likely due to the fact that no linkerd viz installation was made, meaning it was referring to an old setup that did not exist or somehow applied with the main linkerd install, etc. However, it was not used and not necessary, since it is linked to linkerd viz, which we do not use at this time. So, this could be ignored as well at this time. 
