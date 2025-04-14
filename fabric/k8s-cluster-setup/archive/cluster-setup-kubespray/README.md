@@ -140,6 +140,25 @@ ansible -i inventory/dynamos-cluster/inventory.ini all \
 ```
 After exeucting kubespray to configure the cluster, you can follow the next steps in the k8s_setup.ipynb notebook.
 
+This was the ssh_config at the time for example:
+```
+UserKnownHostsFile /dev/null
+StrictHostKeyChecking no
+ServerAliveInterval 120
+
+# Bastion host config
+Host bastion.fabric-testbed.net
+    User collinpoetoehena_0000217992
+    ForwardAgent yes
+    IdentityFile ~/.ssh/fabric_bastion_key
+    IdentitiesOnly yes
+
+# All other hosts than bastion (used to connect with kubespray to the VMs for example)
+Host * !bastion.fabric-testbed.net
+    ProxyJump collinpoetoehena_0000217992@bastion.fabric-testbed.net:22
+    
+```
+
 
 ### Troubleshooting
 See the Troubleshooting.md file.

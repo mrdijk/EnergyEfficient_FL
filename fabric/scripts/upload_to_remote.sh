@@ -61,7 +61,8 @@ if [ -d "$LOCAL_PATH" ]; then
 
   # Unpack remotely by executing a command on the remote host via ssh
   echo "Extracting '$TAR_NAME' on remote host..."
-  ssh -i "$SSH_KEY" -F "$SSH_CONFIG" "$REMOTE_ADDR_SSH" "tar -xzf $TAR_NAME -C $REMOTE_DIR && rm $TAR_NAME"
+  # Go into the remote dir first (will work if the optional argument is passed or not, and then unpack the tar)
+  ssh -i "$SSH_KEY" -F "$SSH_CONFIG" "$REMOTE_ADDR_SSH" "cd $REMOTE_DIR && tar -xzf $TAR_NAME && rm $TAR_NAME"
 
   # --- Cleanup local tarball ---
   echo "Cleaning up local tarball..."
