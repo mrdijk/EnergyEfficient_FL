@@ -1,8 +1,6 @@
 # Troubleshooting
 This file describes any possible problems that occurred during our setup of the Kubernetes cluster.
 
-Note: do not forget to upload the kubespray changes to the remote host controle plane (in this case node1)! Otherwise, the changes will not apply. For example, reupload the whole kubespray file with several files changed, and only a file when only one file changed, etc.
-
 See for more information: https://kubernetes.io/docs/tasks/debug/
 
 

@@ -1,0 +1,3 @@
+This is the old solution from the custom linkerd apply with the Linkerd setup, where the container registry changed to GitHub, since the custom one with "cr.l5d.io" caused some problems within FABRIC.
+
+Note: this uses a linkerd.yaml that is customized with the FABRIC environment for pulling images from a registry that did not cause problems. This file can easily be updated with the above steps to generate the linkerd.yaml file and replace the existing one. This way with VSC and the git/source control option in VSC for example, changes can be easily viewed to see if those changes are necessary or not.

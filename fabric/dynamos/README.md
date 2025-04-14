@@ -15,24 +15,9 @@ ssh -J bastion-1.fabric-testbed.net -R localhost:4567:localhost:5678 <vm IPv6 ad
 ## Install Linkerd
 Do these steps manually after SSH into the k8s-control-plane node:
 ```sh
-# Set Linkerd version
-export TEMP_LINKERD_VERSION=edge-25.4.1
-
-# Preload critical images manually to avoid FABRIC network issue to uncommon registries like cr.l5d.io (see Troubleshooting.md):
-# Load those images with docker from the publicly available GitHub registry: https://github.com/orgs/linkerd/packages
-images=(
-  proxy:$TEMP_LINKERD_VERSION
-  proxy-init:v2.4.1
-  controller:$TEMP_LINKERD_VERSION
-  policy-controller:$TEMP_LINKERD_VERSION
-)
-for image in "${images[@]}"; do
-  sudo docker pull ghcr.io/linkerd/$image
-done
-
 # See: https://linkerd.io/2.17/getting-started/
 # Install CLI (using a specific stable version)
-curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install-edge | LINKERD2_VERSION=$TEMP_LINKERD_VERSION sh
+curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install-edge | LINKERD2_VERSION=edge-25.4.1 sh
 
 # Add Linkerd to PATH
 export PATH=$HOME/.linkerd2/bin:$PATH
@@ -48,15 +33,7 @@ linkerd check --pre
 # Install Linkerd on cluster
 # Install Linkerd CRDs
 linkerd install --crds | kubectl apply -f -
-# TODO: first with yaml install:
-linkerd install \
-  --set proxyInit.runAsRoot=true \
-  --set nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
-  > linkerd.yaml
 # Install Linkerd control plane pinned to dynamos-core node (// escapes the .)
-# linkerd install \
-#   --set nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
-#   | kubectl apply -f -
 linkerd install \
   --set proxyInit.runAsRoot=true \
   --set nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
@@ -80,11 +57,12 @@ linkerd jaeger install \
 # # To remove Linkerd Viz
 # linkerd viz uninstall | kubectl delete -f -
 # # To remove Linkerd Jaeger
-# linkerd jaeger uninstall | kubectl delete -f 
+# linkerd jaeger uninstall | kubectl delete -f -
 # # Remove control plane:
 # linkerd uninstall | kubectl delete -f -
 ```
-TODO: can do with a script? When I did it before with a script I got errors and the pods were not running.
+
+TODO: can do with a script later probably if uploading the linkerd.yaml
 
 
 ## Upload the configuration files and charts to the kubernetes control-plane node
