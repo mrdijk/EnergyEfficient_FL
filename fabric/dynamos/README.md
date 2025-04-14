@@ -34,6 +34,7 @@ linkerd check --pre
 # Install Linkerd CRDs
 linkerd install --crds | kubectl apply -f -
 # Install Linkerd control plane pinned to dynamos-core node (// escapes the .)
+# (you can list labels of nodes with: kubectl get nodes --show-labels)
 linkerd install \
   --set proxyInit.runAsRoot=true \
   --set nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
