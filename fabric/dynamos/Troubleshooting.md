@@ -4,6 +4,37 @@ This file describes any possible problems that occurred during our setup of DYNA
 See for more information: https://kubernetes.io/docs/tasks/debug/
 
 
+## Pod stuck in infinite Pending state
+This issue was that after creating a pod, such as rabbitmq and etcd, it got stuck in Pending. With describe I could see the events:
+```sh
+kubectl describe pod etcd-0 -n core
+
+# Result example:
+Warning  FailedScheduling  4m17s  default-scheduler  0/5 nodes are available: pod has unbound immediate PersistentVolumeClaims. preemption: 0/5 nodes are available: 5 Preemption is not helpful for scheduling
+```
+This was because there were PVC did not have a PV to bound to, which was created automatically in Docker Desktop local setup, but not here in this case. So, I had to manually add a PV in the yaml charts files. After reapplying it worked. Additional tips:
+```sh
+# See persistent volume claims (PVC) and their status, such as Pending meaning there is no matching PV, and Bound meaning it is correctly set:
+kubectl get pvc -A
+# Get PVs:
+kubectl get pv -A
+```
+
+## Etcd warnings of peer not healthy
+On the initial startup of etcd I got the following logs, for example in the etcd-2 pod:
+```sh
+etcd {"level":"warn","ts":"2025-04-15T13:15:25.869Z","caller":"rafthttp/probing_status.go:68","msg":"prober detected unhealthy status","round-tripper-name":"ROUND_TRIPPER_SNAPSHOT","remote-peer-id":"ce1042 ││ 952548ee4e","rtt":"0s","error":"dial tcp: lookup etcd-1.etcd-headless.core.svc.cluster.local on 10.96.0.10:53: no such host"}
+```
+However, this was not an issue, this is normal behaviour on startup of etcd, since not all etcd instances are running at the same time. What I did was check if all pods were running, and delete the last etcd replica, such as etcd-2 in k9s, then check the logs again and search for "level":"warn" to see if the same issue was present:
+```sh
+# Delete the pod in k9s
+# Then check logs and wait for it to finish
+# Search by pressing / and then paste "level":"warn"
+# Verify not the same problem is present
+```
+This was successful at the time I tried it, so generally, the error can be ignored if these steps are followed and successful.
+
+
 ## ImagePullBackOff/cannot pull images on FABRIC VM
 The issue:
 ```sh

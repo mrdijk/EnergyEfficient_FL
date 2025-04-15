@@ -117,6 +117,12 @@ cd DYNAMOS/configuration
 # (you can quickly uninstall using the uninstall-dynamos-configuration.sh script)
 
 # Additional tips:
+# Describe pod for debugging, such as finding out why it is stuck in pending (example below, change to desired pod):
+kubectl describe pod etcd-0 -n core
+# See persistent volume claims (PVC) and their status, such as Pending meaning there is no matching PV, and Bound meaning it is correctly set:
+kubectl get pvc -A
+# Get PVs:
+kubectl get pv -A
 # Show labels:
 kubectl get nodes --show-labels
 kubectl get pods --show-labels -A

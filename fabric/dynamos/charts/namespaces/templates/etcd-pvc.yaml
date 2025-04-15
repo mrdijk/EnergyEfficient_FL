@@ -1,5 +1,5 @@
-# Define Persistent Volume (PV) explicitely on the node, otherwise, the PVC cannot find it. 
-# This did work without PV on the local setup, but for the FABRIC this was required.
+# Define Persistent Volume (PV) explicitely on the node, otherwise, the PVC cannot find it. This did work without PV on the local setup, but for the FABRIC this was required.
+# https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-v1/
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -13,7 +13,17 @@ spec:
       # local path on node
     path: "/mnt/etcd-data"
   persistentVolumeReclaimPolicy: Retain
+  # Use the dynamos-core node for this
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - {{ .Values.node }}
 ---
+# https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -29,9 +39,9 @@ spec:
   resources:
     requests:
       storage: 20Mi
-
 ---
 # This is a different job that now just verifies the files, since we do not have internet access in FABRIC. Therefore, the workaround is to manually add it.
+# https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/job-v1/
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -42,7 +52,7 @@ spec:
     metadata:
       annotations:
         "linkerd.io/inject": "disabled"
-    # Use this specifically on the node for this where the volume is present (dynamos-core)
+    # Use the DYNAMOS core node for this, see https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
     spec:
       nodeSelector:
         kubernetes.io/hostname: {{ .Values.node }}
@@ -65,6 +75,7 @@ spec:
         persistentVolumeClaim:
           claimName: etcd-pvc
 # Old: works only with internet access, which we currently do not have in FABRIC.
+# https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/job-v1/
 # apiVersion: batch/v1
 # kind: Job
 # metadata:

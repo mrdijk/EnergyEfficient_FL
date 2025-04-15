@@ -23,3 +23,6 @@ etcd:
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
+
+# Use the dynamos-core node for this
+node: dynamos-core

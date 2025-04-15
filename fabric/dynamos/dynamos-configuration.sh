@@ -51,7 +51,7 @@ fi
 
 echo "Installing namespaces..."
 
-# Install namespaces, no need to use a specific node, this just creates the structure and does not use Pod specs like Deployment, StatefulSet, Job, etc.
+# Install namespaces, yaml files that need a specific node have been edited to include that
 # (Uninstall with: helm uninstall namespaces)
 helm upgrade -i -f ${namespace_chart}/values.yaml namespaces ${namespace_chart} --set secret.password=${rabbit_pw}
 
@@ -63,7 +63,7 @@ echo "Preparing PVC"
 }
 
 # TODO: uncomment below when the above works, doing it step by step.
-# TODO: also use the node selector for this like above.
+# TODO: also use the node selector for this like above, this is done in the charts themselves.
 
 # Install nginx, use the dynamos-core node (you can list labels of nodes with: kubectl get nodes --show-labels)
 # This expects the nodeSelector to be in the controller section
@@ -76,7 +76,9 @@ helm install -f "${core_chart}/ingress-values.yaml" nginx oci://ghcr.io/nginxinc
 # (Uninstall with: helm uninstall core)
 # TODO: specific node dynamos-core
 echo "Installing DYNAMOS core..."
-helm upgrade -i -f ${core_chart}/values.yaml core ${core_chart} --set hostPath=${HOME}
+helm upgrade -i -f ${core_chart}/values.yaml core ${core_chart} \
+    --set hostPath=${HOME} \
+    --set controller.nodeSelector."kubernetes\\.io/hostname"=dynamos-core
 
 # sleep 3
 # # Install orchestrator layer
