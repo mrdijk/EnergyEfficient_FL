@@ -41,7 +41,9 @@ spec:
     metadata:
       annotations:
         "linkerd.io/inject": "disabled"
+    # Use default dns for this job to inherit from parent node (avoids problems with FABRIC)
     spec:
+      dnsPolicy: Default
       containers:
       - name: init
         image: curlimages/curl

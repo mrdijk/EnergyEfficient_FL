@@ -81,12 +81,23 @@ Then upload the actual files for DYNAMOS in FABRIC specifically:
 
 # Replace the congiguration script in this folder with the FABRIC specific configuration script, such as (replace IP of course in the ssh_config file below if necessary):
 ./upload_to_remote.sh ../dynamos/dynamos-configuration.sh ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS/configuration"
+# Optionally add the script for quickly uninstalling for development purposes
+./upload_to_remote.sh ../dynamos/uninstall-dynamos-configuration.sh ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS/configuration"
 
 # Make sure docker is logged in after:
 docker login -u poetoec
 # Enter the password with a PAT, see https://app.docker.com/settings
 # TODO: then manually start the configuration script. Go to the DYNAMOS/configuration folder and execute:
 ./dynamos-configuration.sh
+# (you can quickly uninstall using the uninstall-dynamos-configuration.sh script)
+
+# Additional tips:
+# Show labels:
+kubectl get nodes --show-labels
+kubectl get pods --show-labels -A
+# Create debug pod with sh:
+kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
+
 ```
 Note: when making changes, the changed files need to be uploaded to the VM again before executing them.
 

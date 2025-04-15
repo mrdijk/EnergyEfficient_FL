@@ -72,12 +72,11 @@ echo "Installing NGINX..."
 helm install -f "${core_chart}/ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress \
     -n ingress --version 0.18.0 \
     --set controller.nodeSelector."kubernetes\\.io/hostname"=dynamos-core
-# helm upgrade -i -f ${namespace_chart}/values.yaml namespaces ${namespace_chart} \
-#     --set secret.password=${rabbit_pw} \
-#     --set nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
 
-# echo "Installing DYNAMOS core..."
-# helm upgrade -i -f ${core_chart}/values.yaml core ${core_chart} --set hostPath=${HOME}
+# (Uninstall with: helm uninstall core)
+# TODO: specific node dynamos-core
+echo "Installing DYNAMOS core..."
+helm upgrade -i -f ${core_chart}/values.yaml core ${core_chart} --set hostPath=${HOME}
 
 # sleep 3
 # # Install orchestrator layer

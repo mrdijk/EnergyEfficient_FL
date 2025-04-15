@@ -134,3 +134,34 @@ The second error was with the linkerd-heartbeat pods:
 time="2025-04-14T14:26:10Z" level=error msg="Prometheus query failed: Post \"http://prometheus.linkerd-viz.svc.cluster.local:9090/api/v1/query\": dial tcp: lookup prometheus.linkerd-viz.svc.cluster.local o ││ n 10.96.0.10:53: no such host"
 ```
 But this was likely due to the fact that no linkerd viz installation was made, meaning it was referring to an old setup that did not exist or somehow applied with the main linkerd install, etc. However, it was not used and not necessary, since it is linked to linkerd viz, which we do not use at this time. So, this could be ignored as well at this time. 
+
+
+## DNS resolution in pods not working, such as raw.githubusercontent.com
+The issue: a pod/job could not reach raw.githubusercontent.com:
+```sh
+curl: (6) Could not resolve host: raw.githubusercontent.com 
+``` 
+After further checking with:
+```sh
+# Create temp pod with sh:
+kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
+# Execute dns lookup, such as well known hosts, the following results were shown:
+/ # nslookup raw.githubusercontent.com
+Server:         10.96.0.10
+Address:        10.96.0.10:53
+** server can't find raw.githubusercontent.com: SERVFAIL
+** server can't find raw.githubusercontent.com: SERVFAIL
+/ # nslookup google.com
+Server:         10.96.0.10
+Address:        10.96.0.10:53
+** server can't find google.com: SERVFAIL
+** server can't find google.com: SERVFAIL
+```
+Furthermore, coredns also gave issues at the time, such as:
+```sh
+# Note: I lost the specific error, but where the ... is, the ip address was shown
+[ERROR] plugin/errors: 2 5739547058379111537.7231777715499938482. HINFO: dial udp [...]:53: connect: network is unreachable
+```
+This means that the core-dns is likely not working correctly, or there is no correct internet access from the pods.
+
+TODO: explain if it worked after creating nodes with IPv4 access (solution for previous one), and only after that configuring the kubernetes cluster. Before I did it while the kubernetes cluster was already created, and it might be that the host file was inherited from the node at that time when the setup was not yet done, causing the issues above.
