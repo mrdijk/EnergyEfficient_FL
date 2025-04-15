@@ -62,7 +62,9 @@ linkerd jaeger install \
 TODO: can do with a script later probably if uploading the linkerd.yaml
 
 
-## Upload the configuration files and charts to the kubernetes control-plane node
+## Install DYNAMOS in Kubernetes on the nodes in FABRIC
+This installs DYNAMOS by uploading the configuration files and charts to the kubernetes control-plane node.
+
 Make sure you have SSH access to the node (explained in the k8s-setup.ipynb notebook in the previous step). After that, execute the following steps.
 
 Prepare the Kubernetes control-plane node for DYNAMOS:
@@ -142,7 +144,7 @@ dynamos-core        Ready    <none>          3h12m   v1.31.7   10.145.1.6    <no
 ...
 # The ingress host under the rule in charts/api-gateway/templates/api-gateway.yaml is api-gateway.api-gateway.svc.cluster.local, so use that as the host, and the path that can be used in the url for the request is "/api/v1" (also from the same yaml file, but then at the path). The url is http, since the ingress specified http.
 # In the command below the Host is the ingress rule host for the api-gateway. The url is in the format: http://<NODE-IP>:<INGRESS-CONTROLLER-PORT><API-GATEWAY-RULE-PATH>/<ENDPOINT-FROM-API-GATEWAY>. The rest is just the content body that is passed with the request.
-# Then execute the below command to test DYNAMOS (can be on the k8s-controle-plane node).
+# Then execute the below command to test DYNAMOS (can be on the k8s-controle-plane node, since this is the most logical/best node to run it from because this is the central node for kubernetes and already runs all other scripts).
 curl -H "Host: api-gateway.api-gateway.svc.cluster.local" \
   http://10.145.1.6:31924/api/v1/requestApproval \
   -H "Content-Type: application/json" \
@@ -162,7 +164,7 @@ curl -H "Host: api-gateway.api-gateway.svc.cluster.local" \
     "jobId": "jorrit-stutterheim-8e83402f"
 }
 
-# Another test: data request, such as from the uva:
+# Another test: data request, such as from the uva (again run it from the k8s-control-plane node, like explained above):
 # The ingress host under the rule in charts/agents/templates/uva.yaml is uva.uva.svc.cluster.local, so use that as the host, and the path that can be used in the url for the request is "/agent/v1/sqlDataRequest/uva" (also from the same yaml file, but then at the path). The url is http, since the ingress specified http.
 # The rest follows the same format as the curl command above, but now replaced with these specific values, and including the header for Authorization that is required for this request (now just a placeholder in the current DYNAMOS setup).
 # NOTE: do not forget to replace the job-id with the response from the previous curl command.
@@ -189,6 +191,8 @@ curl -H "Host: uva.uva.svc.cluster.local" \
 # If it gives back something with data then this is working as well!
 # Note: this is the same for other agents, such as vu, and the third party, but then with the values of their respective files.
 ```
+
+TODO: can also likely just be a script for all of these things above. But keep this in ARCHIVE.MD then for old manual setup before adding it to a script.
 
 Additional tips:
 ```sh

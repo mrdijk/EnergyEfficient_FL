@@ -4,6 +4,14 @@ This file describes any possible problems that occurred during our setup of DYNA
 See for more information: https://kubernetes.io/docs/tasks/debug/
 
 
+## gRPC errors/warnings in some pods, such as orchestrator and policy
+I encountered these errors/warnings in the logs after running the dynamos-configuration.sh script in the orchestrator and policy pods (I did not check others, but it might also be for others such as api-gateway and uva for example):
+```sh
+orchestrator 1.7447246019022796e+09    WARN    /app/pkg/lib/go-grpc.go:38    could not check: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0 ││ .1:50051: connect: connection refused"
+```
+At first, I thought this was a breaking issue, however, after completing the steps and testing if DYNAMOS works by making requests (see README.md for how to test DYNAMOS), it worked fine and the issue was not showing anymore. So, this issue is fine after startup with dynamos-configuration.sh as long as it is still working, i.e., the pods are running and testing DYNAMOS works successfully. It might be something that is just starting gRPC only when a request is made to DYNAMOS, explaining the error’s existence. For example, the gRPC server startup code or whatever the issue above is might only be started after some things in DYNAMOS are executed, such as a request approval and a data request, since those work fine, and after some time the error was not showing in the logs anymore.
+
+
 ## Pod stuck in infinite Pending state
 This issue was that after creating a pod, such as rabbitmq and etcd, it got stuck in Pending. With describe I could see the events:
 ```sh
