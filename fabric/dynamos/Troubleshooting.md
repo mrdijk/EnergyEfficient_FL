@@ -143,6 +143,9 @@ curl: (6) Could not resolve host: raw.githubusercontent.com
 ``` 
 After further checking with:
 ```sh
+# See configmap of the coredns:
+kubectl -n kube-system get configmap coredns -o yaml
+
 # Create temp pod with sh:
 kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
 # Execute dns lookup, such as well known hosts, the following results were shown:
@@ -160,8 +163,9 @@ Address:        10.96.0.10:53
 Furthermore, coredns also gave issues at the time, such as:
 ```sh
 # Note: I lost the specific error, but where the ... is, the ip address was shown
-[ERROR] plugin/errors: 2 5739547058379111537.7231777715499938482. HINFO: dial udp [...]:53: connect: network is unreachable
+[ERROR] plugin/errors: 2 3471522223707457555.3488489260317122880. HINFO: dial udp [2610:1e0:1700:202::3]:53: connect: network is unreachable
 ```
 This means that the core-dns is likely not working correctly, or there is no correct internet access from the pods.
 
 TODO: explain if it worked after creating nodes with IPv4 access (solution for previous one), and only after that configuring the kubernetes cluster. Before I did it while the kubernetes cluster was already created, and it might be that the host file was inherited from the node at that time when the setup was not yet done, causing the issues above.
+TODO: new: that also did not fix the issue. Now requested FABNetv4Ext
