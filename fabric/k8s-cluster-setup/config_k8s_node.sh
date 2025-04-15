@@ -14,9 +14,9 @@ echo "================================================ Starting config script fo
 echo "Preparing apt package manager (silently, only showing errors)..."
 # Update the apt package index and install packages needed to use the Kubernetes apt repository
 # -qq suppresses all output except errors to avoid much outputs in the logs for clarity. -y prompts yes for any inputs
-sudo apt-get update -qq -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq -y
 # apt-transport-https may be a dummy package; if so, you can skip that package
-sudo apt-get install -qq -y apt-transport-https ca-certificates curl gpg
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq -y apt-transport-https ca-certificates curl gpg
 
 # ================================================ Install and Setup Docker as Container Runtime ================================================
 echo "================= Installing and Setting up Docker for Container Runtime ================="
@@ -31,9 +31,9 @@ for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker c
 # Install Docker Engine: https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
 # Add Docker's official GPG key:
 # -qq suppresses all output except errors to avoid much outputs in the logs for clarity
-sudo apt-get update -qq -y
-sudo apt-get install ca-certificates curl -qq
-sudo install -m 0755 -d /etc/apt/keyrings
+sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get install ca-certificates curl -qq
+sudo DEBIAN_FRONTEND=noninteractive install -m 0755 -d /etc/apt/keyrings -qq
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 # Add the repository to Apt sources:
@@ -47,7 +47,7 @@ sudo apt-get update -qq -y
 # They provide a command to list available versions, such as with SSH on the node after the above commands have been run.
 # Install the specific version (added noninteractive and -y to use for specific mode here to avoid problems with prompts in the automatic script):
 DOCKER_VERSION_STRING="5:28.0.4-1~ubuntu.24.04~noble"
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce=$DOCKER_VERSION_STRING docker-ce-cli=$DOCKER_VERSION_STRING containerd.io docker-buildx-plugin docker-compose-plugin
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq -y docker-ce=$DOCKER_VERSION_STRING docker-ce-cli=$DOCKER_VERSION_STRING containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Set systemd driver explicitely for docker, see: https://docs.docker.com/engine/daemon/proxy/#daemon-configuration
 # This option is used specifically: native.cgroupdriver: https://docs.docker.com/reference/cli/dockerd/#configure-cgroup-driver
@@ -123,10 +123,10 @@ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 
 # Update the apt package index, install kubelet, kubeadm and kubectl, and pin their version
 # -qq suppresses all output except errors to avoid much outputs in the logs for clarity
-sudo apt-get update -qq -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq -y
 # This will install the latest patch version of v1.31 (since we added that to our apt package manager specifically above), such as v1.31.0, v1.31.1, 
 # etc., depending on what's available at the time of install.
-sudo apt-get install -y kubelet kubeadm kubectl
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq -y kubelet kubeadm kubectl
 # This ensures that those three packages will not be automatically upgraded to newer versions by future apt upgrade runs to avoid incompatability between versions
 sudo apt-mark hold kubelet kubeadm kubectl
 

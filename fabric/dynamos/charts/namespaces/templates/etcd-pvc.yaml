@@ -31,6 +31,7 @@ spec:
       storage: 20Mi
 
 ---
+# This is a different job that now just verifies the files, since we do not have internet access in FABRIC. Therefore, the workaround is to manually add it.
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -43,17 +44,14 @@ spec:
         "linkerd.io/inject": "disabled"
       containers:
       - name: init
-        image: curlimages/curl
+        image: busybox
+        # Command to verify files have been created
         command:
           - /bin/sh
           - -c
           - |
-            base_url="https://raw.githubusercontent.com/Jorrit05/DYNAMOS/main/configuration/etcd_launch_files"
-            files="agreements.json archetype.json datasets.json microservices.json optional_microservices.json requestType.json"
-
-            for file in $files; do
-              curl -o /etcd/$file $base_url/$file
-            done
+            echo "Files in /etcd (PVC mount):"
+            ls -la /etcd
         volumeMounts:
         - name: pvc-volume
           mountPath: /etcd
@@ -62,3 +60,35 @@ spec:
       - name: pvc-volume
         persistentVolumeClaim:
           claimName: etcd-pvc
+# Old: works only with internet access, which we currently do not have in FABRIC.
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: init-etcd-pvc
+#   namespace: orchestrator
+# spec:
+#   template:
+#     metadata:
+#       annotations:
+#         "linkerd.io/inject": "disabled"
+#       containers:
+#       - name: init
+#         image: curlimages/curl
+#         command:
+#           - /bin/sh
+#           - -c
+#           - |
+#             base_url="https://raw.githubusercontent.com/Jorrit05/DYNAMOS/main/configuration/etcd_launch_files"
+#             files="agreements.json archetype.json datasets.json microservices.json optional_microservices.json requestType.json"
+
+#             for file in $files; do
+#               curl -o /etcd/$file $base_url/$file
+#             done
+#         volumeMounts:
+#         - name: pvc-volume
+#           mountPath: /etcd
+#       restartPolicy: OnFailure
+#       volumes:
+#       - name: pvc-volume
+#         persistentVolumeClaim:
+#           claimName: etcd-pvc
