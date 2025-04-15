@@ -7,3 +7,5 @@ dockerArtifactAccount: "poetoec"
 # branchNameTag: "main"
 # dockerArtifactAccount: "dynamos1"
 
+# Use the dynamos-core node for this
+node: dynamos-core

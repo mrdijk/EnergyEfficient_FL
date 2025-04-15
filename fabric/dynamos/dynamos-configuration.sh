@@ -88,18 +88,16 @@ helm upgrade -i -f "${orchestrator_chart}/values.yaml" orchestrator ${orchestrat
 # Sleep shortly to make sure the previous one is finished
 sleep 5
 
-# echo "Installing agents layer"
-# helm upgrade -i -f "${agents_chart}/values.yaml" agents ${agents_chart}
-
-# sleep 1
-
-# echo "Installing thirdparty layer..."
-# helm upgrade -i -f "${ttp_chart}/values.yaml" surf ${ttp_chart}
-
-# sleep 1
-
-# echo "Installing api gateway"
-# helm upgrade -i -f "${api_gw_chart}/values.yaml" api-gateway ${api_gw_chart}
+# Install final charts, with a small delay between each one
+# This again uses the corresponding node by specifying it in the charts folder.
+echo "Installing agents layer"
+helm upgrade -i -f "${agents_chart}/values.yaml" agents ${agents_chart}
+sleep 1
+echo "Installing thirdparty layer..."
+helm upgrade -i -f "${ttp_chart}/values.yaml" surf ${ttp_chart}
+sleep 1
+echo "Installing api gateway"
+helm upgrade -i -f "${api_gw_chart}/values.yaml" api-gateway ${api_gw_chart}
 
 echo "Finished setting up DYNAMOS"
 

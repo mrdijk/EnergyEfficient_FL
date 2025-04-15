@@ -8,3 +8,6 @@ dockerArtifactAccount: "poetoec"
 # branchNameTag: "main"
 # dockerArtifactAccount: "dynamos1"
 
+# Use the corresponding nodes for this
+uvaNode: uva
+vuNode: vu

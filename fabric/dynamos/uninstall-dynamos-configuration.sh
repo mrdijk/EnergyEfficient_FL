@@ -6,5 +6,6 @@ helm uninstall namespaces
 helm uninstall nginx -n ingress
 helm uninstall core
 helm uninstall orchestrator
-
-# TODO: add others
+helm uninstall agents
+helm uninstall surf
+helm uninstall api-gateway

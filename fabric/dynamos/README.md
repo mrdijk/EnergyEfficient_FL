@@ -131,9 +131,7 @@ kubectl get pods --show-labels -A
 kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
 
 ```
-Note: when making changes, the changed files need to be uploaded to the VM again before executing them.
+Note: when making changes, the changed files need to be uploaded to the VM again before executing them, such as the dynamos-configuration.sh script and the charts folder.
 
-TODO: how to apply charts to specific nodes? Use Helm commands or?
-TODO: custom charts? If so, copy charts folder into this folder for DYNAMOS in fabric.
 
 TODO: further steps after that for energy monitoring, such as Kepler, etc., see energy-efficiency folder

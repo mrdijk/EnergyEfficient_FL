@@ -1,3 +1,4 @@
+# https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,6 +16,9 @@ spec:
       annotations:
         "linkerd.io/inject" : enabled
     spec:
+      # Use the corresponding node for this, see https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.uvaNode }}
       serviceAccountName: job-creator-uva
       containers:
       - name: uva
@@ -47,7 +51,7 @@ spec:
           value: {{ .Values.tracingEndpoint }}
 
 ---
-
+# https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/
 apiVersion: v1
 kind: Service
 metadata:
@@ -65,6 +69,7 @@ spec:
 
 
 ---
+# https://kubernetes.io/docs/reference/kubernetes-api/service-resources/ingress-v1/
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
