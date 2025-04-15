@@ -3,6 +3,18 @@ This file describes any possible problems that occurred during our setup of the 
 
 See for more information: https://kubernetes.io/docs/tasks/debug/
 
+## Infinite preflight checks for joining the cluster
+Issue is it gets stuck on the following output and then eventually times out/exceeds x:
+```sh
+================= Joining node to cluster with Kubeadm =================
+[preflight] Running pre-flight checks
+```
+This issue was very strange, and I could also not do something with the nodes in SSH, such as installing brew, since it would also get stuck.
+
+After trying again with the kubernetes cluster it did work when rerunning the k8s_setup.ipynb notebook step to configure the cluster with kubeadm. So, just retrying the Python code that runs those kubeadm scripts did it for me some time.
+
+However, another time it did not work, and I recreated the slice and then redid all the steps of the k8s_setup.ipynb notebook, and then it did work. A final fix can be recreating the slice, then running k8s_setup.ipynb notebook, and then rerunning the step to configure the cluster with kubeadm if it still does not work.
+
 
 ## Network connectivity issue with networking plugin for Kubernetes
 Problem:

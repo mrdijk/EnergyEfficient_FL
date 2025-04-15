@@ -42,6 +42,7 @@ spec:
     metadata:
       annotations:
         "linkerd.io/inject": "disabled"
+    spec:
       containers:
       - name: init
         image: busybox

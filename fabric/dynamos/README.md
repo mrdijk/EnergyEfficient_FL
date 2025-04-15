@@ -84,6 +84,14 @@ Then upload the actual files for DYNAMOS in FABRIC specifically:
 # Optionally add the script for quickly uninstalling for development purposes
 ./upload_to_remote.sh ../dynamos/uninstall-dynamos-configuration.sh ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS/configuration"
 
+# Workaround for no internet access for etcd init job: manually add the files in the location, see etcd-pvc.yaml:
+# Upload the configuration folder to the dynamos-core node (after changing the IP in fabric/fabric_config/ssh_config_upload_script temporarily to dynamos-core IP):
+TODO
+# Then copy the files to the location of the persistent volume:
+TODO: "/mnt/etcd-data"
+TODO: use kubectl copy, like Jake said.
+TODO: current: fixed infinite joining for preflight checks. Now move on to etcd-pvc test.
+
 # Make sure docker is logged in after:
 docker login -u poetoec
 # Enter the password with a PAT, see https://app.docker.com/settings
