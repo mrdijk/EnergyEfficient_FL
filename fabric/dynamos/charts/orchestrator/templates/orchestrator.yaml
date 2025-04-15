@@ -1,3 +1,4 @@
+# https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/
 # orchestrator deployment
 apiVersion: apps/v1
 kind: Deployment
@@ -14,6 +15,9 @@ spec:
       labels:
         app: orchestrator
     spec:
+      # Use the DYNAMOS core node for this, see https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.node }}
       containers:
       - name: orchestrator
         image: {{ .Values.dockerArtifactAccount }}/orchestrator:{{ .Values.branchNameTag }}
@@ -50,6 +54,8 @@ spec:
           claimName: etcd-pvc
 
 ---
+# https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/
+# Service is used inside a pod, so no need to specificy the node here, specify it at the created pod, e.g. with Deployment or StatefulSet
 apiVersion: v1
 kind: Service
 metadata:
@@ -66,6 +72,7 @@ spec:
   type: ClusterIP
 
 ---
+# https://kubernetes.io/docs/reference/kubernetes-api/service-resources/ingress-v1/
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

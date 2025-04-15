@@ -5,6 +5,9 @@ metadata:
   name: debug
   namespace: {{ .Values.Namespace }}
 spec:
+  # Use the DYNAMOS core node for this, see https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
+  nodeSelector:
+    kubernetes.io/hostname: {{ .Values.node }}
   containers:
   - name: debug
     image: busybox

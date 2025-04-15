@@ -114,7 +114,8 @@ docker login -u poetoec
 cd DYNAMOS/configuration
 # TODO: then manually start the configuration script. Go to the DYNAMOS/configuration folder and execute:
 ./dynamos-configuration.sh
-# (you can quickly uninstall using the uninstall-dynamos-configuration.sh script)
+# (you can quickly uninstall using the uninstall-dynamos-configuration.sh script):
+./uninstall-dynamos-configuration.sh
 
 # Additional tips:
 # Describe pod for debugging, such as finding out why it is stuck in pending (example below, change to desired pod):

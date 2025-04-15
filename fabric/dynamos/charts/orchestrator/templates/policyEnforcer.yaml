@@ -1,4 +1,5 @@
-# orchestrator deployment
+# https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/
+# policy deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,6 +15,9 @@ spec:
       labels:
         app: policy-enforcer
     spec:
+      # Use the DYNAMOS core node for this, see https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.node }}
       containers:
       - name: policy-enforcer
         image: {{ .Values.dockerArtifactAccount }}/policy-enforcer:{{ .Values.branchNameTag }}

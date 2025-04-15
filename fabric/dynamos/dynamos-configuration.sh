@@ -66,25 +66,27 @@ echo "Preparing PVC"
 # TODO: also use the node selector for this like above, this is done in the charts themselves.
 
 # Install nginx, use the dynamos-core node (you can list labels of nodes with: kubectl get nodes --show-labels)
-# This expects the nodeSelector to be in the controller section
+# This expects the nodeSelector to be in the controller section. 
+# Here it is explicit in the helm command, since the chart is now not managed in this project
 # (Uninstall with: helm uninstall nginx -n ingress)
 echo "Installing NGINX..."
 helm install -f "${core_chart}/ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress \
     -n ingress --version 0.18.0 \
     --set controller.nodeSelector."kubernetes\\.io/hostname"=dynamos-core
 
+# This again uses the corresponding node by specifying it in the charts folder.
 # (Uninstall with: helm uninstall core)
-# TODO: specific node dynamos-core
 echo "Installing DYNAMOS core..."
-helm upgrade -i -f ${core_chart}/values.yaml core ${core_chart} \
-    --set hostPath=${HOME} \
-    --set controller.nodeSelector."kubernetes\\.io/hostname"=dynamos-core
+helm upgrade -i -f ${core_chart}/values.yaml core ${core_chart} --set hostPath=${HOME} 
 
-# sleep 3
-# # Install orchestrator layer
-# helm upgrade -i -f "${orchestrator_chart}/values.yaml" orchestrator ${orchestrator_chart}
+# Sleep shortly to make sure the previous one is finished
+sleep 5
+# Install orchestrator layer
+# This again uses the corresponding node by specifying it in the charts folder.
+helm upgrade -i -f "${orchestrator_chart}/values.yaml" orchestrator ${orchestrator_chart}
 
-# sleep 1
+# Sleep shortly to make sure the previous one is finished
+sleep 5
 
 # echo "Installing agents layer"
 # helm upgrade -i -f "${agents_chart}/values.yaml" agents ${agents_chart}
