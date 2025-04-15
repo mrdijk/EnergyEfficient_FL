@@ -29,6 +29,7 @@ REMOTE_DIR="${6:-"~"}"
 if [ "$#" -lt 5 ] || [ "$#" -gt 6 ]; then
   echo "Usage ([] means optional): $0 <LOCAL_PATH> <SSH_KEY> <SSH_CONFIG> <REMOTE_USER> <REMOTE_IP> [REMOTE_DIR]"
   echo "Example (directory):       $0 ../kubespray ~/.ssh/slice_key ../fabric_config/ssh_config ubuntu 2001:610:2d0:fabc:f816:3eff:fe03:f07c"
+  echo "Example (another directory, custom host): $0 ../../configuration ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS""
   # Note: "" is used around the REMOTE_DIR here to avoid ~ being resolved to the local user directory, see above explanation for REMOTE_DIR
   echo "Example (file):            $0 ../kubespray/ansible.cfg ~/.ssh/slice_key ../fabric_config/ssh_config ubuntu 2001:610:2d0:fabc:f816:3eff:fe03:f07c \"~/kubespray\""
   exit 1

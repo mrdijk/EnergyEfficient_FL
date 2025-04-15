@@ -75,12 +75,14 @@ mkdir -p DYNAMOS
 cd fabric/scripts
 # Upload the configuration folder for DYNAMOS to the kubernetes control-plane node, such as (replace IP of course in the ssh_config file below if necessary):
 ./upload_to_remote.sh ../../configuration ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS"
+# Upload the charts folder in the DYNAMOS folder, such as (replace IP of course in the ssh_config file below if necessary):
+./upload_to_remote.sh ../dynamos/charts ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS"
 ```
 Note: this uses a different ssh_config file specific for the nodes, otherwise, it encountered an error such as "ssh: Could not resolve hostname bastion.fabric-testbed.net: Temporary failure in name resolution". Do not forget to change the IP when new nodes are created in FABRIC.
 
 Then upload the actual files for DYNAMOS in FABRIC specifically:
 ```sh
-# Upload the charts folder in the DYNAMOS folder, such as (replace IP of course in the ssh_config file below if necessary):
+# Replace the charts folder in the DYNAMOS folder, such as (replace IP of course in the ssh_config file below if necessary):
 ./upload_to_remote.sh ../dynamos/charts ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS"
 
 # Replace the congiguration script in this folder with the FABRIC specific configuration script, such as (replace IP of course in the ssh_config file below if necessary):
@@ -89,16 +91,27 @@ Then upload the actual files for DYNAMOS in FABRIC specifically:
 ./upload_to_remote.sh ../dynamos/uninstall-dynamos-configuration.sh ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS/configuration"
 
 # Workaround for no internet access for etcd init job: manually add the files in the location, see etcd-pvc.yaml:
+# SSH into dynamos-core node and create directory:
+mkdir -p DYNAMOS
 # Upload the configuration folder to the dynamos-core node (after changing the IP in fabric/fabric_config/ssh_config_upload_script temporarily to dynamos-core IP):
-TODO
+./upload_to_remote.sh ../../configuration ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS"
+# Then in SSH again, run the following:
+sudo mkdir -p /mnt/etcd-data
 # Then copy the files to the location of the persistent volume:
-TODO: "/mnt/etcd-data"
-TODO: use kubectl copy, like Jake said.
-TODO: current: fixed infinite joining for preflight checks. Now move on to etcd-pvc test.
+sudo cp ~/DYNAMOS/configuration/etcd_launch_files/*.json /mnt/etcd-data
+sudo chmod -R 777 /mnt/etcd-data
+# Verify files:
+ls /mnt/etcd-data
+# Then in the ssh_config_upload_script, change back to the IP of the k8s-control-plane node.
+# After executing the dynamos-configuration.sh script, you can view the logs of the init-etcd-pvc pod in k9s for example, where you should see something like this for each file:
+-rwxrwxrwx    1 root     root          1746 Apr 15 12:00 agreements.json
 
+# SSH into the k8s-control-plane node again.
 # Make sure docker is logged in after:
 docker login -u poetoec
 # Enter the password with a PAT, see https://app.docker.com/settings
+# Go to the DYNAMOS/configuration directory
+cd DYNAMOS/configuration
 # TODO: then manually start the configuration script. Go to the DYNAMOS/configuration folder and execute:
 ./dynamos-configuration.sh
 # (you can quickly uninstall using the uninstall-dynamos-configuration.sh script)

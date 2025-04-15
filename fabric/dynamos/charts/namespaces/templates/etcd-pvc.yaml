@@ -42,7 +42,10 @@ spec:
     metadata:
       annotations:
         "linkerd.io/inject": "disabled"
+    # Use this specifically on the node for this where the volume is present (dynamos-core)
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.node }}
       containers:
       - name: init
         image: busybox

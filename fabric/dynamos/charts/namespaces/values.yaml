@@ -1,2 +1,5 @@
 secret:
   password: defaultPassword
+
+# Use the dynamos-core node for this
+node: dynamos-core
