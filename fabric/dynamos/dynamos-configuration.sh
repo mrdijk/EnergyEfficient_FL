@@ -51,11 +51,9 @@ fi
 
 echo "Installing namespaces..."
 
-# Install namespaces, use the dynamos-core node (you can list labels of nodes with: kubectl get nodes --show-labels)
+# Install namespaces, no need to use a specific node, this just creates the structure and does not use Pod specs like Deployment, StatefulSet, Job, etc.
 # TODO: not yet working, see how to do this on a specific node: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ + search further.
-helm upgrade -i -f ${namespace_chart}/values.yaml namespaces ${namespace_chart} \
-    --set secret.password=${rabbit_pw} \
-    --set nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
+helm upgrade -i -f ${namespace_chart}/values.yaml namespaces ${namespace_chart} --set secret.password=${rabbit_pw}
 
 echo "Preparing PVC"
 
@@ -67,8 +65,13 @@ echo "Preparing PVC"
 # TODO: uncomment below when the above works, doing it step by step.
 # TODO: also use the node selector for this like above.
 
-# echo "Installing NGINX..."
-# helm install -f "${core_chart}/ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress -n ingress --version 0.18.0
+# Install nginx, use the dynamos-core node (you can list labels of nodes with: kubectl get nodes --show-labels)
+echo "Installing NGINX..."
+helm install -f "${core_chart}/ingress-values.yaml" nginx oci://ghcr.io/nginxinc/charts/nginx-ingress -n ingress --version 0.18.0 \
+    --set nodeSelector."kubernetes\\.io/hostname"=dynamos-core
+# helm upgrade -i -f ${namespace_chart}/values.yaml namespaces ${namespace_chart} \
+#     --set secret.password=${rabbit_pw} \
+#     --set nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
 
 # echo "Installing DYNAMOS core..."
 # helm upgrade -i -f ${core_chart}/values.yaml core ${core_chart} --set hostPath=${HOME}

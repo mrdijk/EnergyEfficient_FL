@@ -66,8 +66,9 @@ for node in slice.get_nodes():
         # Deletes any existing file, and recreates it as a symlink to the correct DNS config managed by systemd-resolved
         node.execute('sudo rm -f /etc/resolv.conf; sudo ln -sv /run/systemd/resolve/resolv.conf /etc/resolv.conf')
 ```
-After the execution, the steps for Linkerd were repeated and it worked! Explanation:
+After the execution, the steps for Linkerd were repeated and it worked! See create_slice.ipynb notebook for this, it is added here now in the node configuration.
 
+Explanation:
 FABRIC nodes are isolated virtual machines. When you request a slice, each VM (or bare-metal node) gets:
 - A management interface (IPv4 or IPv6)
 - No NAT

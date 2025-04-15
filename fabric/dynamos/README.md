@@ -3,14 +3,6 @@ This file explains how to setup DYNAMOS in the configured Kubernetes environment
 
 This guide assumes that you followed the steps in the notebook for each step below.
 
-## Problems with IPv4 image pulls and connectivity
-```sh
-curl -v https://cr.l5d.io/v2/
-
-# 
-ssh -J bastion-1.fabric-testbed.net -R localhost:4567:localhost:5678 <vm IPv6 address>
-```
-
 
 ## Install Linkerd
 Do these steps manually after SSH into the k8s-control-plane node:
