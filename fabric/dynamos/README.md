@@ -117,6 +117,11 @@ cd DYNAMOS/configuration
 # (you can quickly uninstall using the uninstall-dynamos-configuration.sh script):
 ./uninstall-dynamos-configuration.sh
 
+```
+Note: when making changes, the changed files need to be uploaded to the VM again before executing them, such as the dynamos-configuration.sh script and the charts folder.
+
+After that, test DYNAMOS:
+```sh
 # Test DYNAMOS (without having to add something in the host files, this uses the kubernetes cluster's nodes and setup):
 # First list the ingress service:
 kubectl get svc -n ingress -A
@@ -135,30 +140,55 @@ ubuntu@k8s-control-plane:~/DYNAMOS/configuration$ kubectl get nodes -o wide
 NAME                STATUS   ROLES           AGE     VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION     CONTAINER-RUNTIME
 dynamos-core        Ready    <none>          3h12m   v1.31.7   10.145.1.6    <none>        Ubuntu 24.04.1 LTS   6.8.0-49-generic   docker://28.0.4
 ...
-# The ingress host under the rule in charts/api-gateway/templates/api-gateway.yaml is api-gateway.api-gateway.svc.cluster.local, so use that as the host, and the path is "/api/v1".
+# The ingress host under the rule in charts/api-gateway/templates/api-gateway.yaml is api-gateway.api-gateway.svc.cluster.local, so use that as the host, and the path that can be used in the url for the request is "/api/v1" (also from the same yaml file, but then at the path). The url is http, since the ingress specified http.
 # In the command below the Host is the ingress rule host for the api-gateway. The url is in the format: http://<NODE-IP>:<INGRESS-CONTROLLER-PORT><API-GATEWAY-RULE-PATH>/<ENDPOINT-FROM-API-GATEWAY>. The rest is just the content body that is passed with the request.
-# Then execute the below command to test DYNAMOS
+# Then execute the below command to test DYNAMOS (can be on the k8s-controle-plane node).
 curl -H "Host: api-gateway.api-gateway.svc.cluster.local" \
   http://10.145.1.6:31924/api/v1/requestApproval \
   -H "Content-Type: application/json" \
   -d '{
     "type": "sqlDataRequest",
     "user": {
-      "id": "12324",
-      "userName": "jorrit.stutterheim@cloudnation.nl"
+        "id": "12324",
+        "userName": "jorrit.stutterheim@cloudnation.nl"
     },
-    "dataProviders": ["VU","UVA","RUG"]
+    "dataProviders": ["UVA"]
 }'
 # If it gives back something like this then you are good and DYNAMOS is working:
 {
     "authorized_providers": {
-        "UVA": "uva.uva.svc.cluster.local",
-        "VU": "vu.vu.svc.cluster.local"
+        "UVA": "uva.uva.svc.cluster.local"
     },
-    "jobId": "jorrit-stutterheim-038fd5ea"
+    "jobId": "jorrit-stutterheim-8e83402f"
 }
+
+# Another test: data request, such as from the uva:
+# The ingress host under the rule in charts/agents/templates/uva.yaml is uva.uva.svc.cluster.local, so use that as the host, and the path that can be used in the url for the request is "/agent/v1/sqlDataRequest/uva" (also from the same yaml file, but then at the path). The url is http, since the ingress specified http.
+# The rest follows the same format as the curl command above, but now replaced with these specific values, and including the header for Authorization that is required for this request (now just a placeholder in the current DYNAMOS setup).
+# NOTE: do not forget to replace the job-id with the response from the previous curl command.
+curl -H "Host: uva.uva.svc.cluster.local" \
+  http://10.145.1.6:31924/agent/v1/sqlDataRequest/uva \
+  -H "Content-Type: application/json" \
+  -H "Authorization: bearer 1234" \
+  -d '{
+    "type": "sqlDataRequest",
+    "query": "SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000",
+    "algorithm": "",
+    "options": {
+        "graph": false,
+        "aggregate": false
+    },
+    "user": {
+        "id": "12324",
+        "userName": "jorrit.stutterheim@cloudnation.nl"
+    },
+    "requestMetadata": {
+        "jobId": "jorrit-stutterheim-8e83402f"
+    }
+}'
+# If it gives back something with data then this is working as well!
+# Note: this is the same for other agents, such as vu, and the third party, but then with the values of their respective files.
 ```
-Note: when making changes, the changed files need to be uploaded to the VM again before executing them, such as the dynamos-configuration.sh script and the charts folder.
 
 Additional tips:
 ```sh
