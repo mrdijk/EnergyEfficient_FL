@@ -117,7 +117,51 @@ cd DYNAMOS/configuration
 # (you can quickly uninstall using the uninstall-dynamos-configuration.sh script):
 ./uninstall-dynamos-configuration.sh
 
-# Additional tips:
+# Test DYNAMOS (without having to add something in the host files, this uses the kubernetes cluster's nodes and setup):
+# First list the ingress service:
+kubectl get svc -n ingress -A
+# Check the api-gateway and nginx-nginx-ingress-controller ones (this one's EXTERNAL-IP is likely still pending, which is fine for FABRIC environment, this is mainly for clouds like AWS). For example:
+ubuntu@k8s-control-plane:~/DYNAMOS/configuration$ kubectl get svc -n ingress -A
+NAMESPACE        NAME                             TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                          AGE
+api-gateway      api-gateway                      ClusterIP      10.100.178.113   <none>        8080/TCP                                                         12m
+...
+default          kubernetes                       ClusterIP      10.96.0.1        <none>        443/TCP                                                          3h9m
+ingress          nginx-nginx-ingress-controller   LoadBalancer   10.102.149.144   <pending>     80:31924/TCP,443:31752/TCP                                       12m
+# Now you can see that the ingress exposes port 80 through 31924, which you should use as the port
+# Now list the nodes to get the NODE-IP:
+kubectl get nodes -o wide
+# Select the dynamos-core node, such as in this case: 10.145.1.6
+ubuntu@k8s-control-plane:~/DYNAMOS/configuration$ kubectl get nodes -o wide
+NAME                STATUS   ROLES           AGE     VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION     CONTAINER-RUNTIME
+dynamos-core        Ready    <none>          3h12m   v1.31.7   10.145.1.6    <none>        Ubuntu 24.04.1 LTS   6.8.0-49-generic   docker://28.0.4
+...
+# The ingress host under the rule in charts/api-gateway/templates/api-gateway.yaml is api-gateway.api-gateway.svc.cluster.local, so use that as the host, and the path is "/api/v1".
+# In the command below the Host is the ingress rule host for the api-gateway. The url is in the format: http://<NODE-IP>:<INGRESS-CONTROLLER-PORT><API-GATEWAY-RULE-PATH>/<ENDPOINT-FROM-API-GATEWAY>. The rest is just the content body that is passed with the request.
+# Then execute the below command to test DYNAMOS
+curl -H "Host: api-gateway.api-gateway.svc.cluster.local" \
+  http://10.145.1.6:31924/api/v1/requestApproval \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "sqlDataRequest",
+    "user": {
+      "id": "12324",
+      "userName": "jorrit.stutterheim@cloudnation.nl"
+    },
+    "dataProviders": ["VU","UVA","RUG"]
+}'
+# If it gives back something like this then you are good and DYNAMOS is working:
+{
+    "authorized_providers": {
+        "UVA": "uva.uva.svc.cluster.local",
+        "VU": "vu.vu.svc.cluster.local"
+    },
+    "jobId": "jorrit-stutterheim-038fd5ea"
+}
+```
+Note: when making changes, the changed files need to be uploaded to the VM again before executing them, such as the dynamos-configuration.sh script and the charts folder.
+
+Additional tips:
+```sh
 # Describe pod for debugging, such as finding out why it is stuck in pending (example below, change to desired pod):
 kubectl describe pod etcd-0 -n core
 # See persistent volume claims (PVC) and their status, such as Pending meaning there is no matching PV, and Bound meaning it is correctly set:
@@ -129,9 +173,11 @@ kubectl get nodes --show-labels
 kubectl get pods --show-labels -A
 # Create debug pod with sh:
 kubectl run test-pod --rm -it --image=busybox --restart=Never -- sh
-
+# Get the yaml of a pod:
+kubectl get pod api-gateway-6f6fb94f5c-mwzf2 -n api-gateway -o yaml
+# Get all ingresses created in the cluster:
+kubectl get svc -n ingress -A
 ```
-Note: when making changes, the changed files need to be uploaded to the VM again before executing them, such as the dynamos-configuration.sh script and the charts folder.
 
 
 TODO: further steps after that for energy monitoring, such as Kepler, etc., see energy-efficiency folder
