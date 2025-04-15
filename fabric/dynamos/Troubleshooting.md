@@ -207,4 +207,24 @@ Furthermore, coredns also gave issues at the time, such as:
 This means that the core-dns is likely not working correctly, or there is no correct internet access from the pods.
 
 TODO: explain if it worked after creating nodes with IPv4 access (solution for previous one), and only after that configuring the kubernetes cluster. Before I did it while the kubernetes cluster was already created, and it might be that the host file was inherited from the node at that time when the setup was not yet done, causing the issues above.
-TODO: new: that also did not fix the issue. Now requested FABNetv4Ext
+TODO: new: that also did not fix the issue. Now requested FABNetv4Ext, see if it works afterwards.
+
+### Workaround: manually add files in the nodes
+A workaround for this is manually adding the files in the PV's location, since the error here was specifically related to the init-etcd-pvc job trying to access github for some files to add it there:
+```sh
+# Workaround for no internet access for etcd init job: manually add the files in the location, see etcd-pvc.yaml:
+# SSH into dynamos-core node and create directory:
+mkdir -p DYNAMOS
+# Upload the configuration folder to the dynamos-core node (after changing the IP in fabric/fabric_config/ssh_config_upload_script temporarily to dynamos-core IP):
+./upload_to_remote.sh ../../configuration ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS"
+# Then in SSH again, run the following:
+sudo mkdir -p /mnt/etcd-data
+# Then copy the files to the location of the persistent volume:
+sudo cp ~/DYNAMOS/configuration/etcd_launch_files/*.json /mnt/etcd-data
+sudo chmod -R 777 /mnt/etcd-data
+# Verify files:
+ls /mnt/etcd-data
+# Then in the ssh_config_upload_script, change back to the IP of the k8s-control-plane node.
+# After executing the dynamos-configuration.sh script, you can view the logs of the init-etcd-pvc pod in k9s for example, where you should see something like this for each file:
+-rwxrwxrwx    1 root     root          1746 Apr 15 12:00 agreements.json
+```

@@ -114,7 +114,7 @@ docker login -u poetoec
 # Enter the password with a PAT, see https://app.docker.com/settings
 # Go to the DYNAMOS/configuration directory
 cd DYNAMOS/configuration
-# TODO: then manually start the configuration script. Go to the DYNAMOS/configuration folder and execute:
+# Then manually start the configuration script.
 ./dynamos-configuration.sh
 # (you can quickly uninstall using the uninstall-dynamos-configuration.sh script):
 ./uninstall-dynamos-configuration.sh
@@ -212,6 +212,48 @@ kubectl get pod api-gateway-6f6fb94f5c-mwzf2 -n api-gateway -o yaml
 # Get all ingresses created in the cluster:
 kubectl get svc -n ingress -A
 ```
+
+
+## Install monitoring
+Note: This guide is used from energy-efficiency/docs/getting-started/3_SetupMonitoring.md, but tailored for the FABRIC setup. Therefore, this guide here will only explain how to execute the script and some specifics for FABRIC, the .md file in the above location gives more information.
+
+Note: kubernetes dashboard is skipped here, since it is not necessary and is not as easy to access because Kubernetes is not running on localhost. Therefore, k9s can be used for this completely.
+
+Run the following:
+```sh
+# Prometheus stack (includes Grafana with initial setup (e.g. Prometheus as Data source in Grafana, etc.))
+# Upload to k8s-control-plane node:
+./upload_to_remote.sh ../dynamos/prometheusAndGrafana.sh ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS/configuration"
+# Then SSH into the k8s-controle-plane node.
+# Go to the DYNAMOS/configuration directory
+cd DYNAMOS/configuration
+# Then manually start the script
+./prometheusAndGrafana.sh
+# Wait for it to finish creating, i.e., all pods are running, check with:
+kubectl --namespace monitoring get pods -l "release=prometheus"
+
+# Then the next step: Preparing Kepler (energy measurements)
+# Upload to k8s-control-plane node:
+./upload_to_remote.sh ../dynamos/keplerAndMonitoringChart.sh ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS/configuration"
+# Then manually start the script
+./keplerAndMonitoringChart.sh
+```
+
+TODO: change in script (and likely the yaml for the charts) to use the dynamos-core node.
+
+Then the checks:
+```sh
+# SSH into the k8s-control-plane node.
+# Port-forward Prometheus stack
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
+
+TODO: create SSH tunnel so that I can access it in my browser with the UI still, add that here.
+TODO: check further.
+```
+
+
+
+TODO: can also likely just be a script for all of these things above. But keep this in ARCHIVE.MD then for old manual setup before adding it to a script.
 
 
 TODO: further steps after that for energy monitoring, such as Kepler, etc., see energy-efficiency folder
