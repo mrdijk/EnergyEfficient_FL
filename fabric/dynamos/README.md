@@ -36,9 +36,13 @@ linkerd install \
 linkerd check
 
 # Install Jaeger onto the cluster for observability
-# Install Jaeger on the same node (will also show on other nodes, since it is present on every node)
+# Install Jaeger on the same node
+# This requires a specific setup, see the nodeSelector options in https://github.com/linkerd/linkerd2/blob/main/jaeger/charts/linkerd-jaeger/values.yaml
 linkerd jaeger install \
+  --set collector.nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
   --set nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
+  --set jaeger.nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
+  --set webhook.nodeSelector."kubernetes\\.io/hostname"=dynamos-core \
   | kubectl apply -f -
 
 # Optionally install for insight dashboard - not currently in use
