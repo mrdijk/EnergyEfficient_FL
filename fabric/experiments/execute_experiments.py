@@ -78,8 +78,8 @@ def run_experiment(archetype: str, output_dir, exp_rep):
         # Prepare headers, this contains specific FABRIC Kubernetes setup, where the Host is required in the headers (see fabric/dynamos/DYNAMOS_setup.ipynb curl example):
         headers = constants.HEADERS.copy()
         headers["Host"] = f"{data_steward}.{data_steward}.svc.cluster.local"
-        # Execute data request
-        response_data_request = requests.post(data_request_url, json=request_body, headers=constants.HEADERS)
+        # Execute data request, using specific headers created for FABRIC
+        response_data_request = requests.post(data_request_url, json=request_body, headers=headers)
         # Extract relevant data from the response
         status_code_data_request = response_data_request.status_code
         execution_time_data_request = response_data_request.elapsed.total_seconds()
