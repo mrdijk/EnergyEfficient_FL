@@ -5,7 +5,7 @@ from utils import convert_float_time_to_string
 
 def exec_query(query: str, start_time: float, end_time: float) -> dict:
     """
-    TODO: Add docstring. Function to query Prometheus.
+    Function to query Prometheus.
     """
     print(f"Querying Prometheus with query: {query}")
     print(f"Start time: {convert_float_time_to_string(start_time)}, End time: {convert_float_time_to_string(end_time)}")

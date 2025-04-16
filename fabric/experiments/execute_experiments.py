@@ -100,7 +100,7 @@ def run_experiment(archetype: str, output_dir, exp_rep):
         # Apply interval between requests (if not last run of sequence) 
         if (run + 1) != constants.NUM_EXP_ACTIONS:
             print("Waiting before next action...")
-            time.sleep(7)
+            time.sleep(8)
 
     # Before measuring the active energy, make sure the active period has passed for equal comparisons
     elapsed_time = time.time() - active_start_time
