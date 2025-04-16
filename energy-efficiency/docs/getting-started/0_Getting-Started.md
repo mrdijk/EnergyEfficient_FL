@@ -31,11 +31,11 @@ TODO: here add some helpful commands that I find while developing, such as start
 ```sh
 # Go to the scripts path
 cd energy-efficiency/scripts
-# Load the script in the terminal
+# Load the script in the terminal session
 source ./dynamos-configs.sh
 
 # Now you can run functions, such as
-deploy_core
+deploy_agents
 # You need to load the file in the shell each time you restart a shell or when making changing to the dynamos-configs.sh script
 ```
 You can change this file whenever you want, such as adding or removing helpful functions. After changes you have to load it in the shell again each time. Also, for each terminal you have to load the file, so it is recommended to use one terminal to execute those functions when developing. 

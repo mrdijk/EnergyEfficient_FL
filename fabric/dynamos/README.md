@@ -297,5 +297,20 @@ TODO: can run the patch commands from the node by node.execute (add saying this 
 TODO: the rest of the actions can be in .md format for what I need to do on my local machine.
 
 
-## Final helper steps
-TODO: explain further steps, such as importing the helper functions, etc.
+## Load utility functions for further usage of DYNAMOS
+This step explains the final step to deploy the utility functions from DYNAMOS on the k8s-control-plane node, so that the kubernetes environment can be easily managed with these functions, etc.:
+```sh
+# Upload to k8s-control-plane node:
+./upload_to_remote.sh ../dynamos/dynamos-configs.sh ~/.ssh/slice_key ../fabric_config/ssh_config_upload_script ubuntu dynamos-node "~/DYNAMOS/configuration"
+
+# SSH into the k8s-control-plane node and go to the corresponding location:
+cd DYNAMOS/configuration
+# Load the script in the terminal session:
+source ./dynamos-configs.sh
+# Now you can run functions, such as
+deploy_agents
+# You need to load the file in the shell each time you restart a shell or when making changing to the dynamos-configs.sh script
+```
+You can change this file whenever you want, such as adding or removing helpful functions. After changes you have to load it in the shell again each time. Also, for each terminal you have to load the file, so it is recommended to use one terminal to execute those functions when developing.
+
+TODO: this can likely not be in a script, but I can add it in the notebook I think.
