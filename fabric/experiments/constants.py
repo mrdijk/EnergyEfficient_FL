@@ -1,6 +1,12 @@
 # FABRIC specific variables:
 # NodePort address and exposed port of the API Gateway service (see testing example with curl in fabric/dynamos/DYNAMOS_setup.ipynb notebook)
-NODEPORT_BASE_URL = "http://10.145.1.6:31924"  # Replace with corresponding node IP and NodePort if Kubernetes/FABRIC nodes have been reconfigured/recreated
+# Can be fetched with the following command to extract INTERNAL-IP of the node: kubectl get nodes -o wide
+# See fabric/dynamos/DYNAMOS_setup.ipynb notebook for an example and more explanation on this.
+NODE_IP = "10.145.1.6"
+# Replace with corresponding node IP and NodePort if Kubernetes/FABRIC nodes have been reconfigured/recreated
+# Can be fetched with the following command to extract the NodePort from <LocalNodePort>:<NodePort>/TCP with: kubectl get svc -n ingress -n ingress
+# See fabric/dynamos/DYNAMOS_setup.ipynb notebook for an example and more explanation on this.
+NODEPORT_BASE_URL = f"http://{NODE_IP}:31924"
 
 # Experiment script values
 # All prefixes, i.e. implementations
@@ -12,8 +18,10 @@ ARCHETYPE_ACRONYMS = {
     "DataThroughTTP": "DtTTP"
 }
 
-# Prometheus 
-PROMETHEUS_URL = "http://localhost:9090"
+# Prometheus. The URL is specific to the FABRIC Kubernetes environment, so this should be changed if Kubernetes/FABRIC nodes have been reconfigured/recreated
+# Can be fetched with the following command to extract the NodePort from <LocalNodePort>:<NodePort>/TCP with: kubectl get svc prometheus-kube-prometheus-prometheus -n monitoring
+# See fabric/dynamos/DYNAMOS_setup.ipynb notebook for an example and more explanation on this.
+PROMETHEUS_URL = f"http://{NODE_IP}:30325"
 PROM_CONTAINERS = "{container_name=~\"system_processes|uva|vu|surf|sql.*|policy.*|orchestrator|sidecar|rabbitmq|api-gateway\"}"
 PROM_KEPLER_ENERGY_METRIC = "kepler_container_joules_total"
 PROM_KEPLER_CONTAINER_LABEL = "container_name"
