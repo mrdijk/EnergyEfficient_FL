@@ -62,9 +62,6 @@ echo "Preparing PVC"
     ./fill-rabbit-pvc.sh
 }
 
-# TODO: uncomment below when the above works, doing it step by step.
-# TODO: also use the node selector for this like above, this is done in the charts themselves.
-
 # Install nginx, use the dynamos-core node (you can list labels of nodes with: kubectl get nodes --show-labels)
 # This expects the nodeSelector to be in the controller section. 
 # Here it is explicit in the helm command, since the chart is now not managed in this project

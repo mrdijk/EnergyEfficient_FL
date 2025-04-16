@@ -5,7 +5,7 @@ metadata:
   name: cadvisor
   namespace: monitoring
 ---
-
+# This runs on every node, so no need for a specific node to be added here.
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:

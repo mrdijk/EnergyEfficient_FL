@@ -1,5 +1,8 @@
 # Keep this format for this part, because this works for adding additional scrape configs!
+# To view the values available, see the specific version used in the script from the below links:
 # See the helm chart > Default values for examples: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+# Or see as a backup https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
+# You can also view the yaml of the pods afterwards by using k9s and pressing y on the pod for example to see the configuration and values, etc.
 prometheus:
   prometheusSpec:
     # Set global scrape interval and scrape timeout
@@ -7,6 +10,11 @@ prometheus:
     scrapeInterval: "30s"
     scrapeTimeout: "25s"
     evaluationInterval: "1m"
+
+    # Use the corresponding node for this
+    nodeSelector:
+      # Likely cannot use the Values.node here, since this is not in the templates folder and just used as a file, so hardcode it here equal to Values.node
+      kubernetes.io/hostname: dynamos-core
 
     # Additional scrape configs (on top of already present/default ones)
     additionalScrapeConfigs:
@@ -44,6 +52,9 @@ grafana:
   sidecar:
     datasources:
       enabled: true
+  # This was not explicitely listed in the values available, but this did work to get it on the specific node.
+  nodeSelector:
+    kubernetes.io/hostname: dynamos-core
   
   # Additional data sources
   additionalDataSources:
@@ -58,3 +69,16 @@ grafana:
       isDefault: false
       version: 1
       editable: false
+
+# Alertmanager pod
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      kubernetes.io/hostname: dynamos-core
+
+# Prometheus Operator pod
+prometheusOperator:
+  nodeSelector:
+    kubernetes.io/hostname: dynamos-core
+
+# Kube State Metrics pod did not have any nodeSelector and it was not working, so it is fine to run that on a random pod.

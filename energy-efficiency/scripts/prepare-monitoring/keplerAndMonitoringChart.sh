@@ -23,7 +23,7 @@ helm upgrade -i kepler kepler/kepler \
     --version 0.5.12 \
     --set serviceMonitor.enabled=true \
     --set serviceMonitor.labels.release=prometheus \
-# Uninstall the release using helm to rollback changes: helm uninstall kepler --namespace kepler
+# Uninstall the release using helm to rollback changes: helm uninstall kepler -n monitoring
 
 # Apply/install the monitoring helm release (will use the monitoring charts,
 # which includes the deamonset, service and sesrvicemonitor for cadvisor for example)

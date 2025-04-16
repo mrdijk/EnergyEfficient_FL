@@ -16,3 +16,6 @@ cadvisor:
 prometheus:
   rbac:
     enabled: true
+
+# Use the dynamos-core node for this
+node: dynamos-core

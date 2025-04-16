@@ -1,5 +1,8 @@
 # Keep this format for this part, because this works for adding additional scrape configs!
+# To view the values available, see the specific version used in the script from the below links:
 # See the helm chart > Default values for examples: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+# Or see as a backup https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
+# You can also view the yaml of the pods afterwards by using k9s and pressing y on the pod for example to see the configuration and values, etc.
 prometheus:
   prometheusSpec:
     # Set global scrape interval and scrape timeout
