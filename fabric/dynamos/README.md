@@ -238,22 +238,64 @@ kubectl --namespace monitoring get pods -l "release=prometheus"
 # Then manually start the script
 ./keplerAndMonitoringChart.sh
 ```
+For how to add the Kepler dashboard, see energy-efficiency/docs/getting-started/3_SetupMonitoring.md > Preparing Kepler (energy measurements).
 
 TODO: change in script (and likely the yaml for the charts) to use the dynamos-core node.
+TODO: change to one script where it automatically checks if after:
+kubectl --namespace monitoring get pods -l "release=prometheus"
+everything is running every 5 seconds, and only then does the next part of the script for kepler.
 
 Then the checks:
 ```sh
-# SSH into the k8s-control-plane node.
-# Port-forward Prometheus stack
-kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
+# First we tried an SSH tunnel with port-forward, but that caused a lot of issues and did not work, such as installing socat, but still it kept giving "socat not found", etc. So, instead of relying on kubectl port-forward, which proxies traffic via the Kubernetes API server and depends on internal tooling (socat), we instead: Exposed Prometheus using a NodePort.
+# This is a safe change, it will not break Prometheus or Grafana — as long as the change is only to the Service type, and the underlying pods are running normally. It only adds a NodePort to allow external access outside the kubernetes cluster without affecting the pods of the service, in this case Prometheus.
 
-TODO: create SSH tunnel so that I can access it in my browser with the UI still, add that here.
-TODO: check further.
+# So, first SSH into the k8s-control-plane node in a terminal session, like explained in the fabric/k8s/k8s_setup.ipynb notebook and execute the following commands.
+# This tells Kubernetes to map Prometheus's internal port (9090) to a static port on the control-plane node itself (e.g., 30906). This allows external access via that high-numbered port — as long as you can reach the node:
+kubectl patch svc prometheus-kube-prometheus-prometheus -n monitoring -p '{"spec": {"type": "NodePort"}}'
+
+# To check which external port Prometheus was assigned, run:
+kubectl get svc prometheus-kube-prometheus-prometheus -n monitoring
+# This can give an output like:
+# For example if this is the result of getting the service:
+ubuntu@k8s-control-plane:~$ kubectl get svc prometheus-kube-prometheus-prometheus -n monitoring
+NAME                                    TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)                         AGE
+prometheus-kube-prometheus-prometheus   NodePort   10.111.200.101   <none>        9090:30906/TCP,8080:31028/TCP   14h
+# Here 9090:30906/TCP means:
+# 9090: the internal port Prometheus listens on inside the Pod/Container, it is defined in the Service spec as the targetPort. This is inside the Kubernetes Pod, not the node itself.
+# 30906: the external (NodePort) mapped on the node’s public IP
+
+# Next, on your local machine, go to the path from where you did the SSH connect commands (described in fabric/k8s/k8s_setup.ipynb notebook). Do not yet SSH into the FABRIC node, this below command will do that for you with an SSH tunnel.
+# Create an SSH tunnel from your local machine with the NodePort from above, such as (replace with correct IP of the k8s-control-plane node, same as SSH connect command IP):
+ssh -i ~/.ssh/slice_key -F ssh_config -L 9090:localhost:30906 ubuntu@2001:610:2d0:fabc:f816:3eff:fea4:5b34
+# This creates an SSH tunnel from your local machine to the FABRIC node’s external IP (the same one you normally SSH into), forwarding local port 9090 (on your local machine, i.e. laptop or workstation) to the NodePort 30906. In short it tells SSH: Please take any request to localhost:9090 on my local machine, send it over the SSH tunnel, and on the remote FABRIC node, connect it to localhost:30906 (which is the NodePort of the FABRIC node Prometheus is exposed on).
+# Access it at (on your local machine): http://localhost:9090/
+# -L 9090:localhost:30906 means: [LOCAL_PORT]:[REMOTE_HOST]:[REMOTE_PORT]
+# [LOCAL_PORT]: Listen on local port 9090 on your local machine (e.g., your laptop)
+# [REMOTE_HOST]: Tunnel that traffic through the SSH connection. This refers to "localhost" from the perspective of the remote server (in this case, the FABRIC node you're SSH-ing into).
+# [REMOTE_PORT]: Forward it to port 30906 on localhost from the perspective of the remote FABRIC node. This is the port on the remote machine (the FABRIC node) that you're connecting to — in this case, the NodePort exposed by Prometheus
+```
+You can do the same for any other service, such as Grafana. Below are the same commands for Grafana, but then without the above explanation, since it is exactly the same:
+```sh
+# From SSH in the k8s-control-plane node:
+kubectl patch svc prometheus-grafana -n monitoring -p '{"spec": {"type": "NodePort"}}'
+kubectl get svc prometheus-grafana -n monitoring
+# Example output:
+ubuntu@k8s-control-plane:~$ kubectl get svc prometheus-grafana -n monitoring
+NAME                 TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+prometheus-grafana   NodePort   10.108.65.229   <none>        80:31092/TCP   15h
+# Command with example output for SSH tunnel:
+ssh -i ~/.ssh/slice_key -F ssh_config -L 3000:localhost:31092 ubuntu@2001:610:2d0:fabc:f816:3eff:fea4:5b34
+# Access it at (on your local machine): http://localhost:3000/
+# Login with username: admin
+# Get the password:
+kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 ```
 
-
-
 TODO: can also likely just be a script for all of these things above. But keep this in ARCHIVE.MD then for old manual setup before adding it to a script.
+TODO: can run the patch commands from the node by node.execute (add saying this only needs to be done once in the kubernetes cluster).
+TODO: the rest of the actions can be in .md format for what I need to do on my local machine.
 
 
-TODO: further steps after that for energy monitoring, such as Kepler, etc., see energy-efficiency folder
+## Final helper steps
+TODO: explain further steps, such as importing the helper functions, etc.
