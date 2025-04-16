@@ -206,8 +206,7 @@ Furthermore, coredns also gave issues at the time, such as:
 ```
 This means that the core-dns is likely not working correctly, or there is no correct internet access from the pods.
 
-TODO: explain if it worked after creating nodes with IPv4 access (solution for previous one), and only after that configuring the kubernetes cluster. Before I did it while the kubernetes cluster was already created, and it might be that the host file was inherited from the node at that time when the setup was not yet done, causing the issues above.
-TODO: new: that also did not fix the issue. Now requested FABNetv4Ext, see if it works afterwards.
+This was specific to FABRIC, where we we had a FABNetv4, which did not have public internet access. For this we used a workaround to manually add files in the pod, which is not the best solution, but it works. A good solution would be to request FABNetv4Ext access, which does have public internet access, after which this issue will likely solve itself after creating that network for the FABRIC slice. It can then be tested by running the above steps and seeing if the issues are resolved. However, this was not further tested due to time constraints.
 
 ### Workaround: manually add files in the nodes
 A workaround for this is manually adding the files in the PV's location, since the error here was specifically related to the init-etcd-pvc job trying to access github for some files to add it there:
