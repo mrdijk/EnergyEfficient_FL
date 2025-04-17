@@ -38,7 +38,7 @@ helm upgrade -i prometheus prometheus-community/kube-prometheus-stack \
 
 
 # FABRIC EDIT: waiting 30 seconds to make sure everything is running before running next script
-sleep 30
+sleep 60
 # This result has to be all running before the next part can be executed
 kubectl --namespace monitoring get pods -l "release=prometheus"
 
