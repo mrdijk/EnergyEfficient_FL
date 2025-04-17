@@ -15,7 +15,6 @@ The following steps explain the sequence of execution for the notebooks:
 3. Confiure and prepare kubernetes cluster: [Configure Kubernetes](./k8s-cluster-setup/k8s_setup.ipynb)
 4. DYNAMOS setup in Kubernetes: [Configure DYNAMOS for Kubernetes Specifically](./dynamos/DYNAMOS_setup.ipynb)
 5. Execute energy experiments in FABRIC with the created setup: [Execute Experiments](./experiments/experiments.ipynb)
-TODO: is this all?
 
 
 ## Additional explanation

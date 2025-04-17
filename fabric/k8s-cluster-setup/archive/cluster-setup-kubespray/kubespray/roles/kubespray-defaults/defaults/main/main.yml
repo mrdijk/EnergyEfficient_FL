@@ -35,7 +35,7 @@ kubeadm_config_api_version: "{{ 'v1beta4' if kube_version is version('v1.31.0', 
 ## The timeout for init first control-plane
 kubeadm_init_timeout: 300s
 
-# TODO: remove this
+# Note: remove this
 kube_reserved_cgroups_for_service_slice: kube.slice
 
 ## List of kubeadm init phases that should be skipped during control plane setup

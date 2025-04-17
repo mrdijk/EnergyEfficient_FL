@@ -9,7 +9,7 @@
     - cilium_encryption_type == "ipsec"
     - cilium_tunnel_mode in ['vxlan']
 
-# TODO: Clean this task up when we drop backward compatibility support for `cilium_ipsec_enabled`
+# Note: Clean this task up when we drop backward compatibility support for `cilium_ipsec_enabled`
 - name: Stop if `cilium_ipsec_enabled` is defined and `cilium_encryption_type` is not `ipsec`
   assert:
     that: cilium_encryption_type == 'ipsec'
@@ -53,7 +53,7 @@
     that: cilium_version | regex_replace('v') is version(cilium_min_version_required, '>=')
     msg: "cilium_version is too low. Minimum version {{ cilium_min_version_required }}"
 
-# TODO: Clean this task up when we drop backward compatibility support for `cilium_ipsec_enabled`
+# Note: Clean this task up when we drop backward compatibility support for `cilium_ipsec_enabled`
 - name: Set `cilium_encryption_type` to "ipsec" and  if `cilium_ipsec_enabled` is true
   set_fact:
     cilium_encryption_type: ipsec

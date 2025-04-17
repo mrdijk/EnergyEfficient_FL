@@ -279,7 +279,7 @@
     - inventory_hostname in groups.get('etcd',[])
     - container_manager != 'docker'
 
-# TODO: Clean this task up when we drop backward compatibility support for `etcd_kubeadm_enabled`
+# Note: Clean this task up when we drop backward compatibility support for `etcd_kubeadm_enabled`
 - name: Stop if etcd deployment type is not host or kubeadm when container_manager != docker and etcd_kubeadm_enabled is not defined
   run_once: true
   when: etcd_kubeadm_enabled is defined

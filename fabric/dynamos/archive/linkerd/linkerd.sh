@@ -40,7 +40,6 @@ kubectl kustomize . | kubectl apply -f -
 linkerd check
 
 # Install Jaeger onto the cluster for observability
-# TODO: customize jaegar as well?
 # Install Jaeger on the same node
 linkerd jaeger install \
   --set nodeSelector."kubernetes\\.io/hostname"=dynamos-core \

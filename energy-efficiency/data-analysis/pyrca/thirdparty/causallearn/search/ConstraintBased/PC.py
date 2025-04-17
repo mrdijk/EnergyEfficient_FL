@@ -162,13 +162,13 @@ def mvpc_alg(
     indep_test : str, name of the test-wise deletion independence test being used
             ["mv_fisherz", "mv_g_sq"]
             - mv_fisherz: Fisher's Z conditional independence test
-            - mv_g_sq: G-squared conditional independence test (TODO: under development)
+            - mv_g_sq: G-squared conditional independence test (Note: under development)
     correction_name : correction_name: name of the missingness correction
             [MV_Crtn_Fisher_Z, MV_Crtn_G_sq, MV_DRW_Fisher_Z, MV_DRW_G_sq]
             - "MV_Crtn_Fisher_Z": Permutation based correction method
-            - "MV_Crtn_G_sq": G-squared conditional independence test (TODO: under development)
-            - "MV_DRW_Fisher_Z": density ratio weighting based correction method (TODO: under development)
-            - "MV_DRW_G_sq": G-squared conditional independence test (TODO: under development)
+            - "MV_Crtn_G_sq": G-squared conditional independence test (Note: under development)
+            - "MV_DRW_Fisher_Z": density ratio weighting based correction method (Note: under development)
+            - "MV_DRW_G_sq": G-squared conditional independence test (Note: under development)
     stable : run stabilized skeleton discovery if True (default = True)
     uc_rule : how unshielded colliders are oriented
            0: run uc_sepset
@@ -258,7 +258,7 @@ def get_parent_missingness_pairs(data: ndarray, alpha: float, indep_test, stable
     :param alpha: desired significance level in (0, 1) (float)
     :param indep_test: name of the test-wise deletion independence test being used
         - "MV_Fisher_Z": Fisher's Z conditional independence test
-        - "MV_G_sq": G-squared conditional independence test (TODO: under development)
+        - "MV_G_sq": G-squared conditional independence test (Note: under development)
     :param stable: run stabilized skeleton discovery if True (default = True)
     :return:
     cg: a CausalGraph object
@@ -305,12 +305,12 @@ def detect_parent(r: int, data_: ndarray, alpha: float, indep_test, stable: bool
     :param alpha: desired significance level in (0, 1) (float)
     :param indep_test: name of the test-wise deletion independence test being used
         - "MV_Fisher_Z": Fisher's Z conditional independence test
-        - "MV_G_sq": G-squared conditional independence test (TODO: under development)
+        - "MV_G_sq": G-squared conditional independence test (Note: under development)
     :param stable: run stabilized skeleton discovery if True (default = True)
     : return:
     prt: parent of the missingness indicator, r
     """
-    ## TODO: in the test-wise deletion CI test, if test between a binary and a continuous variable,
+    ## Note: in the test-wise deletion CI test, if test between a binary and a continuous variable,
     #  there can be the case where the binary variable only take one value after deletion.
     #  It is because the assumption is violated.
 

@@ -24,7 +24,7 @@ Follow the Development guide: https://github.com/Jorrit05/DYNAMOS/tree/main/docs
 # After completing getting started steps
 These tutorials can be used after the getting started steps have been followed.
 
-TODO: here add some helpful commands that I find while developing, such as startup Kubernetes Dashboard, Prometheus, etc.
+Below are some helpful commands that I found while developing, such as startup Kubernetes Dashboard, Prometheus, etc.
 
 
 ## Using DYNAMOS config helper functions

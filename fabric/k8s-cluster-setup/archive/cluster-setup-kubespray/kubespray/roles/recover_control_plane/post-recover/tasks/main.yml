@@ -1,5 +1,5 @@
 ---
-# TODO: Figure out why kubeadm does not fix this
+# Note: Figure out why kubeadm does not fix this
 - name: Set etcd-servers fact
   set_fact:
     # noqa: jinja[spacing]

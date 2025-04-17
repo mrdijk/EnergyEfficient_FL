@@ -97,7 +97,7 @@ quay_image_repo: "quay.io"
 # github image repo define (ex multus only use that)
 github_image_repo: "ghcr.io"
 
-# TODO(mattymo): Move calico versions to roles/network_plugins/calico/defaults
+# Note(mattymo): Move calico versions to roles/network_plugins/calico/defaults
 # after migration to container download
 calico_version: "v3.29.2"
 calico_ctl_version: "{{ calico_version }}"

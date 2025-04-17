@@ -84,8 +84,6 @@ def run_experiment(archetype: str, output_dir, exp_rep):
         status_code_data_request = response_data_request.status_code
         execution_time_data_request = response_data_request.elapsed.total_seconds()
         print(f"Data request completed with status: {status_code_data_request}, execution time: {execution_time_data_request}s")
-        # TODO: remove this print after testing to see if the request actually works:
-        print(f"{response_data_request}")
         # For logging purposes print the request body if it fails
         if status_code_data_request != 200:
             print(f"Data request was not successful: request body for data request: {request_body}")

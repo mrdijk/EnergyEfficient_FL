@@ -21,7 +21,7 @@ def exec_query(query: str, start_time: float, end_time: float) -> dict:
         },
     )
     
-    # # TODO: remove later (used to verify metrics included in the response)
+    # Optional debugging (used to verify metrics included in the response):
     # response_data = response.json()
     # # Extract the metrics part
     # if "data" in response_data and "result" in response_data["data"]:

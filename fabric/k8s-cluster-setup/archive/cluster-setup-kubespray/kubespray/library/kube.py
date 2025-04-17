@@ -274,7 +274,7 @@ class KubeManager(object):
             return False
         return True
 
-    # TODO: This is currently unused, perhaps convert to 'scale' with a replicas param?
+    # Note: This is currently unused, perhaps convert to 'scale' with a replicas param?
     def stop(self):
 
         if not self.force and not self.exists():

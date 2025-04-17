@@ -58,7 +58,7 @@ spec:
         image: "{{ coredns_image_repo }}:{{ coredns_image_tag }}"
         imagePullPolicy: {{ k8s_image_pull_policy }}
         resources:
-          # TODO: Set memory limits when we've profiled the container for large
+          # Note: Set memory limits when we've profiled the container for large
           # clusters, then set request = limit to keep this container in
           # guaranteed class. Currently, this container falls into the
           # "burstable" category so the kubelet doesn't backoff from restarting it.

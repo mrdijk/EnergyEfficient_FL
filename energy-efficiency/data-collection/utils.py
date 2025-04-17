@@ -21,7 +21,7 @@ def get_time_range(minutes_before=30) -> float:
 
 def save_energy_data_to_file(df: pd.DataFrame, filename: str):
     """
-    TODO: Add docstring. Function to save energy data to a file.
+    Function to save energy data to a file.
     """
     output_dir = 'data'
 

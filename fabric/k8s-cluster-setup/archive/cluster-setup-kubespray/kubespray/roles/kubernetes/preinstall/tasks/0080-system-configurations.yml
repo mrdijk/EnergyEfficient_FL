@@ -1,5 +1,5 @@
 ---
-# Todo : selinux configuration
+# Note : selinux configuration
 - name: Confirm selinux deployed
   stat:
     path: /etc/selinux/config

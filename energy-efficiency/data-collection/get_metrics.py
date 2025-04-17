@@ -115,7 +115,7 @@ if __name__ == '__main__':
     main()
 
 
-# TODO: old solution, remove later
+# Old solution, kept here for reference:
 # # Function to calculate energy consumption and save to a file
 # def calculate_energy_consumption():
 #     output_data = {}
