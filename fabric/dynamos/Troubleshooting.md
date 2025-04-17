@@ -37,13 +37,13 @@ sudo journalctl -u docker -n 100 --no-pager
 ```
 I saw similar problems with the other nodes. So, this was the underlying problem causing all the issues.
 
-TODO: restart kubernetes cluster setup with k8s_setup.ipynb steps to configure the cluster (reran all steps).
+First, I restarted the kubernetes cluster setup with k8s_setup.ipynb steps to configure the cluster (reran all steps). However, that did not work this time and some nodes were still not ready. Therefore, I tried recreating the whole slice (see fabric/create_slice.ipynb).
 
-TODO: explain this can be done with similar problems as well.
+After making sure the nodes were ready and not crashing/going to NotReady after some time with "kubectl get nodes -o wide" and describing the nodes, such as "kubectl describe node dynamos-core", I retried the installations of DYNAMOS.
 
-TODO: remove from archive and add to main, say can also do individual steps.
+The cause of this problem was unclear, it could have been a lot of different things. What I was thinking now was that I tried too many things at same time, overloading the machine and causing it to go to state NotReady and crashing the kubernetes environment, or it was just something random happening here that sometimes is the case with these systems. And a recreate of the VMs likely fixed that issue by resetting it and trying again.
 
-TODO: otherwise, recreate entire slice.
+So, this can be done with similar problems that do not really have one major cause or with weird problems like this that are unexpected, etc. This reflects a lot of issues in these systems where if no quick cause can be found, it is most likely something that is fixed with recreating/redeploying something to refresh it, and most of the times it then works.
 
 
 ## gRPC errors/warnings in some pods, such as orchestrator and policy
