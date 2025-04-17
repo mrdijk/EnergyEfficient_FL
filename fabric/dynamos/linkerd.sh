@@ -10,7 +10,7 @@ curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install-edge | LINK
 # (This uses the shown export command after the above command, and adds it to the shell rc)
 echo 'export PATH=$PATH:/home/ubuntu/.linkerd2/bin' >> ~/.bashrc
 # Load the shell rc to apply changes in any termainl session your run with: source ~/.bashrc
-# However, in this noninteractive mode in Jupyter notebook, it does not persist, so also add it manually for this script:
+# Here for this script do it manually:
 export PATH=$PATH:/home/ubuntu/.linkerd2/bin
 
 # Check version to verify installation:

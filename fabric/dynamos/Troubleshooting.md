@@ -3,6 +3,48 @@ This file describes any possible problems that occurred during our setup of DYNA
 
 See for more information: https://kubernetes.io/docs/tasks/debug/
 
+## DYNAMOS pods stuck in infinite loop of completing, while it should be running
+The issue: the DYNAMOS pods were stuck in a loop of creating, running, completed, with Back-off along the way sometimes as well. However, the pods were meant to be running without completing, since it was a deployment (e.g. policy, orchestrator, api-gateway, etc.).
+
+This was likely caused by something in Kubernetes being a bit unstable, which is what we found after checking the nodes:
+```sh
+ubuntu@k8s-control-plane:~/DYNAMOS/configuration$ kubectl get nodes -o wide
+NAME                STATUS     ROLES           AGE     VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION     CONTAINER-RUNTIME
+dynamos-core        NotReady   <none>          3h20m   v1.31.7   10.145.1.4    <none>        Ubuntu 24.04.1 LTS   6.8.0-49-generic   docker://28.0.4
+k8s-control-plane   Ready      control-plane   3h21m   v1.31.7   10.145.1.2    <none>        Ubuntu 24.04.1 LTS   6.8.0-49-generic   docker://28.0.4
+surf                Ready      <none>          3h20m   v1.31.7   10.145.1.3    <none>        Ubuntu 24.04.1 LTS   6.8.0-49-generic   docker://28.0.4
+uva                 Ready      <none>          3h20m   v1.31.7   10.145.1.4    <none>        Ubuntu 24.04.1 LTS   6.8.0-49-generic   docker://28.0.4
+vu                  NotReady   <none>          3h20m   v1.31.7   10.145.1.3    <none>        Ubuntu 24.04.1 LTS   6.8.0-49-generic   docker://28.0.4
+```
+Two nodes were not ready. You can view the node by:
+```sh
+# View the nodes with for example:
+kubectl describe node dynamos-core
+# Here I saw this, meaning it was going to not ready over 96 times over the last 3 hours and 29 minutes. 
+Events:
+  Type    Reason                   Age                     From             Message
+  ----    ------                   ----                    ----             -------
+  Normal  NodeHasSufficientMemory  4m32s (x96 over 3h30m)  kubelet          Node dynamos-core status is now: NodeHasSufficientMemory
+  Normal  NodeNotReady             3s (x96 over 3h29m)     node-controller  Node dynamos-core status is now: NodeNotReady
+
+# View logs of kubelet:
+sudo journalctl -u kubelet -n 100 --no-pager
+# In this case there were some errors with the controle plane node connection from the node, such as:
+Apr 17 11:30:44 dynamos-core kubelet[6710]: W0417 11:30:44.362586    6710 reflector.go:561] object-"api-gateway"/"rabbit": failed to list *v1.Secret: Get "https://10.145.1.2:6443/api/v1/namespaces/api-gateway/secrets?fieldSelector=metadata.name%3Drabbit&resourceVersion=53720": dial tcp 10.145.1.2:6443: i/o timeout
+Apr 17 11:32:26 dynamos-core kubelet[6710]: E0417 11:32:26.629295    6710 controller.go:145] "Failed to ensure lease exists, will retry" err="Get \"https://10.145.1.2:6443/apis/coordination.k8s.io/v1/namespaces/kube-node-lease/leases/dynamos-core?timeout=10s\": net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)" interval="400ms"
+# Optionally view docker logs:
+sudo journalctl -u docker -n 100 --no-pager
+```
+I saw similar problems with the other nodes. So, this was the underlying problem causing all the issues.
+
+TODO: restart kubernetes cluster setup with k8s_setup.ipynb steps to configure the cluster (reran all steps).
+
+TODO: explain this can be done with similar problems as well.
+
+TODO: remove from archive and add to main, say can also do individual steps.
+
+TODO: otherwise, recreate entire slice.
+
 
 ## gRPC errors/warnings in some pods, such as orchestrator and policy
 I encountered these errors/warnings in the logs after running the dynamos-configuration.sh script in the orchestrator and policy pods (I did not check others, but it might also be for others such as api-gateway and uva for example):
