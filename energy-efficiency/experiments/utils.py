@@ -1,20 +1,36 @@
 import os
 import pandas as pd
+import constants
 
 # Path to the folder containing the experiment results
 DATA_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data'))
 EXP_FILENAME = 'full_experiment_results.csv'
 
 # Load all full_experiment_results.csv files into a single DataFrame
-def load_experiment_results(prefix: str, archetype: str):
-    # print(f"Using data folder: {DATA_FOLDER}")
+def load_experiment_results(prefix: str, archetype: str, data_type: str = constants.DATA_TYPE_NORMAL):
+    """
+    Load experiment results from a specific data folder based on the data type.
+
+    :param prefix: Prefix for experiment folders
+    :param archetype: Archetype for filtering folders
+    :param data_type: Type of data folder to use (e.g., constants.DATA_TYPE_NORMAL or constants.DATA_TYPE_FABRIC). Default constants.DATA_TYPE_NORMAL
+    :return: A tuple containing a concatenated DataFrame and a list of experiment directories
+    """
+    # Determine the data folder based on the data type
+    if data_type not in constants.DATA_TYPE_FOLDERS:
+        raise ValueError(f"Invalid data type: {data_type}. Must be one of {list(constants.DATA_TYPE_FOLDERS.keys())}.")
+    
+    data_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), constants.DATA_TYPE_FOLDERS[data_type]))
+    print(f"Using data folder: {data_folder}")
+
     # Set the prefix for all experiment folders
     prefix = f"{prefix}_{archetype}"
-    # print(f"Using prefix: {prefix}")
+    print(f"Using prefix: {prefix}")
+
     # Get the directories in the data folder
     data_folder_exp_dirs = []
-    for dir in os.listdir(DATA_FOLDER):
-        if os.path.isdir(os.path.join(DATA_FOLDER, dir)) and prefix in dir:
+    for dir in os.listdir(data_folder):
+        if os.path.isdir(os.path.join(data_folder, dir)) and prefix in dir:
             data_folder_exp_dirs.append(dir)
 
     # Get all files by going over each experiment folder
@@ -22,7 +38,7 @@ def load_experiment_results(prefix: str, archetype: str):
     exp_dirs = []
     for exp_dir in data_folder_exp_dirs:
         # Get the experiment directory path
-        exp_dir_path = os.path.join(DATA_FOLDER, exp_dir)
+        exp_dir_path = os.path.join(data_folder, exp_dir)
         # print(f"Exp dir path: {exp_dir_path}")
         # Experiment repetitions
         exp_rep_dirs = os.listdir(exp_dir_path)

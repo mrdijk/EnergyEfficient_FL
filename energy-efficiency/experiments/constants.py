@@ -1,3 +1,11 @@
+# Data folder types
+DATA_TYPE_NORMAL = "normal"
+DATA_TYPE_FABRIC = "fabric"
+DATA_TYPE_FOLDERS = {
+    DATA_TYPE_NORMAL: "data",
+    DATA_TYPE_FABRIC: "data-fabric"
+}
+
 # Experiment script values
 # All prefixes, i.e. implementations
 IMPLEMENTATIONS_PREFIXES = ["baseline", "compression", "caching"]

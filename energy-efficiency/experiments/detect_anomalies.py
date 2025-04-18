@@ -58,10 +58,12 @@ if __name__ == "__main__":
                         help="Archetype to detect anomalies from.")
     parser.add_argument("prefix", type=str, choices=["baseline", "caching", "compression"], help="Prefix of the experiment folders")
     parser.add_argument("--remove", action="store_true", help="Remove anomaly folders")
+    parser.add_argument("--data_type", type=str, choices=["normal", "fabric"], default="normal", 
+                        help="Data type to use, i.e., the data folder to use for this analysis. Defaults to 'normal'.")
     args = parser.parse_args()
 
     # Load the data (will load all experiments folders and its data with the prefix)
-    df, exp_dirs = utils.load_experiment_results(args.prefix, args.archetype)
+    df, exp_dirs = utils.load_experiment_results(args.prefix, args.archetype, args.data_type)
 
     if df.empty:
         print("No data loaded. Exiting.")

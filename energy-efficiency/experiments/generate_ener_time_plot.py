@@ -36,6 +36,8 @@ if __name__ == "__main__":
     parser.add_argument("archetype", type=str, choices=["ComputeToData", "DataThroughTTP", "all"], 
                         help="Archetype to generate scatter plot from.")
     parser.add_argument("--mean", action="store_true", help="Use mean values for the scatter plot")
+    parser.add_argument("--data_type", type=str, choices=["normal", "fabric"], default="normal", 
+                        help="Data type to use, i.e., the data folder to use for this analysis. Defaults to 'normal'.")
     args = parser.parse_args()
 
     data_dict = {}
@@ -49,7 +51,7 @@ if __name__ == "__main__":
     for prefix in constants.IMPLEMENTATIONS_PREFIXES:
         for archetype in archetypes:
             # Load the data (will load all experiments folders and its data with the prefix)
-            df, exp_dirs = utils.load_experiment_results(prefix, archetype)
+            df, exp_dirs = utils.load_experiment_results(prefix, archetype, args.data_type)
             if not df.empty:
                 data_dict[f"{prefix}_{constants.ARCHETYPE_ACRONYMS[archetype]}"] = df
             else:

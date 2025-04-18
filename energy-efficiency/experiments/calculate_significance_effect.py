@@ -52,6 +52,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run statistical significance test on energy efficiency experiment data")
     parser.add_argument("archetype", type=str, choices=["ComputeToData", "DataThroughTTP", "all"], 
                         help="Archetype to test statistical significance from.")
+    parser.add_argument("--data_type", type=str, choices=["normal", "fabric"], default="normal", 
+                        help="Data type to use, i.e., the data folder to use for this analysis. Defaults to 'normal'.")
     args = parser.parse_args()
 
     # If all is selected, use all archetypes
@@ -61,7 +63,7 @@ if __name__ == "__main__":
     baseline_data_dict = {}
     for archetype in archetypes:
         # Load the data (will load all experiments folders and its data with the prefix)
-        df, exp_dirs = utils.load_experiment_results("baseline", archetype)
+        df, exp_dirs = utils.load_experiment_results("baseline", archetype, args.data_type)
         if not df.empty:
             # Add the baseline df for this archetype
             baseline_data_dict[archetype] = df
@@ -74,7 +76,7 @@ if __name__ == "__main__":
         # Loop over optimizations only (excluding baseline)
         for prefix in constants.OPTIMIZATIONS_PREFIXES:
             # Load the data (will load all experiments folders and its data with the prefix)
-            df, exp_dirs = utils.load_experiment_results(prefix, archetype)
+            df, exp_dirs = utils.load_experiment_results(prefix, archetype, args.data_type)
             # If data is not empty, perform statistical significance test
             if not df.empty:
                 print(f"\n***************************************************************************")

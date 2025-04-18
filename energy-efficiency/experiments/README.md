@@ -52,6 +52,9 @@ python3.10 detect_anomalies.py "DataThroughTTP" "caching"
 python3.10 detect_anomalies.py "ComputeToData" "baseline" --remove
 # Or different archetype and prefix
 python3.10 detect_anomalies.py "DataThroughTTP" "caching" --remove
+
+# Note: you can also use the option to select a specific data folder, such as (leave empty for the default value):
+python3.10 detect_anomalies.py "DataThroughTTP" "caching" --remove --data_type "fabric"
 ```
 
 ### Test normality
@@ -59,6 +62,9 @@ python3.10 detect_anomalies.py "DataThroughTTP" "caching" --remove
 python3.10 test_normality.py "ComputeToData" "baseline"
 # Or with a different prefix or archetype:
 python3.10 test_normality.py "DataThroughTTP" "caching"
+
+# Note: you can also use the option to select a specific data folder, such as (leave empty for the default value):
+python3.10 test_normality.py "ComputeToData" "baseline" --data_type "fabric"
 ```
 
 
@@ -68,6 +74,9 @@ python3.10 calculate_mean.py "ComputeToData"
 # Or with a different archetype:
 python3.10 calculate_mean.py "DataThroughTTP"
 python3.10 calculate_mean.py "all"
+
+# Note: you can also use the option to select a specific data folder, such as (leave empty for the default value):
+python3.10 calculate_mean.py "all" --data_type "fabric"
 ```
 
 ### Generate box plots
@@ -76,6 +85,9 @@ python3.10 generate_box_plot.py "ComputeToData"
 # Or with a different archetype:
 python3.10 generate_box_plot.py "DataThroughTTP"
 python3.10 generate_box_plot.py "all"
+
+# Note: you can also use the option to select a specific data folder, such as (leave empty for the default value):
+python3.10 generate_box_plot.py "all" --data_type "fabric"
 ```
 
 ### Calculate statistics (statistical significance and effect size) for each optimization compared to baseline for its corresponding archetype
@@ -84,6 +96,9 @@ python3.10 calculate_significance_effect.py "ComputeToData"
 # Or with a different archetype:
 python3.10 calculate_significance_effect.py "DataThroughTTP"
 python3.10 calculate_significance_effect.py "all"
+
+# Note: you can also use the option to select a specific data folder, such as (leave empty for the default value):
+python3.10 calculate_significance_effect.py "all" --data_type "fabric"
 ```
 
 ### Calculate correlation between energy and time for all experiments
@@ -92,6 +107,9 @@ python3.10 calculate_correlation_ener_time.py "ComputeToData"
 # Or with a different archetype:
 python3.10 calculate_correlation_ener_time.py "DataThroughTTP"
 python3.10 calculate_correlation_ener_time.py "all"
+
+# Note: you can also use the option to select a specific data folder, such as (leave empty for the default value):
+python3.10 calculate_correlation_ener_time.py "all" --data_type "fabric"
 ```
 
 ### Generate energy and time plots
@@ -102,4 +120,7 @@ python3.10 generate_ener_time_plot.py "DataThroughTTP"
 python3.10 generate_ener_time_plot.py "all"
 # Or use the --mean flag to use mean values
 python3.10 generate_ener_time_plot.py "all" --mean
+
+# Note: you can also use the option to select a specific data folder, such as (leave empty for the default value):
+python3.10 generate_ener_time_plot.py "all" --mean --data_type "fabric"
 ```

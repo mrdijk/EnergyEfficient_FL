@@ -52,8 +52,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run energy efficiency experiment")
     parser.add_argument("archetype", type=str, choices=["ComputeToData", "DataThroughTTP", "all"], 
                         help="Archetype to calculate means from.")
+    parser.add_argument("--data_type", type=str, choices=["normal", "fabric"], default="normal", 
+                        help="Data type to use, i.e., the data folder to use for this analysis. Defaults to 'normal'.")
     args = parser.parse_args()
-
+    
     # If all is selected, use all archetypes
     archetypes = constants.ARCHETYPES if args.archetype == "all" else [args.archetype]
 
@@ -67,7 +69,7 @@ if __name__ == "__main__":
     for archetype in archetypes:
         for prefix in constants.IMPLEMENTATIONS_PREFIXES:
             # Load the data (will load all experiments folders and its data with the prefix)
-            df, exp_dirs = utils.load_experiment_results(prefix, archetype)
+            df, exp_dirs = utils.load_experiment_results(prefix, archetype, args.data_type)
             # If data is not empty, calculate the mean and standard deviation values
             if not df.empty:
                 # Calculate means and standard deviations
