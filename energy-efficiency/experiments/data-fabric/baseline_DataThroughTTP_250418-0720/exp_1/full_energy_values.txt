@@ -1,0 +1,27 @@
+Idle Energy:
+kernel_processes: 10484.163999999815
+system_processes: 38628.5920000005
+policy: 224.9879999999983
+rabbitmq: 528.488
+policy-enforcer: 207.98799999999997
+orchestrator: 197.932
+sidecar: 2498.756
+surf: 654.6
+vu: 632.6039999999999
+uva: 568.128
+api-gateway: 154.32799999999997
+
+Active Energy:
+kernel_processes: 9427.440000000215
+system_processes: 44468.63999999823
+policy: 178.16800000001209
+rabbitmq: 484.952
+policy-enforcer: 169.34400000000005
+orchestrator: 134.21199999999993
+sidecar: 1878.4899324
+surf: 387.78400000000005
+vu: 331.0760000000001
+uva: 520.2
+api-gateway: 144.92
+sql-algorithm: 75.95238269999997
+sql-query: 64.0973544
