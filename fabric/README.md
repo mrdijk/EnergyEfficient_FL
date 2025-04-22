@@ -17,6 +17,10 @@ The following steps explain the sequence of execution for the notebooks:
 5. Execute energy experiments in FABRIC with the created setup: [Execute Experiments](./experiments/experiments.ipynb)
 
 
+## Optional: Multi-site FABRIC solution
+In the fabric/multi-site folder, there is a different solution for multi-site FABRIC (i.e. different sites/hosts for the VMs on different locations).
+
+
 ## Additional explanation
 ### Uploading multiple folders to FABRIC Jupyter Hub
 Unfortunately, you cannot manually add folders to Jupyter Hub. So, to upload the folder to FABRIC Jupyter Hub, you need to follow these steps:
