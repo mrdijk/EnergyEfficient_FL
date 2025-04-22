@@ -13,7 +13,7 @@ def execute_DBSCAN_AD_algorithm(df: pd.DataFrame, exp_dirs, anomaly_folders):
     # DBSCAN parameters, increase eps to detect fewer anomalies
     # TODO: when using this first try to play around with these values to somewhat manually control
     # which are anomalies, mainly use eps. The current threshold is used for earlier anomaly detection and could be good already.
-    dbscan = DBSCAN(eps=47, min_samples=3)
+    dbscan = DBSCAN(eps=100, min_samples=3)
     labels = dbscan.fit_predict(X)
 
     # Anomalies are labeled as -1
@@ -70,14 +70,15 @@ if __name__ == "__main__":
     else:
         anomaly_folders = set()
 
-        # Call DBSCAN function to detect anomalies
-        execute_DBSCAN_AD_algorithm(df, exp_dirs, anomaly_folders)
+        # Check runs_results.csv for status codes not equal to 200
+        # Do this before checking for anomaly result values since these have more priority
+        check_runs_results(exp_dirs, anomaly_folders)
 
         # Print empty line between functions
         print("")
 
-        # Check runs_results.csv for status codes not equal to 200
-        check_runs_results(exp_dirs, anomaly_folders)
+        # Call DBSCAN function to detect anomalies
+        execute_DBSCAN_AD_algorithm(df, exp_dirs, anomaly_folders)
 
         # Print combined list of folders containing anomalies
         print(f"\nFolders containing anomalies: ({len(anomaly_folders)} total anomalies)")
