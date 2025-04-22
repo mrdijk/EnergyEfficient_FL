@@ -13,7 +13,7 @@ def execute_DBSCAN_AD_algorithm(df: pd.DataFrame, exp_dirs, anomaly_folders):
     # DBSCAN parameters, increase eps to detect fewer anomalies
     # TODO: when using this first try to play around with these values to somewhat manually control
     # which are anomalies, mainly use eps. The current threshold is used for earlier anomaly detection and could be good already.
-    dbscan = DBSCAN(eps=100, min_samples=3)
+    dbscan = DBSCAN(eps=30, min_samples=3)
     labels = dbscan.fit_predict(X)
 
     # Anomalies are labeled as -1
