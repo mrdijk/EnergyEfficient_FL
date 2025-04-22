@@ -5,8 +5,6 @@ metadata:
   labels:
     name: kubelet-density
 spec:
-  nodeSelector:
-    node-role.kubernetes.io/worker: ""
   containers:
   - name: kubelet-density
     image: {{.containerImage}}
