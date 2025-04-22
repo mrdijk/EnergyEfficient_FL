@@ -10,7 +10,7 @@ jobs:
     burst: 2
     preLoadImages: false
     namespacedIterations: false
-    namespace: kubelet-density
+    namespace: kube-burner
     waitWhenFinished: true
     podWait: false
     objects:

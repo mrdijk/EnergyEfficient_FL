@@ -52,6 +52,10 @@ kube-burner init -c kubelet-density.yml
 # Tip: meanwhile, you can view what is happening in the Kubernetes cluster with kubectl commands and k9s for example.
 # If something goes wrong, these commands might help to cleanup:
 # Remove a selection of pods, such as:
-kubectl delete pods -l name=kubelet-density -n kubelet-density
-
+kubectl delete pods -l kube-burner-job=kubelet-density-heavy -n kube-burner
+# Or:
+kubectl delete pods -l name=kubelet-density -n kube-burner
+# Or delete entire namespace:
+kubectl delete ns kube-burner
+# Tip: you can view labels in k9s by clicking y on a pod to see the YAML, then you can view the labels Kubernetes attached to the pod.
 ```

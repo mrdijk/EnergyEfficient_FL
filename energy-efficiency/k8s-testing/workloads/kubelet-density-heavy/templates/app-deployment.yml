@@ -8,8 +8,6 @@ spec:
       labels:
         name: perfapp-{{.Replica}}-{{.Iteration}}
     spec:
-      nodeSelector:
-        node-role.kubernetes.io/worker: ""
       containers:
       - name: perfapp
         image: quay.io/cloud-bulldozer/perfapp:latest
