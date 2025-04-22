@@ -5,7 +5,7 @@ global:
    - name: podLatency
 jobs:
   - name: kubelet-density
-    jobIterations: 25
+    jobIterations: 10
     qps: 2
     burst: 2
     preLoadImages: false

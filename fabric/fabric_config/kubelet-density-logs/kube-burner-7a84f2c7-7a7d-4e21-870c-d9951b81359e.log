@@ -1,0 +1,1 @@
+time="2025-04-22 15:23:50" level=fatal msg="Error reading configuration file kubelet-density: failed to open local config file kubelet-density: open kubelet-density: no such file or directory" file="kube-burner.go:107"
