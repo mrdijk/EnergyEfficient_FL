@@ -89,7 +89,7 @@ def run_test():
     print(f"Switching archetype completed with status: {response_archetype_update.status_code}, execution time: {response_archetype_update.elapsed.total_seconds()}s")
     # Apply short idle period after switching archetypes
     print("Resting for short period before executing next experiments (after switching archetypes)...")
-    time.sleep(10)
+    time.sleep(8)
 
     # Get request URL based on used data_steward
     data_steward = constants.ARCH_DATA_STEWARDS[archetype]
@@ -117,7 +117,7 @@ def run_test():
     # Handle data request
     handle_data_request_response(act3_response_data_request)
     # Wait shortly before next request, also to catch my breath during the demo video presentation
-    time.sleep(10)
+    time.sleep(8)
     # ================================================ Action 4: get from cache again after different request ================================================
     print(f"\nAction 4: with cache...")
     # Request approval
@@ -134,12 +134,12 @@ def run_test():
     # Handle data request
     handle_data_request_response(act4_response_data_request)
     # Wait shortly before next request, also to catch my breath during the demo video presentation
-    time.sleep(10)
+    time.sleep(8)
 
     # ================================================ Action 5: different request, should perform request again ================================================
     print("\n================================================================================================")
     # Perform an action that changes the request so the cache is reset. For example, change request approval:
-    print(f"\nAction 5: without cache (different request: changed data providers)...")
+    print(f"Action 5: without cache (different request: changed data providers)...")
     # Request approval
     print(f"Requesting approval...")
     # Change request body to change request for cache testing
@@ -163,7 +163,7 @@ def run_test():
     # Handle data request
     handle_data_request_response(act5_response_data_request)
     # Wait shortly before next request, also to catch my breath during the demo video presentation
-    time.sleep(10)
+    time.sleep(8)
     # ================================================ Action 6: get from cache again after different request ================================================
     print(f"\nAction 6: with cache...")
     # Request approval
