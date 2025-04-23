@@ -50,3 +50,17 @@ cd energy-efficiency/data-analysis
 python3.10 main.py
 ```
 Running the scripts from this location is crucial, since the imports are assuming the scripts are run from this location.
+
+
+## FABRIC addition
+You can run exactly the same steps above if you create an SSH tunnel for Prometheus on localhost:9090. This way, you can use the same constants.py values for Prometheus, since it is then tunneled to localhost:9090 from this local machine, which means you can still get the data from this machine. See fabric/dynamos/DYNAMOS_setup.ipynb notebook for how to set up an SSH tunnel for Prometheus on your local machine in detail. In short:
+```sh
+# Get Prometheus service NodePort 
+kubectl get svc prometheus-kube-prometheus-prometheus -n monitoring
+# Create SSH tunnel from the location you connect to the FABRIC nodes with SSH in a terminal, such as (of course change NodePort after localhost: and IP of ubuntu node):
+ssh -i ~/.ssh/slice_key -F ssh_config -L 9090:localhost:32471 ubuntu@2001:610:2d0:fabc:f816:3eff:fe1f:b201
+# See for more information the above specified notebook
+```
+Then with the SSH tunnel open, execute the above steps like you would locally.
+
+However, if you want to collect the data in the FABRIC Jupyter Hub environment, you can also follow the steps in the fabric/experiments/energy_efficiency_pipeline.ipynb notebook. Note: this is more complex and more steps than the above approach, so the above one is recommended and preferred.
