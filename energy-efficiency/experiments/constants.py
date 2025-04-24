@@ -73,3 +73,4 @@ ARCH_DATA_STEWARDS = {
     "ComputeToData": "uva",
     "DataThroughTTP": "surf"
 }
+HEADERS_UPDATE_ARCH = { "Content-Type": "application/json" }
