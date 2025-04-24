@@ -1,0 +1,189 @@
+========== SETUP 1 | Archetype: ComputeToData ==========
+Switching archetypes to ComputeToData...
+Archetype switch response: 200, time: 0.007732s
+
+Running Arch1_Standard (10 iterations)...
+Iteration 1/10...
+Approval: Status 200, Time 0.035559s
+Data: Status 200, Time 6.573313s, Size 1034734 bytes
+Iteration 2/10...
+Approval: Status 200, Time 0.022738s
+Data: Status 200, Time 6.559956s, Size 1034734 bytes
+Iteration 3/10...
+Approval: Status 200, Time 0.02053s
+Data: Status 200, Time 6.396701s, Size 1034734 bytes
+Iteration 4/10...
+Approval: Status 200, Time 0.020217s
+Data: Status 200, Time 6.452401s, Size 1034734 bytes
+Iteration 5/10...
+Approval: Status 200, Time 0.019297s
+Data: Status 200, Time 6.490892s, Size 1034734 bytes
+Iteration 6/10...
+Approval: Status 200, Time 0.020325s
+Data: Status 200, Time 6.348711s, Size 1034734 bytes
+Iteration 7/10...
+Approval: Status 200, Time 0.02223s
+Data: Status 200, Time 6.321039s, Size 1034734 bytes
+Iteration 8/10...
+Approval: Status 200, Time 0.018846s
+Data: Status 200, Time 6.324931s, Size 1034734 bytes
+Iteration 9/10...
+Approval: Status 200, Time 0.021561s
+Data: Status 200, Time 6.308929s, Size 1034734 bytes
+Iteration 10/10...
+Approval: Status 200, Time 0.023386s
+Data: Status 200, Time 6.361882s, Size 1034734 bytes
+
+Running Arch1_Modified (10 iterations)...
+Iteration 1/10...
+Approval: Status 200, Time 0.028513s
+Data: Status 200, Time 6.328527s, Size 1034734 bytes
+Iteration 2/10...
+Approval: Status 200, Time 0.028513s
+Data: Status 200, Time 6.362867s, Size 1034734 bytes
+Iteration 3/10...
+Approval: Status 200, Time 0.034879s
+Data: Status 200, Time 6.26718s, Size 1034734 bytes
+Iteration 4/10...
+Approval: Status 200, Time 0.033766s
+Data: Status 200, Time 6.379008s, Size 1034734 bytes
+Iteration 5/10...
+Approval: Status 200, Time 0.030075s
+Data: Status 200, Time 6.282835s, Size 1034734 bytes
+Iteration 6/10...
+Approval: Status 200, Time 0.030539s
+Data: Status 200, Time 6.285366s, Size 1034734 bytes
+Iteration 7/10...
+Approval: Status 200, Time 0.026619s
+Data: Status 200, Time 6.299639s, Size 1034734 bytes
+Iteration 8/10...
+Approval: Status 200, Time 0.025262s
+Data: Status 200, Time 6.312876s, Size 1034734 bytes
+Iteration 9/10...
+Approval: Status 200, Time 0.02878s
+Data: Status 200, Time 6.279262s, Size 1034734 bytes
+Iteration 10/10...
+Approval: Status 200, Time 0.023745s
+Data: Status 200, Time 6.237136s, Size 1034734 bytes
+
+========== SETUP 2 | Archetype: DataThroughTTP ==========
+Switching archetypes to DataThroughTTP...
+Archetype switch response: 200, time: 0.010474s
+
+Running Arch2_Standard (10 iterations)...
+Iteration 1/10...
+Approval: Status 200, Time 0.025571s
+Data: Status 200, Time 5.177547s, Size 1034734 bytes
+Iteration 2/10...
+Approval: Status 200, Time 0.026974s
+Data: Status 200, Time 5.056313s, Size 1034734 bytes
+Iteration 3/10...
+Approval: Status 200, Time 0.029351s
+Data: Status 200, Time 5.051139s, Size 1034734 bytes
+Iteration 4/10...
+Approval: Status 200, Time 0.027227s
+Data: Status 200, Time 5.203427s, Size 1034734 bytes
+Iteration 5/10...
+Approval: Status 200, Time 0.024475s
+Data: Status 200, Time 5.073714s, Size 1034734 bytes
+Iteration 6/10...
+Approval: Status 200, Time 0.022952s
+Data: Status 200, Time 5.099841s, Size 1034734 bytes
+Iteration 7/10...
+Approval: Status 200, Time 0.021726s
+Data: Status 200, Time 5.208091s, Size 1034734 bytes
+Iteration 8/10...
+Approval: Status 200, Time 0.020649s
+Data: Status 200, Time 5.151452s, Size 1034734 bytes
+Iteration 9/10...
+Approval: Status 200, Time 0.023728s
+Data: Status 200, Time 5.266985s, Size 1034734 bytes
+Iteration 10/10...
+Approval: Status 200, Time 0.022086s
+Data: Status 200, Time 5.234474s, Size 1034734 bytes
+
+Running Arch2_Modified (10 iterations)...
+Iteration 1/10...
+Approval: Status 200, Time 0.028472s
+Data: Status 200, Time 7.062283s, Size 0 bytes
+Iteration 2/10...
+Approval: Status 200, Time 0.029964s
+Data: Status 200, Time 6.994821s, Size 1034734 bytes
+Iteration 3/10...
+Approval: Status 200, Time 0.027279s
+Data: Status 200, Time 7.462899s, Size 0 bytes
+Iteration 4/10...
+Approval: Status 200, Time 0.027353s
+Data: Status 200, Time 7.226278s, Size 1034734 bytes
+Iteration 5/10...
+Approval: Status 200, Time 0.033298s
+Data: Status 200, Time 7.179643s, Size 1034734 bytes
+Iteration 6/10...
+Approval: Status 200, Time 0.030037s
+Data: Status 200, Time 7.104838s, Size 1034734 bytes
+Iteration 7/10...
+Approval: Status 200, Time 0.028805s
+Data: Status 200, Time 7.40518s, Size 0 bytes
+Iteration 8/10...
+Approval: Status 200, Time 0.027177s
+Data: Status 200, Time 7.435259s, Size 0 bytes
+Iteration 9/10...
+Approval: Status 200, Time 0.026914s
+Data: Status 200, Time 7.053575s, Size 0 bytes
+Iteration 10/10...
+Approval: Status 200, Time 0.028512s
+Data: Status 200, Time 6.981101s, Size 1034734 bytes
+
+================== RESULTS SUMMARY ==================
+
+--- Arch1_Standard ---
+Execution 1: 6.5733s
+Execution 2: 6.5600s
+Execution 3: 6.3967s
+Execution 4: 6.4524s
+Execution 5: 6.4909s
+Execution 6: 6.3487s
+Execution 7: 6.3210s
+Execution 8: 6.3249s
+Execution 9: 6.3089s
+Execution 10: 6.3619s
+Mean time: 6.4139s
+
+--- Arch1_Modified ---
+Execution 1: 6.3285s
+Execution 2: 6.3629s
+Execution 3: 6.2672s
+Execution 4: 6.3790s
+Execution 5: 6.2828s
+Execution 6: 6.2854s
+Execution 7: 6.2996s
+Execution 8: 6.3129s
+Execution 9: 6.2793s
+Execution 10: 6.2371s
+Mean time: 6.3035s
+
+--- Arch2_Standard ---
+Execution 1: 5.1775s
+Execution 2: 5.0563s
+Execution 3: 5.0511s
+Execution 4: 5.2034s
+Execution 5: 5.0737s
+Execution 6: 5.0998s
+Execution 7: 5.2081s
+Execution 8: 5.1515s
+Execution 9: 5.2670s
+Execution 10: 5.2345s
+Mean time: 5.1523s
+
+--- Arch2_Modified ---
+Execution 1: 7.0623s
+Execution 2: 6.9948s
+Execution 3: 7.4629s
+Execution 4: 7.2263s
+Execution 5: 7.1796s
+Execution 6: 7.1048s
+Execution 7: 7.4052s
+Execution 8: 7.4353s
+Execution 9: 7.0536s
+Execution 10: 6.9811s
+Mean time: 7.1906s
