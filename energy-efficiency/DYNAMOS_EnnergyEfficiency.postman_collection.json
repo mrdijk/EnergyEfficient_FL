@@ -95,7 +95,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n    \"algorithm\": \"\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-ac1327a8\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n    \"algorithm\": \"\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-e7b90ad8\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -136,7 +136,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n    \"algorithm\": \"\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-6a309e04\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"query\": \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n    \"algorithm\": \"\",\r\n    \"options\": {\r\n        \"graph\": false,\r\n        \"aggregate\": false\r\n    },\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"requestMetadata\": {\r\n        \"jobId\": \"jorrit-stutterheim-6975b4e5\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -551,6 +551,51 @@
 								"v1",
 								"sqlDataRequest",
 								"vu"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "api-gateway-setup",
+			"item": [
+				{
+					"name": "approval and data request in one with api-gateway",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer 1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"sqlDataRequest\",\r\n    \"user\": {\r\n        \"id\": \"12324\",\r\n        \"userName\": \"jorrit.stutterheim@cloudnation.nl\"\r\n    },\r\n    \"dataProviders\": [\r\n        \"VU\",\r\n        \"UVA\"\r\n    ],\r\n    \"data_request\": {\r\n        \"type\": \"sqlDataRequest\",\r\n        \"query\": \"SELECT DISTINCT p.Unieknr, p.Geslacht, p.Gebdat, s.Aanst_22, s.Functcat, s.Salschal as Salary FROM Personen p JOIN Aanstellingen s ON p.Unieknr = s.Unieknr LIMIT 30000\",\r\n        \"algorithm\": \"\",\r\n        \"options\": {\r\n            \"graph\": false,\r\n            \"aggregate\": false\r\n        },\r\n        \"requestMetadata\": {}\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://api-gateway.api-gateway.svc.cluster.local:80/api/v1/requestApproval",
+							"protocol": "http",
+							"host": [
+								"api-gateway",
+								"api-gateway",
+								"svc",
+								"cluster",
+								"local"
+							],
+							"port": "80",
+							"path": [
+								"api",
+								"v1",
+								"requestApproval"
 							]
 						}
 					},
