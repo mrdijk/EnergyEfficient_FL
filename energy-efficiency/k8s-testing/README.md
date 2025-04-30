@@ -36,8 +36,6 @@ The energy-efficiency/k8s-testing/workloads folder contains the workloads used f
 
 See for example workloads https://github.com/kube-burner/kube-burner/tree/main/examples/workloads
 
-TODO: explain shortly.
-
 To upload workloads to the FABRIC VMs, see the fabric/scripts/upload_to_remote.sh script. An example can be seen in fabric/dynamos/DYNAMOS_setup.ipynb, where a folder is uploaded to the remote VM in FABRIC. Tip: upload the whole workloads directory to the VM to easily execute several workloads without having to reupload every workload individually. For example, from the fabric/scripts folder, execute:
 ```sh
 # Make sure the directory exists by executing the following command in SSH on the node:
