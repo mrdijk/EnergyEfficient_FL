@@ -48,7 +48,7 @@ linkerd jaeger install \
 # Optionally install for insight dashboard - not currently in use
 # linkerd wiz install | kubectl apply -f -
 
-# Note: you can debug with commands like:
+# Note: you can debug with commands like (Or use k9s by pressing d on the pod):
 # kubectl describe pod linkerd-destination-77b8ff9d69-l2z4k -n linkerd
 # To reset:
 # # To remove Linkerd Viz

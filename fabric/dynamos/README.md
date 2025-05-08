@@ -10,6 +10,7 @@ Additional tips:
 ```sh
 # Describe pod for debugging, such as finding out why it is stuck in pending (example below, change to desired pod):
 kubectl describe pod etcd-0 -n core
+# (Or use k9s by pressing d on the pod)
 # See persistent volume claims (PVC) and their status, such as Pending meaning there is no matching PV, and Bound meaning it is correctly set:
 kubectl get pvc -A
 # Get PVs:

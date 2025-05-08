@@ -20,6 +20,7 @@ Two nodes were not ready. You can view the node by:
 ```sh
 # View the nodes with for example:
 kubectl describe node dynamos-core
+# (Or use k9s by pressing d on the pod)
 # Here I saw this, meaning it was going to not ready over 96 times over the last 3 hours and 29 minutes. 
 Events:
   Type    Reason                   Age                     From             Message
@@ -58,6 +59,7 @@ At first, I thought this was a breaking issue, however, after completing the ste
 This issue was that after creating a pod, such as rabbitmq and etcd, it got stuck in Pending. With describe I could see the events:
 ```sh
 kubectl describe pod etcd-0 -n core
+# (Or use k9s by pressing d on the pod)
 
 # Result example:
 Warning  FailedScheduling  4m17s  default-scheduler  0/5 nodes are available: pod has unbound immediate PersistentVolumeClaims. preemption: 0/5 nodes are available: 5 Preemption is not helpful for scheduling
@@ -90,6 +92,7 @@ The issue:
 ```sh
 # Running this to get the results:
 kubectl describe pod linkerd-destination-77b8ff9d69-l2z4k -n linkerd
+# (Or use k9s by pressing d on the pod)
 # End results:
 Events:
   Type     Reason     Age   From               Message
