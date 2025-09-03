@@ -26,7 +26,7 @@ PROM_ENERGY_QUERY_RANGE = f"sum(increase({PROM_KEPLER_ENERGY_METRIC}{PROM_CONTAI
 
 # Experiment configurations
 NUM_EXP_ACTIONS = 7  # Number of actions per experiment
-IDLE_PERIOD = 120  # Idle period in seconds
+IDLE_PERIOD = 60  # Idle period in seconds
 ACTIVE_PERIOD = 120  # Active period in seconds
 
 # DYNAMOS requests

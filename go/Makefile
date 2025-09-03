@@ -1,7 +1,7 @@
 branch_name := $(shell git rev-parse --abbrev-ref HEAD)
 sql_microservices := sql-algorithm sql-anonymize sql-aggregate sql-test
 dynamos := sidecar policy-enforcer orchestrator agent api-gateway
-dockerhub_account := poetoec
+dockerhub_account := mdijk
 # Default DYNAMOS (old):
 # dockerhub_account := dynamos1
 

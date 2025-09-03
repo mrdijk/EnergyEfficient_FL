@@ -76,7 +76,9 @@ def run_experiment(archetype: str, output_dir, exp_rep):
         # Add job-id to request body
         request_body["requestMetadata"] = {"jobId": f"{job_id}"}
         # Execute data request
+        # print("request body: ", request_body)
         response_data_request = requests.post(data_request_url, json=request_body, headers=constants.HEADERS)
+        # print("respsonse data request: ", response_data_request)
         # Extract relevant data from the response
         status_code_data_request = response_data_request.status_code
         execution_time_data_request = response_data_request.elapsed.total_seconds()

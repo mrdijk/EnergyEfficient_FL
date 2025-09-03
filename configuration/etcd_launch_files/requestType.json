@@ -15,5 +15,13 @@
         "name": "genericRequest",
         "requiredServices": [],
         "optionalServices": {}
-    }
+    },
+   {
+    "name": "vflTrainModelRequest",
+    "requiredServices": ["vfl-train-model", "vfl-train"]
+  },
+  {
+    "name": "vflTrainRequest",
+    "requiredServices": ["vfl-train"]
+  }
 ]

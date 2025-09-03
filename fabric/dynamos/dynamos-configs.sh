@@ -4,7 +4,7 @@
 # This file is used for env vars and helper functions to run and deploy DYNAMOS
 
 # Path to root of DYNAMOS project on local machine
-export DYNAMOS_ROOT="${HOME}/DYNAMOS"
+export DYNAMOS_ROOT="${HOME}/EnergyEfficiency_DYNAMOS"
 # Helm chart location for the core chart (used in multiple deployments)
 export coreChart="${DYNAMOS_ROOT}/charts/core"
 

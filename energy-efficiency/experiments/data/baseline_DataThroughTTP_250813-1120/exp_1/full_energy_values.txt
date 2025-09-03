@@ -1,0 +1,5 @@
+Idle Energy:
+system_processes: 20466.339403771155
+
+Active Energy:
+system_processes: 20475.699447960575

@@ -4,7 +4,7 @@
 # This file is used for env vars and helper functions to run and deploy DYNAMOS
 
 # Path to root of DYNAMOS project on local machine
-export DYNAMOS_ROOT="/mnt/c/Users/cpoet/VSC_Projs/EnergyEfficiency_DYNAMOS"
+export DYNAMOS_ROOT="/${HOME}/EnergyEfficiency_DYNAMOS"
 # Helm chart location for the core chart (used in multiple deployments)
 export coreChart="${DYNAMOS_ROOT}/charts/core"
 
@@ -152,7 +152,7 @@ redeploy_structurally() {
   # Uninstall all and wait a while before it is all removed
   uninstall_all
   echo "Waiting for 1 minute..."
-  sleep 60
+  sleep 30
 
   # Deploy core and wait for 15 seconds so orchestrator is running after core is done
   deploy_core

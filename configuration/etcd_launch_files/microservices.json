@@ -5,6 +5,7 @@
         "allowedOutputs": [
             "sql-aggregate",
             "sql-algorithm",
+            "vfl-train-model",
             "sql-anonymize"
         ],
         "invalidArchetypes": []
@@ -41,5 +42,17 @@
         "invalidArchetypes": [
             "computeToData"
         ]
-    }
+    },  
+    {
+        "name": "vfl-train-model",
+        "label": "computeProvider",
+        "allowedOutputs": ["vfl-train"],
+        "invalidArchetypes": []
+    },
+    {
+        "name": "vfl-train",
+        "label": "computeProvider",
+        "allowedOutputs": [],
+        "invalidArchetypes": []
+  }
 ]
