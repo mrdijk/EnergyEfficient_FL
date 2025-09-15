@@ -5,7 +5,7 @@ set -e
 # Change this to the path of the DYNAMOS repository on your disk
 echo "Setting up paths..."
 # Path to root of DYNAMOS project on local machine
-DYNAMOS_ROOT="${HOME}/EnergyEfficiency_DYNAMOS"
+DYNAMOS_ROOT="${HOME}/EnergyEfficiencient_FL"
 
 # Charts
 charts_path="${DYNAMOS_ROOT}/charts"
@@ -78,7 +78,7 @@ helm upgrade -i -f "${agents_chart}/values.yaml" agents ${agents_chart}
 sleep 1
 
 echo "Installing thirdparty layer..."
-helm upgrade -i -f "${ttp_chart}/values.yaml" surf ${ttp_chart}
+helm upgrade -i -f "${ttp_chart}/values.yaml" thirdparties ${ttp_chart}
 
 sleep 1
 

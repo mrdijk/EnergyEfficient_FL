@@ -16,6 +16,26 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+func jobExists(ctx context.Context, jobName string) bool {
+	// Check if job exists, if it does, do not make a new one
+	dataStewardName := strings.ToLower(serviceName)
+	if dataStewardName == "" {
+		return false
+	}
+
+	jobMutex.Lock()
+	newValue := jobCounter[jobName]
+	jobMutex.Unlock()
+
+	newJobName := replaceLastCharacter(jobName, newValue)
+
+	logger.Sugar().Info("Steward: ", dataStewardName, ", job name: ", newJobName)
+	logger.Sugar().Info(clientSet.BatchV1().Jobs(dataStewardName))
+	_, err := clientSet.BatchV1().Jobs(dataStewardName).Get(ctx, newJobName, metav1.GetOptions{})
+
+	return err == nil
+}
+
 func generateChainAndDeploy(ctx context.Context, compositionRequest *pb.CompositionRequest, localJobName string, options map[string]bool) (context.Context, *batchv1.Job, error) {
 	logger.Debug("Starting generateChainAndDeploy")
 
@@ -51,7 +71,7 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 	jobMutex.Unlock()
 
 	newJobName := replaceLastCharacter(jobName, newValue)
-	// Define the job
+	// TODO: Give access to a PVC?
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      newJobName,
@@ -64,10 +84,34 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 			BackoffLimit:            &backoffLimit,
 			Template: v1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels: map[string]string{"app": dataStewardName},
+					Labels: map[string]string{"app": dataStewardName, "nodeName": dataStewardName},
 				},
 				Spec: v1.PodSpec{
-					Containers:    []v1.Container{},
+					NodeName:   dataStewardName,
+					Containers: []v1.Container{},
+					// 	{
+					// 		Name:    "pvc-container",
+					// 		Image:   "busybox",
+					// 		Command: []string{"sleep", "600"},
+					// 		VolumeMounts: []v1.VolumeMount{
+					// 			{
+					// 				Name:      "shared-storage",
+					// 				MountPath: "/mnt/data",
+					// 			},
+					// 		},
+					// 	},
+					// },
+					// Volumes: []v1.Volume{
+					// 	{
+					// 		Name: "shared-storage",
+					// 		VolumeSource: v1.VolumeSource{
+					// 			PersistentVolumeClaim: &v1.PersistentVolumeClaimVolumeSource{
+					// 				ClaimName: dataStewardName + "-pvc",
+					// 				ReadOnly:  false,
+					// 			},
+					// 		},
+					// 	},
+					// },
 					RestartPolicy: v1.RestartPolicyOnFailure,
 				},
 			},
@@ -99,9 +143,7 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 
 		repositoryName := os.Getenv("MICROSERVICE_REPOSITORY_NAME")
 		if repositoryName == "" {
-			repositoryName = "poetoec"
-			// Default DYNAMOS (old):
-			// repositoryName = "dynamos1"
+			repositoryName = "mdijk"
 		}
 
 		fullImage := fmt.Sprintf("%s/%s:%s", repositoryName, microservice.Name, microserviceTag)
@@ -154,9 +196,7 @@ func addSidecar() v1.Container {
 
 	repositoryName := os.Getenv("SIDECAR_REPOSITORY_NAME")
 	if repositoryName == "" {
-		repositoryName = "poetoec"
-		// Default DYNAMOS (old):
-		// repositoryName = "dynamos1"
+		repositoryName = "mdijk"
 	}
 
 	sidecarTag := getMicroserviceTag(sidecarName)
@@ -272,5 +312,5 @@ func getMicroserviceTag(msName string) string {
 		return tag
 	}
 
-	return "main"
+	return "latest"
 }

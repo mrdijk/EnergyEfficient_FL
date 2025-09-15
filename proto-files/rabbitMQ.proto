@@ -5,6 +5,7 @@ package dynamos;
 option go_package = "github.com/Jorrit05/DYNAMOS/pkg/proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/any.proto";
+import "google/protobuf/struct.proto";
 import "generic.proto";
 import "microserviceCommunication.proto";
 
@@ -18,9 +19,9 @@ service RabbitMQ {
   rpc SendRequestApproval(RequestApproval) returns  (google.protobuf.Empty) {}
   rpc SendValidationResponse(ValidationResponse) returns  (google.protobuf.Empty) {}
   rpc SendCompositionRequest(CompositionRequest) returns  (google.protobuf.Empty) {}
-  rpc SendSqlDataRequest(SqlDataRequest) returns  (google.protobuf.Empty) {}
+  rpc SendRequest(Request) returns  (google.protobuf.Empty) {}
   rpc SendPolicyUpdate(PolicyUpdate) returns  (google.protobuf.Empty) {}
-  rpc SendTest(SqlDataRequest) returns  (google.protobuf.Empty) {}
+  rpc SendTest(Request) returns  (google.protobuf.Empty) {}
   rpc SendMicroserviceComm(MicroserviceCommunication) returns  (google.protobuf.Empty) {}
   rpc CreateQueue(QueueInfo) returns  (google.protobuf.Empty) {}
   rpc DeleteQueue(QueueInfo) returns  (google.protobuf.Empty) {}
@@ -104,7 +105,8 @@ message RequestApproval {
   repeated string data_providers = 3;
   string destination_queue = 4;
   // OLD: was part of doing /sqlDataRequest after /requestApproval, now only requests approval
-  // map<string, bool> options = 5;
+  // Necessary for FL
+  map<string, bool> options = 5;
 }
 
 message RequestApprovalResponse  {
@@ -144,4 +146,12 @@ message SqlDataRequest {
   User user = 5;
   RequestMetadata request_metadata = 6;
   map<string, bool> options = 7;
+}
+
+message Request {
+  string type = 1;
+  map<string, google.protobuf.Value> data = 2;
+  User user = 3;
+  RequestMetadata request_metadata = 4;
+  map<string, bool> options = 5;
 }

@@ -1,0 +1,8 @@
+{
+  "type": "vflTrainModelRequest",
+  "user": {
+    "id": "12324",
+    "userName": "maurits.dijk@student.uva.nl"
+  },
+  "dataProviders": ["alpha", "enigma", "omnia", "scientia"]
+}

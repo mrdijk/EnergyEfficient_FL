@@ -4,7 +4,7 @@
 # This file is used for env vars and helper functions to run and deploy DYNAMOS
 
 # Path to root of DYNAMOS project on local machine
-export DYNAMOS_ROOT="${HOME}/EnergyEfficiency_DYNAMOS"
+export DYNAMOS_ROOT="${HOME}/EnergyEfficiencient_FL"
 # Helm chart location for the core chart (used in multiple deployments)
 export coreChart="${DYNAMOS_ROOT}/charts/core"
 
@@ -55,24 +55,26 @@ deploy_api_gateway() {
 
 # Deploy the agents (UVA, VU, etc) to the cluster
 deploy_agent() {
-  agentChart="${DYNAMOS_ROOT}/charts/agents/values.yaml"
-  helm upgrade -i -f "${agentChart}" agents ${DYNAMOS_ROOT}/charts/agents
+  agents_chart="${charts_path}/agents"
+  helm upgrade -i -f "${agents_chart}/values.yaml" agents ${agents_chart}
+  # agentChart="${DYNAMOS_ROOT}/charts/agents/values.yaml"
+  # helm upgrade -i -f "${agentChart}" agents ${DYNAMOS_ROOT}/charts/agents
 }
 
 # Deploy trusted third party "surf" to the cluster
-deploy_surf() {
+deploy_ttp() {
   surfChart="${DYNAMOS_ROOT}/charts/thirdparty/values.yaml"
-  helm upgrade -i -f "${surfChart}" surf ${DYNAMOS_ROOT}/charts/thirdparty
+  helm upgrade -i -f "${surfChart}" thirdparty ${DYNAMOS_ROOT}/charts/thirdparty
 }
 
 # Deploy agents (agents and third party: surf)
 deploy_agents() {
   deploy_agent
-  deploy_surf
+  deploy_ttp
 }
 # Uninstall agents (agents and third party: surf)
 uninstall_agents(){
-  helm uninstall surf
+  helm uninstall thirdparty
   helm uninstall agents
 }
 
@@ -88,7 +90,7 @@ deploy_all() {
   deploy_orchestrator
   deploy_api_gateway
   deploy_agent
-  deploy_surf
+  deploy_ttp
 }
 
 # Remove all services running in the cluster.
@@ -96,7 +98,7 @@ deploy_all() {
 #   Any service can be manually removed by using `helm uninstall <name of service>`
 uninstall_all(){
   helm uninstall orchestrator
-  helm uninstall surf
+  helm uninstall thirdparty
   helm uninstall agents
   helm uninstall api-gateway
   helm uninstall core
@@ -107,12 +109,12 @@ deploy_addons() {
   deploy_orchestrator
   deploy_api_gateway
   deploy_agent
-  deploy_surf
+  deploy_ttp
 }
 
 uninstall_addons() {
   helm uninstall orchestrator
-  helm uninstall surf
+  helm uninstall thirdparty
   helm uninstall agents
   helm uninstall api-gateway
 }

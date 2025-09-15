@@ -255,7 +255,15 @@ func (s *serverInstance) SendMicroserviceComm(ctx context.Context, in *pb.Micros
 	return &emptypb.Empty{}, nil
 }
 
-func (s *serverInstance) SendTest(ctx context.Context, in *pb.SqlDataRequest) (*emptypb.Empty, error) {
+// func (s *serverInstance) SendTest(ctx context.Context, in *pb.SqlDataRequest) (*emptypb.Empty, error) {
+// 	data, err := proto.Marshal(in)
+// 	if err != nil {
+// 		logger.Sugar().Errorf("Marshal SendMicroserviceComm failed: %s", err)
+
+// 		return nil, status.Error(codes.Internal, err.Error())
+// 	}
+//  Change sqlDataRequest to generic request for FL
+func (s *serverInstance) SendTest(ctx context.Context, in *pb.Request) (*emptypb.Empty, error) {
 	data, err := proto.Marshal(in)
 	if err != nil {
 		logger.Sugar().Errorf("Marshal SendMicroserviceComm failed: %s", err)

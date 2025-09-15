@@ -4,7 +4,7 @@
 # This file is used for env vars and helper functions to run and deploy DYNAMOS
 
 # Path to root of DYNAMOS project on local machine
-export DYNAMOS_ROOT="/${HOME}/EnergyEfficiency_DYNAMOS"
+export DYNAMOS_ROOT="${HOME}/EnergyEfficiencient_FL"
 # Helm chart location for the core chart (used in multiple deployments)
 export coreChart="${DYNAMOS_ROOT}/charts/core"
 
@@ -57,19 +57,19 @@ deploy_agent() {
 }
 
 # Deploy trusted third party "surf" to the cluster
-deploy_surf() {
-  surfChart="${DYNAMOS_ROOT}/charts/thirdparty/values.yaml"
-  helm upgrade -i -f "${surfChart}" surf ${DYNAMOS_ROOT}/charts/thirdparty
+deploy_ttp() {
+  ttpChart="${DYNAMOS_ROOT}/charts/thirdparty/values.yaml"
+  helm upgrade -i -f "${ttpChart}" thirdparties ${DYNAMOS_ROOT}/charts/thirdparty
 }
 
-# Deploy agents (agents and third party: surf)
+# Deploy agents (agents and third parties)
 deploy_agents() {
   deploy_agent
-  deploy_surf
+  deploy_ttp
 }
 # Uninstall agents (agents and third party: surf)
 uninstall_agents(){
-  helm uninstall surf
+  helm uninstall thirdparties
   helm uninstall agents
 }
 
@@ -85,7 +85,7 @@ deploy_all() {
   deploy_orchestrator
   deploy_api_gateway
   deploy_agent
-  deploy_surf
+  deploy_ttp
 }
 
 # Remove all services running in the cluster.
@@ -93,7 +93,7 @@ deploy_all() {
 #   Any service can be manually removed by using `helm uninstall <name of service>`
 uninstall_all(){
   helm uninstall orchestrator
-  helm uninstall surf
+  helm uninstall thirdparties
   helm uninstall agents
   helm uninstall api-gateway
   helm uninstall core
@@ -104,7 +104,7 @@ deploy_addons() {
   deploy_orchestrator
   deploy_api_gateway
   deploy_agent
-  deploy_surf
+  deploy_ttp
 }
 
 uninstall_addons() {

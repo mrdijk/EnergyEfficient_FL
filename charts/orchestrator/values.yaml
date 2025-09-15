@@ -3,7 +3,7 @@ hostPath: default
 etcdDns: etcd-headless.core.svc.cluster.local
 tracingEndpoint: collector.linkerd-jaeger:55678
 branchNameTag: "main"
-dockerArtifactAccount: "poetoec"
+dockerArtifactAccount: "mdijk"
 # Default DYNAMOS (old):
 # branchNameTag: "main"
 # dockerArtifactAccount: "dynamos1"
